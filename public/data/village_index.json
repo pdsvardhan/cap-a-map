@@ -1,0 +1,326 @@
+{
+  "thullur": {
+    "name": "Thullur",
+    "count": 7692,
+    "file": "villages/thullur.geojson",
+    "size_kb": 6554.0
+  },
+  "venkatapalem": {
+    "name": "Venkatapalem",
+    "count": 3506,
+    "file": "villages/venkatapalem.geojson",
+    "size_kb": 3063.9
+  },
+  "nowlur": {
+    "name": "Nowlur",
+    "count": 5820,
+    "file": "villages/nowlur.geojson",
+    "size_kb": 5093.9
+  },
+  "lingayapalem": {
+    "name": "Lingayapalem",
+    "count": 2130,
+    "file": "villages/lingayapalem.geojson",
+    "size_kb": 1889.1
+  },
+  "malkapuram": {
+    "name": "Malkapuram",
+    "count": 1156,
+    "file": "villages/malkapuram.geojson",
+    "size_kb": 1025.4
+  },
+  "nidamarru": {
+    "name": "Nidamarru",
+    "count": 5595,
+    "file": "villages/nidamarru.geojson",
+    "size_kb": 4864.4
+  },
+  "kuragallu": {
+    "name": "Kuragallu",
+    "count": 8325,
+    "file": "villages/kuragallu.geojson",
+    "size_kb": 7203.8
+  },
+  "unknown": {
+    "name": "N/A",
+    "count": 4910,
+    "file": "villages/unknown.geojson",
+    "size_kb": 8515.4
+  },
+  "rayapudi": {
+    "name": "Rayapudi",
+    "count": 5431,
+    "file": "villages/rayapudi.geojson",
+    "size_kb": 4734.8
+  },
+  "ananthavaram": {
+    "name": "Ananthavaram",
+    "count": 4765,
+    "file": "villages/ananthavaram.geojson",
+    "size_kb": 4176.5
+  },
+  "yerrabalem": {
+    "name": "Yerrabalem",
+    "count": 3508,
+    "file": "villages/yerrabalem.geojson",
+    "size_kb": 3047.7
+  },
+  "sakhamuru": {
+    "name": "Sakhamuru",
+    "count": 3841,
+    "file": "villages/sakhamuru.geojson",
+    "size_kb": 3344.4
+  },
+  "kondamarajupalem": {
+    "name": "Kondamarajupalem",
+    "count": 1811,
+    "file": "villages/kondamarajupalem.geojson",
+    "size_kb": 1636.4
+  },
+  "mandadam": {
+    "name": "Mandadam",
+    "count": 6993,
+    "file": "villages/mandadam.geojson",
+    "size_kb": 6105.8
+  },
+  "inavolu": {
+    "name": "Inavolu",
+    "count": 3413,
+    "file": "villages/inavolu.geojson",
+    "size_kb": 3059.5
+  },
+  "nekkallu": {
+    "name": "Nekkallu",
+    "count": 3264,
+    "file": "villages/nekkallu.geojson",
+    "size_kb": 2957.6
+  },
+  "abbarajupalem": {
+    "name": "Abbarajupalem",
+    "count": 1782,
+    "file": "villages/abbarajupalem.geojson",
+    "size_kb": 1575.7
+  },
+  "pitchakalapalem": {
+    "name": "Pitchakalapalem",
+    "count": 1764,
+    "file": "villages/pitchakalapalem.geojson",
+    "size_kb": 1529.8
+  },
+  "borupalem": {
+    "name": "Borupalem",
+    "count": 1164,
+    "file": "villages/borupalem.geojson",
+    "size_kb": 1036.1
+  },
+  "krishnayapalem": {
+    "name": "Krishnayapalem",
+    "count": 3163,
+    "file": "villages/krishnayapalem.geojson",
+    "size_kb": 2787.6
+  },
+  "velagapudi": {
+    "name": "Velagapudi",
+    "count": 4191,
+    "file": "villages/velagapudi.geojson",
+    "size_kb": 3688.9
+  },
+  "nelapadu": {
+    "name": "Nelapadu",
+    "count": 2726,
+    "file": "villages/nelapadu.geojson",
+    "size_kb": 2475.2
+  },
+  "mandadam_2": {
+    "name": "Mandadam-2",
+    "count": 21,
+    "file": "villages/mandadam_2.geojson",
+    "size_kb": 18.1
+  },
+  "gannavaram": {
+    "name": "Gannavaram",
+    "count": 341,
+    "file": "villages/gannavaram.geojson",
+    "size_kb": 300.1
+  },
+  "dondapadu": {
+    "name": "Dondapadu",
+    "count": 845,
+    "file": "villages/dondapadu.geojson",
+    "size_kb": 757.3
+  },
+  "uddandarayunipalem": {
+    "name": "Uddandarayunipalem",
+    "count": 1103,
+    "file": "villages/uddandarayunipalem.geojson",
+    "size_kb": 987.8
+  },
+  "nidamarru_1": {
+    "name": "Nidamarru-1",
+    "count": 101,
+    "file": "villages/nidamarru_1.geojson",
+    "size_kb": 90.0
+  },
+  "rayapudi_1": {
+    "name": "Rayapudi-1",
+    "count": 139,
+    "file": "villages/rayapudi_1.geojson",
+    "size_kb": 122.9
+  },
+  "thullur_1": {
+    "name": "Thullur-1",
+    "count": 112,
+    "file": "villages/thullur_1.geojson",
+    "size_kb": 97.4
+  },
+  "mandadam_1": {
+    "name": "Mandadam-1",
+    "count": 197,
+    "file": "villages/mandadam_1.geojson",
+    "size_kb": 170.3
+  },
+  "thulluru": {
+    "name": "Thulluru",
+    "count": 61,
+    "file": "villages/thulluru.geojson",
+    "size_kb": 52.2
+  },
+  "nowluru": {
+    "name": "Nowluru",
+    "count": 217,
+    "file": "villages/nowluru.geojson",
+    "size_kb": 195.4
+  },
+  "kuragallu,nidamarru": {
+    "name": "Kuragallu,Nidamarru",
+    "count": 5,
+    "file": "villages/kuragallu,nidamarru.geojson",
+    "size_kb": 4.6
+  },
+  "maplapuram": {
+    "name": "Maplapuram",
+    "count": 1,
+    "file": "villages/maplapuram.geojson",
+    "size_kb": 0.9
+  },
+  "pitchikalapalem": {
+    "name": "Pitchikalapalem",
+    "count": 35,
+    "file": "villages/pitchikalapalem.geojson",
+    "size_kb": 39.9
+  },
+  "penumaka": {
+    "name": "Penumaka",
+    "count": 3970,
+    "file": "villages/penumaka.geojson",
+    "size_kb": 3808.1
+  },
+  "pitchikalaplem": {
+    "name": "Pitchikalaplem",
+    "count": 18,
+    "file": "villages/pitchikalaplem.geojson",
+    "size_kb": 16.5
+  },
+  "rayapudi,_lingayapalem": {
+    "name": "Rayapudi, Lingayapalem",
+    "count": 8,
+    "file": "villages/rayapudi,_lingayapalem.geojson",
+    "size_kb": 7.0
+  },
+  "rayapudi,_kondamarajupalem": {
+    "name": "Rayapudi, Kondamarajupalem",
+    "count": 13,
+    "file": "villages/rayapudi,_kondamarajupalem.geojson",
+    "size_kb": 17.7
+  },
+  "nelapadu,_sakhamuru": {
+    "name": "Nelapadu, Sakhamuru",
+    "count": 8,
+    "file": "villages/nelapadu,_sakhamuru.geojson",
+    "size_kb": 7.6
+  },
+  "sakhamuru,velgapudi,inavolu": {
+    "name": "Sakhamuru,Velgapudi,Inavolu",
+    "count": 1,
+    "file": "villages/sakhamuru,velgapudi,inavolu.geojson",
+    "size_kb": 1.4
+  },
+  "nowluru,kuragallu": {
+    "name": "Nowluru,Kuragallu",
+    "count": 1,
+    "file": "villages/nowluru,kuragallu.geojson",
+    "size_kb": 1.3
+  },
+  "udpalem": {
+    "name": "UDPalem",
+    "count": 5,
+    "file": "villages/udpalem.geojson",
+    "size_kb": 4.2
+  },
+  "lingayapalem,udpalem": {
+    "name": "Lingayapalem,UDPalem",
+    "count": 1,
+    "file": "villages/lingayapalem,udpalem.geojson",
+    "size_kb": 0.9
+  },
+  "uddandarayunipalem,velagapudi": {
+    "name": "Uddandarayunipalem,Velagapudi",
+    "count": 2,
+    "file": "villages/uddandarayunipalem,velagapudi.geojson",
+    "size_kb": 1.9
+  },
+  "ananthavaram,thulluru": {
+    "name": "Ananthavaram,Thulluru",
+    "count": 1,
+    "file": "villages/ananthavaram,thulluru.geojson",
+    "size_kb": 1.0
+  },
+  "velgapudi": {
+    "name": "Velgapudi",
+    "count": 1,
+    "file": "villages/velgapudi.geojson",
+    "size_kb": 1.8
+  },
+  "lingayapalem,uddandarayunipalem": {
+    "name": "Lingayapalem,Uddandarayunipalem",
+    "count": 1,
+    "file": "villages/lingayapalem,uddandarayunipalem.geojson",
+    "size_kb": 1.2
+  },
+  "ptichikalapalem": {
+    "name": "Ptichikalapalem",
+    "count": 3,
+    "file": "villages/ptichikalapalem.geojson",
+    "size_kb": 3.5
+  },
+  "abbarajupalem:_rayapudi": {
+    "name": "Abbarajupalem: Rayapudi",
+    "count": 1,
+    "file": "villages/abbarajupalem:_rayapudi.geojson",
+    "size_kb": 1.0
+  },
+  "mandadam,venkatapalem": {
+    "name": "Mandadam,Venkatapalem",
+    "count": 1,
+    "file": "villages/mandadam,venkatapalem.geojson",
+    "size_kb": 3.4
+  },
+  "inavolu_;_mandadam": {
+    "name": "Inavolu ; Mandadam",
+    "count": 3,
+    "file": "villages/inavolu_;_mandadam.geojson",
+    "size_kb": 3.3
+  },
+  "uddandaryunipalem_;_velagapudi": {
+    "name": "Uddandaryunipalem ; Velagapudi",
+    "count": 1,
+    "file": "villages/uddandaryunipalem_;_velagapudi.geojson",
+    "size_kb": 1.8
+  },
+  "undavalli": {
+    "name": "Undavalli",
+    "count": 1124,
+    "file": "villages/undavalli.geojson",
+    "size_kb": 1318.6
+  }
+}

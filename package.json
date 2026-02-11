@@ -1,0 +1,28 @@
+{
+  "name": "project-cap-a",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Amaravati Capital City Interactive Map",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "data": "python scripts/process_all.py"
+  },
+  "keywords": ["amaravati", "map", "gis", "apcrda"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fuse.js": "^7.1.0",
+    "maplibre-gl": "^5.18.0",
+    "pmtiles": "^4.4.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "@vitejs/plugin-react": "^5.1.4",
+    "tailwindcss": "^4.1.18",
+    "vite": "^7.3.1"
+  }
+}
