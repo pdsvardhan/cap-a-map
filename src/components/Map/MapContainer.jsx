@@ -154,15 +154,16 @@ const MapContainer = forwardRef(function MapContainer(
         type: 'line',
         source: 'plots',
         paint: {
-          'line-color': '#888888',
+          'line-color': '#1A1A1A',
           'line-width': [
             'interpolate', ['linear'], ['zoom'],
             10, 0,
-            14, 0.4,
-            16, 0.7,
-            18, 1.2,
+            13, 0.3,
+            15, 0.8,
+            17, 1.2,
+            19, 1.8,
           ],
-          'line-opacity': 0.65,
+          'line-opacity': 0.9,
         },
       })
 
@@ -232,9 +233,9 @@ const MapContainer = forwardRef(function MapContainer(
         type: 'line',
         source: 'plots',
         paint: {
-          'line-color': '#888888',
-          'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0, 14, 0.4, 16, 0.7, 18, 1.2],
-          'line-opacity': 0.65,
+          'line-color': '#1A1A1A',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0, 13, 0.3, 15, 0.8, 17, 1.2, 19, 1.8],
+          'line-opacity': 0.9,
         },
       })
 
