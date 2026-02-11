@@ -13,8 +13,9 @@ export const DATA_PATHS = {
   searchIndex: '/data/search_index.json',
   allocatedLandsIndex: '/data/allocated_lands_index.json',
   allocatedLands: '/data/allocated_lands.geojson',
-  roads: '/data/roads.geojson',
   roadsNamed: '/data/roads_named.geojson',
+  roads: '/data/roads.geojson',
+
   burialGrounds: '/data/burial_grounds.geojson',
   boundaries: '/data/boundaries.geojson',
   surveyParcels: '/data/survey_parcels.geojson',

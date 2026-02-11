@@ -300,52 +300,54 @@ const MapContainer = forwardRef(function MapContainer(
       }
     }
 
-    // Load named roads (generated from U2/SU2 spatial analysis)
+    // Load named roads (anchor-verified E/N arterial roads)
     try {
       const res = await fetch(DATA_PATHS.roadsNamed)
       if (res.ok) {
         const data = await res.json()
-        map.addSource('roads_named', { type: 'geojson', data })
+        if (data.features && data.features.length > 0) {
+          map.addSource('roads_named', { type: 'geojson', data })
 
-        map.addLayer({
-          id: LAYERS.ROADS_NAMED,
-          type: 'line',
-          source: 'roads_named',
-          paint: {
-            'line-color': ['match', ['get', 'classification'],
-              'arterial', '#FFD700',
-              'sub-arterial', '#FFA500',
-              '#CCCCCC'
-            ],
-            'line-width': ['match', ['get', 'classification'],
-              'arterial', 4,
-              'sub-arterial', 2.5,
-              1.5
-            ],
-            'line-opacity': 0.85,
-          },
-        })
+          map.addLayer({
+            id: LAYERS.ROADS_NAMED,
+            type: 'line',
+            source: 'roads_named',
+            paint: {
+              'line-color': ['match', ['get', 'classification'],
+                'arterial', '#FF6B00',
+                'sub-arterial', '#FFD700',
+                '#CCCCCC'
+              ],
+              'line-width': ['match', ['get', 'classification'],
+                'arterial', 5,
+                'sub-arterial', 3.5,
+                2
+              ],
+              'line-opacity': 0.9,
+            },
+          })
 
-        map.addLayer({
-          id: LAYERS.ROADS_NAMED_LABELS,
-          type: 'symbol',
-          source: 'roads_named',
-          layout: {
-            'symbol-placement': 'line-center',
-            'text-field': ['get', 'name'],
-            'text-size': ['interpolate', ['linear'], ['zoom'], 12, 10, 16, 14, 18, 16],
-            'text-anchor': 'center',
-            'text-allow-overlap': false,
-            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-          },
-          paint: {
-            'text-color': '#FFFFFF',
-            'text-halo-color': '#000000',
-            'text-halo-width': 2,
-          },
-        })
+          map.addLayer({
+            id: LAYERS.ROADS_NAMED_LABELS,
+            type: 'symbol',
+            source: 'roads_named',
+            layout: {
+              'symbol-placement': 'line-center',
+              'text-field': ['get', 'name'],
+              'text-size': ['interpolate', ['linear'], ['zoom'], 12, 10, 16, 14, 18, 16],
+              'text-anchor': 'center',
+              'text-allow-overlap': false,
+              'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+            },
+            paint: {
+              'text-color': '#FFFFFF',
+              'text-halo-color': '#000000',
+              'text-halo-width': 2,
+            },
+          })
 
-        loadedSourcesRef.current.add('roads_named')
+          loadedSourcesRef.current.add('roads_named')
+        }
       }
     } catch (err) {
       console.warn('Named roads not available:', err)
@@ -375,6 +377,7 @@ const MapContainer = forwardRef(function MapContainer(
           name: props.name,
           direction: props.direction,
           classification: props.classification,
+          width_m: props.width_m,
           segments: props.segments,
         })
       }

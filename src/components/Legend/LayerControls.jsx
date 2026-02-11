@@ -10,7 +10,7 @@ const LAYER_CONFIG = [
   {
     key: 'roadsNamed',
     label: 'Named Roads (E/N)',
-    description: 'Derived E-W and N-S arterial road names',
+    description: 'Official E1-E18 / N1-N18 arterial roads (anchor-verified)',
     color: '#FFD700',
   },
   {

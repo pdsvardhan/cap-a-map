@@ -26,12 +26,13 @@ export default function PlotDetailPanel({ plot, onClose }) {
             <InfoGrid items={[
               { label: 'Direction', value: plot.direction },
               { label: 'Classification', value: plot.classification },
+              { label: 'Width', value: plot.width_m ? `${plot.width_m}m` : 'N/A' },
               { label: 'Segments', value: plot.segments },
             ]} />
           </Section>
         </div>
         <div className="px-5 py-3 border-t border-gray-100 flex-shrink-0">
-          <p className="text-[10px] text-gray-400">Derived from U2/SU2 road reserve spatial analysis</p>
+          <p className="text-[10px] text-gray-400">Anchor-verified from APCRDA plot neighbour data</p>
         </div>
       </div>
     )
