@@ -5,39 +5,6 @@ import { formatArea, formatDimensions, formatFarmerName, formatNeighbour } from 
 export default function PlotDetailPanel({ plot, onClose }) {
   if (!plot) return null
 
-  // Handle road type
-  if (plot._type === 'road') {
-    return (
-      <div className="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl z-20 flex flex-col animate-slide-in">
-        <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
-          <div className="flex items-start justify-between">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-4 h-4 rounded" style={{ backgroundColor: '#FFD700' }} />
-                <span className="text-xs font-medium text-gray-600">Named Road</span>
-              </div>
-              <h2 className="text-lg font-bold text-gray-900">{plot.name}</h2>
-            </div>
-            <CloseButton onClick={onClose} />
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto panel-scroll px-5 py-4 space-y-5">
-          <Section title="Road Details">
-            <InfoGrid items={[
-              { label: 'Direction', value: plot.direction },
-              { label: 'Classification', value: plot.classification },
-              { label: 'Width', value: plot.width_m ? `${plot.width_m}m` : 'N/A' },
-              { label: 'Segments', value: plot.segments },
-            ]} />
-          </Section>
-        </div>
-        <div className="px-5 py-3 border-t border-gray-100 flex-shrink-0">
-          <p className="text-[10px] text-gray-400">Anchor-verified from APCRDA plot neighbour data</p>
-        </div>
-      </div>
-    )
-  }
-
   // Handle landmark type
   if (plot._type === 'landmark') {
     const googleMapsLink = plot.lat && plot.lon

@@ -48,10 +48,6 @@ export default function Legend({ onClose }) {
             Overlays
           </p>
           <div className="flex items-center gap-2.5 py-1">
-            <div className="w-5 h-0.5 flex-shrink-0" style={{ backgroundColor: '#FFD700' }} />
-            <span className="text-xs text-gray-700">Named Roads (E/N)</span>
-          </div>
-          <div className="flex items-center gap-2.5 py-1">
             <div className="w-5 h-0.5 bg-[#78909C] flex-shrink-0" />
             <span className="text-xs text-gray-700">Roads</span>
           </div>

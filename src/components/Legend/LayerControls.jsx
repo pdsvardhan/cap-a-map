@@ -8,12 +8,6 @@ const LAYER_CONFIG = [
     color: '#FF6F00',
   },
   {
-    key: 'roadsNamed',
-    label: 'Named Roads (E/N)',
-    description: 'Official E1-E18 / N1-N18 arterial roads (anchor-verified)',
-    color: '#FFD700',
-  },
-  {
     key: 'roads',
     label: 'Roads',
     description: 'Existing roads (R&B and Panchayati Raj)',

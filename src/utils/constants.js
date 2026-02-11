@@ -13,7 +13,6 @@ export const DATA_PATHS = {
   searchIndex: '/data/search_index.json',
   allocatedLandsIndex: '/data/allocated_lands_index.json',
   allocatedLands: '/data/allocated_lands.geojson',
-  roadsNamed: '/data/roads_named.geojson',
   roads: '/data/roads.geojson',
 
   burialGrounds: '/data/burial_grounds.geojson',
@@ -30,8 +29,6 @@ export const LAYERS = {
   ALLOCATED_LANDS_OUTLINE: 'allocated-lands-outline',
   ALLOCATED_LANDS_LABELS: 'allocated-lands-labels',
   ROADS: 'roads-line',
-  ROADS_NAMED: 'roads-named-line',
-  ROADS_NAMED_LABELS: 'roads-named-labels',
   BURIAL_GROUNDS: 'burial-grounds-fill',
   BOUNDARIES: 'boundaries-outline',
   SURVEY_PARCELS: 'survey-parcels-outline',

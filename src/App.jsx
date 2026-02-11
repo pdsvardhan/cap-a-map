@@ -15,7 +15,6 @@ export default function App() {
   const [layerVisibility, setLayerVisibility] = useState({
     allocatedLands: true,
     roads: true,
-    roadsNamed: true,
     burialGrounds: true,
     boundaries: false,
   })
