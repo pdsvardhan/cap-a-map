@@ -37,6 +37,9 @@ const MapContainer = forwardRef(function MapContainer(
 
     map.on('load', async () => {
       try {
+        // Hide OSM basemap noise (minor roads, villages, buildings, paths)
+        hideBasemapNoise(map)
+
         onLoadingStatus?.('Loading plot data...')
         await loadPlotData(map)
 
@@ -58,6 +61,60 @@ const MapContainer = forwardRef(function MapContainer(
       mapInstanceRef.current = null
     }
   }, [])
+
+  function hideBasemapNoise(map) {
+    // Hide OSM layers from CARTO Dark Matter basemap that create visual noise:
+    // - Minor/service roads, paths, tracks (grey crisscrossing lines)
+    // - Village/settlement polygons (brown patches with internal streets)
+    // - Building footprints, house numbers, minor labels
+    const layersToHide = [
+      // Minor roads & service roads
+      'road_minor', 'road_minor_construction',
+      'road_service', 'road_service_construction',
+      // Paths & tracks
+      'road_path', 'road_track',
+      // Tunnels
+      'tunnel_minor', 'tunnel_minor_construction',
+      'tunnel_service', 'tunnel_service_construction',
+      'tunnel_path',
+      // Bridges
+      'bridge_minor', 'bridge_minor_construction',
+      'bridge_service', 'bridge_service_construction',
+      'bridge_path',
+      // Land use (village/settlement polygons)
+      'landuse', 'landuse_residential',
+      'landuse-overlay',
+      // Buildings
+      'building', 'building-top',
+      // Labels & house numbers
+      'housenumber',
+      'road_label', 'roadname_minor',
+      // Place labels inside city area
+      'place_village', 'place_hamlet', 'place_suburb', 'place_neighbourhood',
+    ]
+
+    for (const layerId of layersToHide) {
+      if (map.getLayer(layerId)) {
+        map.setLayoutProperty(layerId, 'visibility', 'none')
+      }
+    }
+
+    // Also try pattern-based hiding for CARTO layer naming variants
+    const style = map.getStyle()
+    if (style && style.layers) {
+      for (const layer of style.layers) {
+        const id = layer.id
+        // Hide any remaining minor road, service, path, building, landuse layers
+        if (
+          /^(road_minor|road_service|road_path|road_track|tunnel_minor|tunnel_service|tunnel_path|bridge_minor|bridge_service|bridge_path)/.test(id) ||
+          /^(building|landuse|housenumber)/.test(id) ||
+          /^place_(village|hamlet|suburb|neighbourhood)/.test(id)
+        ) {
+          map.setLayoutProperty(id, 'visibility', 'none')
+        }
+      }
+    }
+  }
 
   async function loadPlotData(map) {
     onLoadingStatus?.('Loading village index...')
@@ -85,9 +142,9 @@ const MapContainer = forwardRef(function MapContainer(
           'fill-color': buildSymbologyColorExpression(),
           'fill-opacity': [
             'interpolate', ['linear'], ['zoom'],
-            10, 0.4,
-            14, 0.6,
-            18, 0.7,
+            10, 0.6,
+            14, 0.75,
+            18, 0.85,
           ],
         },
       })
@@ -97,15 +154,15 @@ const MapContainer = forwardRef(function MapContainer(
         type: 'line',
         source: 'plots',
         paint: {
-          'line-color': '#555555',
+          'line-color': '#888888',
           'line-width': [
             'interpolate', ['linear'], ['zoom'],
             10, 0,
-            14, 0.3,
-            16, 0.5,
-            18, 1,
+            14, 0.4,
+            16, 0.7,
+            18, 1.2,
           ],
-          'line-opacity': 0.5,
+          'line-opacity': 0.65,
         },
       })
 
@@ -166,7 +223,7 @@ const MapContainer = forwardRef(function MapContainer(
         source: 'plots',
         paint: {
           'fill-color': buildSymbologyColorExpression(),
-          'fill-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0.4, 14, 0.6, 18, 0.7],
+          'fill-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0.6, 14, 0.75, 18, 0.85],
         },
       })
 
@@ -175,9 +232,9 @@ const MapContainer = forwardRef(function MapContainer(
         type: 'line',
         source: 'plots',
         paint: {
-          'line-color': '#555555',
-          'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0, 14, 0.3, 16, 0.5, 18, 1],
-          'line-opacity': 0.5,
+          'line-color': '#888888',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0, 14, 0.4, 16, 0.7, 18, 1.2],
+          'line-opacity': 0.65,
         },
       })
 

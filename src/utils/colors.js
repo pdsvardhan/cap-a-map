@@ -7,8 +7,8 @@
 export const ZONING_GROUPS = {
   'residential-high': {
     label: 'Residential (Medium-High Density)',
-    color: '#FFD868',
-    outlineColor: '#C9A838',
+    color: '#D9963A',
+    outlineColor: '#B07A2A',
     symbologies: [
       'R3-Medium to high density zone',
       'R3 - Medium to high density zone',
@@ -19,8 +19,8 @@ export const ZONING_GROUPS = {
   },
   'residential-low': {
     label: 'Residential (Village/Low Density)',
-    color: '#D4A574',
-    outlineColor: '#B08050',
+    color: '#F6D79A',
+    outlineColor: '#D4B878',
     symbologies: [
       'R1-Village planning zone',
       'R1MP',
@@ -33,14 +33,14 @@ export const ZONING_GROUPS = {
   },
   'residential-vacant': {
     label: 'Residential Vacant',
-    color: '#FFEBAF',
-    outlineColor: '#D4C48A',
+    color: '#EFB866',
+    outlineColor: '#D09A48',
     symbologies: ['Residential Vacant'],
   },
   'commercial': {
     label: 'Commercial',
-    color: '#4EAEF5',
-    outlineColor: '#2080C0',
+    color: '#5FA8D3',
+    outlineColor: '#4888B0',
     symbologies: [
       'C1 -Mixed use zone',
       'C1 - Mixed use zone',
@@ -62,14 +62,14 @@ export const ZONING_GROUPS = {
   },
   'commercial-vacant': {
     label: 'Commercial Vacant',
-    color: '#BEE8FF',
-    outlineColor: '#90C0DD',
+    color: '#8EC5E8',
+    outlineColor: '#6AA8CC',
     symbologies: ['Commercial Vacant'],
   },
   'parks-active': {
     label: 'Parks & Recreation (Active)',
-    color: '#00CD34',
-    outlineColor: '#00A028',
+    color: '#6FAF6B',
+    outlineColor: '#558F52',
     symbologies: [
       'P2-Active zone',
       'P2 - Active zone',
@@ -79,8 +79,8 @@ export const ZONING_GROUPS = {
   },
   'parks-passive': {
     label: 'Parks & Gardens (Passive)',
-    color: '#017F3F',
-    outlineColor: '#015C2D',
+    color: '#4C8F4A',
+    outlineColor: '#3A7038',
     symbologies: [
       'P1-Passive zone',
       'P1 - Passive zone',
@@ -90,8 +90,8 @@ export const ZONING_GROUPS = {
   },
   'water': {
     label: 'Water Bodies',
-    color: '#97DBF2',
-    outlineColor: '#5CB8D8',
+    color: '#4A90C2',
+    outlineColor: '#3670A0',
     symbologies: [
       'P3-Protected zone',
       'P3 - Protected zone',
@@ -101,8 +101,8 @@ export const ZONING_GROUPS = {
   },
   'green-belt': {
     label: 'Green Belt / Forest',
-    color: '#4C7300',
-    outlineColor: '#3A5800',
+    color: '#2E6B2E',
+    outlineColor: '#1E4E1E',
     symbologies: [
       'PGN-G',
       'P3-Protected zone Hills',
@@ -138,8 +138,8 @@ export const ZONING_GROUPS = {
   },
   'education': {
     label: 'Education',
-    color: '#FF7F7F',
-    outlineColor: '#D05050',
+    color: '#7A8FD1',
+    outlineColor: '#5A6FB0',
     symbologies: [
       'S2-Education zone',
       'S2 - Education zone',
@@ -149,8 +149,8 @@ export const ZONING_GROUPS = {
   },
   'cultural': {
     label: 'Cultural',
-    color: '#A900E6',
-    outlineColor: '#7F00B0',
+    color: '#B3A4D8',
+    outlineColor: '#8E80B8',
     symbologies: [
       'SS2b Cultural Zone',
       'SS2b - Cultural Zone',
@@ -158,8 +158,8 @@ export const ZONING_GROUPS = {
   },
   'health': {
     label: 'Health & Wellness',
-    color: '#D3FFBE',
-    outlineColor: '#A0D090',
+    color: '#E48C8C',
+    outlineColor: '#C06A6A',
     symbologies: [
       'SS2c Health Zone',
       'SS2c - Health Zone',
@@ -169,8 +169,8 @@ export const ZONING_GROUPS = {
   },
   'government': {
     label: 'Government & Civic',
-    color: '#E60000',
-    outlineColor: '#B00000',
+    color: '#C94A4A',
+    outlineColor: '#A03838',
     symbologies: [
       'S1-Government zone',
       'S1 - Government zone',
@@ -198,8 +198,8 @@ export const ZONING_GROUPS = {
   },
   'industrial': {
     label: 'Industrial',
-    color: '#FEA8FF',
-    outlineColor: '#D080D0',
+    color: '#9C8BC8',
+    outlineColor: '#7E6BB3',
     symbologies: [
       'I1-Business park zone',
       'I1 - Business park zone',
