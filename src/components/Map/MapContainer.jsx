@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, forwardRef, useImperativeHandle, useCallback } from 'react'
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import maplibregl from 'maplibre-gl'
 import { MAP_CENTER, MAP_ZOOM, MAP_MIN_ZOOM, MAP_MAX_ZOOM, MAP_STYLE, DATA_PATHS, LAYERS } from '../../utils/constants'
-import { buildSymbologyColorExpression } from '../../utils/colors'
+import { buildSymbologyColorExpression, ROAD_RESERVE_SYMBOLOGIES } from '../../utils/colors'
 
 const MapContainer = forwardRef(function MapContainer(
   { onMapReady, onPlotClick, onLoadingStatus, layerVisibility, selectedPlot },
@@ -12,10 +12,8 @@ const MapContainer = forwardRef(function MapContainer(
   const loadedSourcesRef = useRef(new Set())
   const hoveredPlotRef = useRef(null)
 
-  // Expose map instance to parent via ref
   useImperativeHandle(ref, () => mapInstanceRef.current, [])
 
-  // Initialize map
   useEffect(() => {
     if (mapInstanceRef.current) return
 
@@ -31,28 +29,20 @@ const MapContainer = forwardRef(function MapContainer(
       attributionControl: false,
     })
 
-    // Add attribution in bottom-right
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right')
-
-    // Add navigation controls
     map.addControl(new maplibregl.NavigationControl(), 'bottom-right')
-
-    // Add scale bar
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 150 }), 'bottom-left')
 
     mapInstanceRef.current = map
 
     map.on('load', async () => {
       try {
-        // Load plot data
         onLoadingStatus?.('Loading plot data...')
         await loadPlotData(map)
 
-        // Load overlay layers
         onLoadingStatus?.('Loading overlays...')
         await loadOverlays(map)
 
-        // Set up interactions
         setupInteractions(map)
 
         onLoadingStatus?.('Ready!')
@@ -69,15 +59,10 @@ const MapContainer = forwardRef(function MapContainer(
     }
   }, [])
 
-  // Load plot data as GeoJSON source (per-village loading)
   async function loadPlotData(map) {
     onLoadingStatus?.('Loading village index...')
 
-    // Load the main plots GeoJSON
-    const plotsUrl = DATA_PATHS.plotsTiles.replace('.pmtiles', '').replace('/data/plots', '/data/plots_wgs84.geojson')
-
     try {
-      // First try loading the full GeoJSON
       onLoadingStatus?.('Loading all plots (this may take a moment)...')
 
       const response = await fetch('/data/plots_wgs84.geojson')
@@ -92,7 +77,6 @@ const MapContainer = forwardRef(function MapContainer(
         generateId: true,
       })
 
-      // Plot fill layer - color-coded by symbology
       map.addLayer({
         id: LAYERS.PLOTS_FILL,
         type: 'fill',
@@ -108,7 +92,6 @@ const MapContainer = forwardRef(function MapContainer(
         },
       })
 
-      // Plot outline layer
       map.addLayer({
         id: LAYERS.PLOTS_OUTLINE,
         type: 'line',
@@ -126,7 +109,6 @@ const MapContainer = forwardRef(function MapContainer(
         },
       })
 
-      // Highlight layer for selected/hovered plot
       map.addLayer({
         id: LAYERS.PLOTS_HIGHLIGHT,
         type: 'line',
@@ -136,20 +118,17 @@ const MapContainer = forwardRef(function MapContainer(
           'line-width': 3,
           'line-opacity': 1,
         },
-        filter: ['==', ['id'], -1], // Initially hidden
+        filter: ['==', ['id'], -1],
       })
 
       loadedSourcesRef.current.add('plots')
     } catch (err) {
       console.error('Failed to load plots GeoJSON:', err)
       onLoadingStatus?.('Error loading plots data. Trying village-by-village...')
-
-      // Fallback: load per-village
       await loadPlotsByVillage(map)
     }
   }
 
-  // Fallback: load plots by village
   async function loadPlotsByVillage(map) {
     try {
       const indexRes = await fetch('/data/village_index.json')
@@ -158,7 +137,6 @@ const MapContainer = forwardRef(function MapContainer(
       const villages = Object.entries(villageIndex)
         .sort((a, b) => b[1].count - a[1].count)
 
-      // Load the largest villages first
       let totalLoaded = 0
       const allFeatures = []
 
@@ -178,14 +156,10 @@ const MapContainer = forwardRef(function MapContainer(
 
       map.addSource('plots', {
         type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: allFeatures,
-        },
+        data: { type: 'FeatureCollection', features: allFeatures },
         generateId: true,
       })
 
-      // Same layers as above
       map.addLayer({
         id: LAYERS.PLOTS_FILL,
         type: 'fill',
@@ -221,7 +195,6 @@ const MapContainer = forwardRef(function MapContainer(
     }
   }
 
-  // Load overlay layers
   async function loadOverlays(map) {
     const overlays = [
       {
@@ -262,7 +235,7 @@ const MapContainer = forwardRef(function MapContainer(
           {
             id: LAYERS.BURIAL_GROUNDS,
             type: 'fill',
-            paint: { 'fill-color': '#5D4037', 'fill-opacity': 0.6 },
+            paint: { 'fill-color': '#FF0000', 'fill-opacity': 0.4 },
           },
         ],
       },
@@ -291,42 +264,8 @@ const MapContainer = forwardRef(function MapContainer(
               'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
             },
             paint: {
-              'text-color': '#BF360C',
-              'text-halo-color': '#FFFFFF',
-              'text-halo-width': 1.5,
-            },
-          },
-        ],
-      },
-      // Water bodies loaded LAST so they render on top of plots & other overlays
-      // P3-Protected zone plots beneath appear green; water bodies must dominate visually
-      {
-        key: 'waterbodies',
-        url: DATA_PATHS.waterbodies,
-        layers: [
-          {
-            id: LAYERS.WATERBODIES_FILL,
-            type: 'fill',
-            paint: { 'fill-color': '#42A5F5', 'fill-opacity': 0.85 },
-          },
-          {
-            id: LAYERS.WATERBODIES_OUTLINE,
-            type: 'line',
-            paint: { 'line-color': '#1565C0', 'line-width': 2.5, 'line-opacity': 0.9 },
-          },
-          {
-            id: LAYERS.WATERBODIES_LABELS,
-            type: 'symbol',
-            layout: {
-              'text-field': ['get', 'village'],
-              'text-size': ['interpolate', ['linear'], ['zoom'], 12, 9, 16, 12, 18, 14],
-              'text-anchor': 'center',
-              'text-allow-overlap': false,
-              'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-            },
-            paint: {
-              'text-color': '#0D47A1',
-              'text-halo-color': '#FFFFFF',
+              'text-color': '#FFFFFF',
+              'text-halo-color': '#333333',
               'text-halo-width': 1.5,
             },
           },
@@ -360,24 +299,87 @@ const MapContainer = forwardRef(function MapContainer(
         console.warn(`Failed to load overlay ${overlay.key}:`, err)
       }
     }
+
+    // Load named roads (generated from U2/SU2 spatial analysis)
+    try {
+      const res = await fetch(DATA_PATHS.roadsNamed)
+      if (res.ok) {
+        const data = await res.json()
+        map.addSource('roads_named', { type: 'geojson', data })
+
+        map.addLayer({
+          id: LAYERS.ROADS_NAMED,
+          type: 'line',
+          source: 'roads_named',
+          paint: {
+            'line-color': ['match', ['get', 'classification'],
+              'arterial', '#FFD700',
+              'sub-arterial', '#FFA500',
+              '#CCCCCC'
+            ],
+            'line-width': ['match', ['get', 'classification'],
+              'arterial', 4,
+              'sub-arterial', 2.5,
+              1.5
+            ],
+            'line-opacity': 0.85,
+          },
+        })
+
+        map.addLayer({
+          id: LAYERS.ROADS_NAMED_LABELS,
+          type: 'symbol',
+          source: 'roads_named',
+          layout: {
+            'symbol-placement': 'line-center',
+            'text-field': ['get', 'name'],
+            'text-size': ['interpolate', ['linear'], ['zoom'], 12, 10, 16, 14, 18, 16],
+            'text-anchor': 'center',
+            'text-allow-overlap': false,
+            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+          },
+          paint: {
+            'text-color': '#FFFFFF',
+            'text-halo-color': '#000000',
+            'text-halo-width': 2,
+          },
+        })
+
+        loadedSourcesRef.current.add('roads_named')
+      }
+    } catch (err) {
+      console.warn('Named roads not available:', err)
+    }
   }
 
-  // Set up map interactions
   function setupInteractions(map) {
-    // Click on plot
+    // Click on plot — skip road reserve zones (U2/SU2)
     map.on('click', LAYERS.PLOTS_FILL, (e) => {
       if (e.features && e.features.length > 0) {
-        const feature = e.features[0]
+        // Find first non-road-reserve feature
+        const feature = e.features.find(f => !ROAD_RESERVE_SYMBOLOGIES.has(f.properties.symbology))
+        if (!feature) return
+
         const props = feature.properties
-
-        // Highlight the clicked plot
         map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['id'], feature.id])
-
         onPlotClick?.(props)
       }
     })
 
-    // Hover cursor
+    // Click on named road
+    map.on('click', LAYERS.ROADS_NAMED, (e) => {
+      if (e.features && e.features.length > 0) {
+        const props = e.features[0].properties
+        onPlotClick?.({
+          _type: 'road',
+          name: props.name,
+          direction: props.direction,
+          classification: props.classification,
+          segments: props.segments,
+        })
+      }
+    })
+
     map.on('mouseenter', LAYERS.PLOTS_FILL, () => {
       map.getCanvas().style.cursor = 'pointer'
     })
@@ -386,24 +388,19 @@ const MapContainer = forwardRef(function MapContainer(
       map.getCanvas().style.cursor = ''
     })
 
-    // Hover highlight
+    map.on('mouseenter', LAYERS.ROADS_NAMED, () => {
+      map.getCanvas().style.cursor = 'pointer'
+    })
+
+    map.on('mouseleave', LAYERS.ROADS_NAMED, () => {
+      map.getCanvas().style.cursor = ''
+    })
+
     map.on('mousemove', LAYERS.PLOTS_FILL, (e) => {
       if (e.features && e.features.length > 0) {
         const feature = e.features[0]
         if (hoveredPlotRef.current !== feature.id) {
           hoveredPlotRef.current = feature.id
-
-          // Show a tooltip with basic info
-          const props = feature.properties
-          const tooltipContent = `
-            <div style="padding: 8px 12px; font-size: 12px;">
-              <div style="font-weight: 600;">${props.regcode || 'N/A'}</div>
-              <div style="color: #666;">${props.village || ''} • ${props.symbology || ''}</div>
-            </div>
-          `
-
-          // We could add a popup here, but for performance we'll skip it
-          // and rely on the click panel instead
         }
       }
     })
@@ -417,7 +414,7 @@ const MapContainer = forwardRef(function MapContainer(
     const layerMapping = {
       allocatedLands: [LAYERS.ALLOCATED_LANDS, LAYERS.ALLOCATED_LANDS_OUTLINE, LAYERS.ALLOCATED_LANDS_LABELS],
       roads: [LAYERS.ROADS],
-      waterbodies: [LAYERS.WATERBODIES_FILL, LAYERS.WATERBODIES_OUTLINE, LAYERS.WATERBODIES_LABELS],
+      roadsNamed: [LAYERS.ROADS_NAMED, LAYERS.ROADS_NAMED_LABELS],
       burialGrounds: [LAYERS.BURIAL_GROUNDS],
       boundaries: [LAYERS.BOUNDARIES],
     }
@@ -438,8 +435,7 @@ const MapContainer = forwardRef(function MapContainer(
     if (!map || !map.isStyleLoaded() || !map.getLayer(LAYERS.PLOTS_HIGHLIGHT)) return
 
     if (selectedPlot && selectedPlot.regcode) {
-      // We can't easily filter by regcode with generateId, so we keep the current highlight
-      // The highlight is set on click in setupInteractions
+      // Highlight is set on click in setupInteractions
     } else {
       map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['id'], -1])
     }

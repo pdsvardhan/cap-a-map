@@ -1,46 +1,51 @@
 /**
  * Zoning color scheme for Amaravati Capital City plots.
- * Maps symbology values → visual groups → colors.
+ * Colors match official ArcGIS APCRDA Land Pooling Scheme renderer.
+ * Source: layers_metadata.json → Layer 7 (LPSVILLAGE) uniqueValueInfos
  */
 
-// Zoning group definitions
 export const ZONING_GROUPS = {
   'residential-high': {
     label: 'Residential (Medium-High Density)',
-    color: '#E88D67',
-    outlineColor: '#C96B45',
+    color: '#FFD868',
+    outlineColor: '#C9A838',
     symbologies: [
       'R3-Medium to high density zone',
       'R3 - Medium to high density zone',
+      'R4-High density zone',
+      'R4 - High density zone',
       'SR4 - High Density Private',
     ],
   },
   'residential-low': {
     label: 'Residential (Village/Low Density)',
-    color: '#F4A582',
-    outlineColor: '#D4856A',
+    color: '#D4A574',
+    outlineColor: '#B08050',
     symbologies: [
       'R1-Village planning zone',
       'R1MP',
       'R1-MP',
       'SR1 - Village Planning',
+      'R2-Low density zone',
+      'R2 - Low density zone',
+      'SR2 Low Density Housing',
     ],
   },
   'residential-vacant': {
     label: 'Residential Vacant',
-    color: '#F5D5C0',
-    outlineColor: '#D9B9A4',
+    color: '#FFEBAF',
+    outlineColor: '#D4C48A',
     symbologies: ['Residential Vacant'],
   },
   'commercial': {
     label: 'Commercial',
-    color: '#7B68EE',
-    outlineColor: '#5B48CE',
+    color: '#4EAEF5',
+    outlineColor: '#2080C0',
     symbologies: [
-      'C2 - General commercial zone',
-      'C2- General commercial zone',
       'C1 -Mixed use zone',
       'C1 - Mixed use zone',
+      'C2 - General commercial zone',
+      'C2- General commercial zone',
       'C3-Neighbourhood centre zone',
       'C3 - Neighbourhood centre zone',
       'C4-Town centre zone',
@@ -57,93 +62,149 @@ export const ZONING_GROUPS = {
   },
   'commercial-vacant': {
     label: 'Commercial Vacant',
-    color: '#D8D0F0',
-    outlineColor: '#B8B0D0',
+    color: '#BEE8FF',
+    outlineColor: '#90C0DD',
     symbologies: ['Commercial Vacant'],
   },
   'parks-active': {
     label: 'Parks & Recreation (Active)',
-    color: '#4CAF50',
-    outlineColor: '#388E3C',
+    color: '#00CD34',
+    outlineColor: '#00A028',
     symbologies: [
       'P2-Active zone',
       'P2 - Active zone',
       'SP2 - Active Zone',
+      'SP2- Active Zone',
     ],
   },
   'parks-passive': {
     label: 'Parks & Gardens (Passive)',
-    color: '#81C784',
-    outlineColor: '#66BB6A',
+    color: '#017F3F',
+    outlineColor: '#015C2D',
     symbologies: [
       'P1-Passive zone',
       'P1 - Passive zone',
       'SP1 - Passive Zone',
+      'SP1- Passive Zone',
     ],
   },
-  'parks-protected': {
-    label: 'Green & Protected Areas',
-    color: '#2E7D32',
-    outlineColor: '#1B5E20',
+  'water': {
+    label: 'Water Bodies',
+    color: '#97DBF2',
+    outlineColor: '#5CB8D8',
     symbologies: [
       'P3-Protected zone',
       'P3 - Protected zone',
+      'SP3-Protected Zone',
       'SP3 - Protected Zone',
-      'PGN-G',
-      'PGN-V',
     ],
   },
-  'roads-infra': {
-    label: 'Roads & Infrastructure',
-    color: '#9E9E9E',
-    outlineColor: '#757575',
+  'green-belt': {
+    label: 'Green Belt / Forest',
+    color: '#4C7300',
+    outlineColor: '#3A5800',
     symbologies: [
-      'U2 - Road reserve zone',
-      'U2- Road reserve zone',
+      'PGN-G',
+      'P3-Protected zone Hills',
+      'P3 - Protected zone Hills',
+    ],
+  },
+  'village-green': {
+    label: 'Village Green',
+    color: '#B59670',
+    outlineColor: '#8A7050',
+    symbologies: ['PGN-V'],
+  },
+  'roads-infra': {
+    label: 'Reserves & Infrastructure',
+    color: '#B2B2B2',
+    outlineColor: '#888888',
+    symbologies: [
       'U1-Reserve zone',
       'U1 - Reserve zone',
-      'SU2 - Road Network',
       'SU1-Reserve Zone',
       'SU1 - Reserve Zone',
     ],
   },
+  'road-reserve': {
+    label: 'Road Reserve',
+    color: 'transparent',
+    outlineColor: '#333333',
+    symbologies: [
+      'U2 - Road reserve zone',
+      'U2- Road reserve zone',
+      'SU2 - Road Network',
+    ],
+  },
   'education': {
     label: 'Education',
-    color: '#FFB74D',
-    outlineColor: '#F59E1B',
+    color: '#FF7F7F',
+    outlineColor: '#D05050',
     symbologies: [
       'S2-Education zone',
       'S2 - Education zone',
       'SS2a - Education Zone',
+      'SS2a- Education Zone',
+    ],
+  },
+  'cultural': {
+    label: 'Cultural',
+    color: '#A900E6',
+    outlineColor: '#7F00B0',
+    symbologies: [
       'SS2b Cultural Zone',
       'SS2b - Cultural Zone',
     ],
   },
+  'health': {
+    label: 'Health & Wellness',
+    color: '#D3FFBE',
+    outlineColor: '#A0D090',
+    symbologies: [
+      'SS2c Health Zone',
+      'SS2c - Health Zone',
+      'SS3 - Health and Wellness Zone',
+      'SS3-Health and Wellness Zone',
+    ],
+  },
   'government': {
     label: 'Government & Civic',
-    color: '#EF5350',
-    outlineColor: '#D32F2F',
+    color: '#E60000',
+    outlineColor: '#B00000',
     symbologies: [
+      'S1-Government zone',
+      'S1 - Government zone',
       'SS1 - Government Zone',
       'SS1-Government Zone',
     ],
   },
   'special': {
-    label: 'Special & Health',
-    color: '#AB47BC',
-    outlineColor: '#8E24AA',
+    label: 'Special Zone',
+    color: '#D7B09E',
+    outlineColor: '#B09080',
     symbologies: [
       'S3-Special zone',
       'S3 - Special zone',
-      'SS3 - Health and Wellness Zone',
-      'SS3-Health and Wellness Zone',
+    ],
+  },
+  'special-zone': {
+    label: 'Special Zone (Master Plan)',
+    color: '#A83800',
+    outlineColor: '#802A00',
+    symbologies: [
+      'SS3 - Special Zone',
+      'SS3-Special Zone',
     ],
   },
   'industrial': {
     label: 'Industrial',
-    color: '#78909C',
-    outlineColor: '#546E7A',
+    color: '#FEA8FF',
+    outlineColor: '#D080D0',
     symbologies: [
+      'I1-Business park zone',
+      'I1 - Business park zone',
+      'I2-Logistics zone',
+      'I2 - Logistics zone',
       'I3-Non polluting industry zone',
       'I3 - Non polluting industry zone',
       'SI1 - Business Park',
@@ -152,17 +213,25 @@ export const ZONING_GROUPS = {
   },
   'recreation': {
     label: 'Recreation & Open Space',
-    color: '#AED581',
-    outlineColor: '#8BC34A',
+    color: '#FFAA00',
+    outlineColor: '#CC8800',
     symbologies: [
       'RAA',
       'RARP',
       'RATH',
     ],
   },
+  'burial-ground': {
+    label: 'Burial Ground',
+    color: '#D2D2D2',
+    outlineColor: '#191993',
+    symbologies: [
+      'Burial Ground',
+    ],
+  },
 }
 
-// Build a flat lookup: symbology string → color
+// Build flat lookups: symbology string → color / group
 export const SYMBOLOGY_COLOR_MAP = {}
 export const SYMBOLOGY_GROUP_MAP = {}
 
@@ -173,29 +242,27 @@ for (const [groupKey, group] of Object.entries(ZONING_GROUPS)) {
   }
 }
 
-/**
- * Get the color for a given symbology value.
- * Falls back to a neutral grey if unknown.
- */
 export function getColorForSymbology(symbology) {
   return SYMBOLOGY_COLOR_MAP[symbology] || '#BDBDBD'
 }
 
-/**
- * Get the zoning group key for a symbology value.
- */
 export function getGroupForSymbology(symbology) {
   return SYMBOLOGY_GROUP_MAP[symbology] || 'unknown'
 }
 
 /**
  * Build a MapLibre match expression for fill-color based on symbology.
- * Returns: ['match', ['get', 'symbology'], sym1, color1, sym2, color2, ..., defaultColor]
+ * Road-reserve (U2/SU2) gets near-transparent fill to match ArcGIS behavior.
  */
 export function buildSymbologyColorExpression() {
   const expr = ['match', ['get', 'symbology']]
   for (const [sym, color] of Object.entries(SYMBOLOGY_COLOR_MAP)) {
-    expr.push(sym, color)
+    // Road reserve zones are transparent in ArcGIS — use near-transparent
+    if (color === 'transparent') {
+      expr.push(sym, 'rgba(0,0,0,0)')
+    } else {
+      expr.push(sym, color)
+    }
   }
   expr.push('#BDBDBD') // default fallback
   return expr
@@ -211,9 +278,18 @@ export function buildSymbologyOutlineExpression() {
       expr.push(sym, group.outlineColor)
     }
   }
-  expr.push('#9E9E9E') // default fallback
+  expr.push('#9E9E9E')
   return expr
 }
+
+/**
+ * Road reserve symbologies that should be non-clickable
+ */
+export const ROAD_RESERVE_SYMBOLOGIES = new Set([
+  'U2 - Road reserve zone',
+  'U2- Road reserve zone',
+  'SU2 - Road Network',
+])
 
 // Allocated lands categories
 export const ALLOCATED_LAND_CATEGORIES = {
@@ -259,9 +335,6 @@ export const ALLOCATED_LAND_CATEGORIES = {
   },
 }
 
-/**
- * Categorize an allocated land label into a category.
- */
 export function categorizeAllocatedLand(label) {
   if (!label) return 'private'
   const upper = label.toUpperCase()

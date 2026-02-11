@@ -3,103 +3,103 @@
     "name": "Thullur",
     "count": 7692,
     "file": "villages/thullur.geojson",
-    "size_kb": 6554.0
+    "size_kb": 6553.9
   },
   "venkatapalem": {
     "name": "Venkatapalem",
     "count": 3506,
     "file": "villages/venkatapalem.geojson",
-    "size_kb": 3063.9
+    "size_kb": 3063.1
   },
   "nowlur": {
     "name": "Nowlur",
     "count": 5820,
     "file": "villages/nowlur.geojson",
-    "size_kb": 5093.9
+    "size_kb": 5093.8
   },
   "lingayapalem": {
     "name": "Lingayapalem",
     "count": 2130,
     "file": "villages/lingayapalem.geojson",
-    "size_kb": 1889.1
+    "size_kb": 1888.9
   },
   "malkapuram": {
     "name": "Malkapuram",
     "count": 1156,
     "file": "villages/malkapuram.geojson",
-    "size_kb": 1025.4
+    "size_kb": 1025.2
   },
   "nidamarru": {
     "name": "Nidamarru",
     "count": 5595,
     "file": "villages/nidamarru.geojson",
-    "size_kb": 4864.4
+    "size_kb": 4863.9
   },
   "kuragallu": {
     "name": "Kuragallu",
     "count": 8325,
     "file": "villages/kuragallu.geojson",
-    "size_kb": 7203.8
+    "size_kb": 7202.4
   },
   "unknown": {
     "name": "N/A",
     "count": 4910,
     "file": "villages/unknown.geojson",
-    "size_kb": 8515.4
+    "size_kb": 8517.9
   },
   "rayapudi": {
     "name": "Rayapudi",
     "count": 5431,
     "file": "villages/rayapudi.geojson",
-    "size_kb": 4734.8
+    "size_kb": 4733.7
   },
   "ananthavaram": {
     "name": "Ananthavaram",
     "count": 4765,
     "file": "villages/ananthavaram.geojson",
-    "size_kb": 4176.5
+    "size_kb": 4175.9
   },
   "yerrabalem": {
     "name": "Yerrabalem",
     "count": 3508,
     "file": "villages/yerrabalem.geojson",
-    "size_kb": 3047.7
+    "size_kb": 3047.6
   },
   "sakhamuru": {
     "name": "Sakhamuru",
     "count": 3841,
     "file": "villages/sakhamuru.geojson",
-    "size_kb": 3344.4
+    "size_kb": 3344.1
   },
   "kondamarajupalem": {
     "name": "Kondamarajupalem",
     "count": 1811,
     "file": "villages/kondamarajupalem.geojson",
-    "size_kb": 1636.4
+    "size_kb": 1636.3
   },
   "mandadam": {
     "name": "Mandadam",
     "count": 6993,
     "file": "villages/mandadam.geojson",
-    "size_kb": 6105.8
+    "size_kb": 6105.3
   },
   "inavolu": {
     "name": "Inavolu",
     "count": 3413,
     "file": "villages/inavolu.geojson",
-    "size_kb": 3059.5
+    "size_kb": 3059.3
   },
   "nekkallu": {
     "name": "Nekkallu",
     "count": 3264,
     "file": "villages/nekkallu.geojson",
-    "size_kb": 2957.6
+    "size_kb": 2957.4
   },
   "abbarajupalem": {
     "name": "Abbarajupalem",
     "count": 1782,
     "file": "villages/abbarajupalem.geojson",
-    "size_kb": 1575.7
+    "size_kb": 1575.4
   },
   "pitchakalapalem": {
     "name": "Pitchakalapalem",
@@ -111,7 +111,7 @@
     "name": "Borupalem",
     "count": 1164,
     "file": "villages/borupalem.geojson",
-    "size_kb": 1036.1
+    "size_kb": 1036.0
   },
   "krishnayapalem": {
     "name": "Krishnayapalem",
@@ -123,13 +123,13 @@
     "name": "Velagapudi",
     "count": 4191,
     "file": "villages/velagapudi.geojson",
-    "size_kb": 3688.9
+    "size_kb": 3688.7
   },
   "nelapadu": {
     "name": "Nelapadu",
     "count": 2726,
     "file": "villages/nelapadu.geojson",
-    "size_kb": 2475.2
+    "size_kb": 2475.3
   },
   "mandadam_2": {
     "name": "Mandadam-2",
@@ -147,7 +147,7 @@
     "name": "Dondapadu",
     "count": 845,
     "file": "villages/dondapadu.geojson",
-    "size_kb": 757.3
+    "size_kb": 757.2
   },
   "uddandarayunipalem": {
     "name": "Uddandarayunipalem",
@@ -213,7 +213,7 @@
     "name": "Penumaka",
     "count": 3970,
     "file": "villages/penumaka.geojson",
-    "size_kb": 3808.1
+    "size_kb": 3808.3
   },
   "pitchikalaplem": {
     "name": "Pitchikalaplem",
@@ -231,7 +231,7 @@
     "name": "Rayapudi, Kondamarajupalem",
     "count": 13,
     "file": "villages/rayapudi,_kondamarajupalem.geojson",
-    "size_kb": 17.7
+    "size_kb": 17.8
   },
   "nelapadu,_sakhamuru": {
     "name": "Nelapadu, Sakhamuru",
@@ -321,6 +321,6 @@
     "name": "Undavalli",
     "count": 1124,
     "file": "villages/undavalli.geojson",
-    "size_kb": 1318.6
+    "size_kb": 1318.8
   }
 }

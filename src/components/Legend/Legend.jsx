@@ -21,15 +21,26 @@ export default function Legend({ onClose }) {
 
       {/* Legend items */}
       <div className="overflow-y-auto panel-scroll px-4 py-3 space-y-1.5">
-        {groups.map(([key, group]) => (
-          <div key={key} className="flex items-center gap-2.5 py-1">
-            <div
-              className="w-5 h-4 rounded-sm border border-gray-200 flex-shrink-0"
-              style={{ backgroundColor: group.color }}
-            />
-            <span className="text-xs text-gray-700">{group.label}</span>
-          </div>
-        ))}
+        {groups.map(([key, group]) => {
+          // Road reserve is transparent — show with hatching pattern
+          const isTransparent = group.color === 'transparent'
+          return (
+            <div key={key} className="flex items-center gap-2.5 py-1">
+              <div
+                className="w-5 h-4 rounded-sm flex-shrink-0"
+                style={isTransparent ? {
+                  backgroundColor: '#f5f5f5',
+                  border: '1px solid #999',
+                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, #ccc 2px, #ccc 3px)',
+                } : {
+                  backgroundColor: group.color,
+                  border: '1px solid ' + (group.outlineColor || '#ddd'),
+                }}
+              />
+              <span className="text-xs text-gray-700">{group.label}</span>
+            </div>
+          )
+        })}
 
         {/* Additional overlay indicators */}
         <div className="pt-3 mt-3 border-t border-gray-100 space-y-1.5">
@@ -37,15 +48,15 @@ export default function Legend({ onClose }) {
             Overlays
           </p>
           <div className="flex items-center gap-2.5 py-1">
-            <div className="w-5 h-4 rounded-sm bg-[#42A5F5] border border-gray-200 flex-shrink-0" />
-            <span className="text-xs text-gray-700">Water Bodies</span>
+            <div className="w-5 h-0.5 flex-shrink-0" style={{ backgroundColor: '#FFD700' }} />
+            <span className="text-xs text-gray-700">Named Roads (E/N)</span>
           </div>
           <div className="flex items-center gap-2.5 py-1">
-            <div className="w-5 h-0.5 bg-[#78909C] flex-shrink-0" style={{ marginLeft: 0, marginRight: 0 }} />
+            <div className="w-5 h-0.5 bg-[#78909C] flex-shrink-0" />
             <span className="text-xs text-gray-700">Roads</span>
           </div>
           <div className="flex items-center gap-2.5 py-1">
-            <div className="w-5 h-4 rounded-sm bg-[#5D4037] border border-gray-200 flex-shrink-0" />
+            <div className="w-5 h-4 rounded-sm bg-[#FF0000] border border-gray-200 flex-shrink-0" style={{ opacity: 0.4 }} />
             <span className="text-xs text-gray-700">Burial Grounds</span>
           </div>
           <div className="flex items-center gap-2.5 py-1">

@@ -15,10 +15,9 @@ export default function App() {
   const [layerVisibility, setLayerVisibility] = useState({
     allocatedLands: true,
     roads: true,
-    waterbodies: true,
+    roadsNamed: true,
     burialGrounds: true,
     boundaries: false,
-    surveyParcels: false,
   })
 
   const mapRef = useRef(null)
@@ -32,29 +31,36 @@ export default function App() {
   }, [])
 
   const handleSearchSelect = useCallback((result) => {
-    // Fly to the selected plot
+    // Fly to the selected location
     if (mapRef.current && result.la && result.lo) {
       mapRef.current.flyTo({
         center: [result.lo, result.la],
-        zoom: 18,
+        zoom: result._type === 'landmark' ? 16 : 18,
         duration: 1500,
       })
     }
-    // Set selected plot data from search result
-    setSelectedPlot({
-      regcode: result.rc,
-      plot_code: result.pc,
-      farmer_n: result.fn,
-      village: result.vi,
-      township: result.tw,
-      sector: result.se,
-      block: result.bl,
-      colony: result.co,
-      symbology: result.sy,
-      alloted_ex: result.ae,
-      lat: result.la,
-      lon: result.lo,
-    })
+
+    if (result._type === 'landmark') {
+      // Allocated land / landmark result
+      setSelectedPlot({
+        _type: 'landmark',
+        name: result.nm,
+        category: result.cat,
+        lat: result.la,
+        lon: result.lo,
+      })
+    } else {
+      // Plot result
+      setSelectedPlot({
+        regcode: result.rc,
+        plot_code: result.pc,
+        village: result.vi,
+        symbology: result.sy,
+        alloted_ex: result.ae,
+        lat: result.la,
+        lon: result.lo,
+      })
+    }
   }, [])
 
   const handleLayerToggle = useCallback((layerKey) => {

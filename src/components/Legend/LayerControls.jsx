@@ -8,34 +8,28 @@ const LAYER_CONFIG = [
     color: '#FF6F00',
   },
   {
+    key: 'roadsNamed',
+    label: 'Named Roads (E/N)',
+    description: 'Derived E-W and N-S arterial road names',
+    color: '#FFD700',
+  },
+  {
     key: 'roads',
     label: 'Roads',
     description: 'Existing roads (R&B and Panchayati Raj)',
     color: '#78909C',
   },
   {
-    key: 'waterbodies',
-    label: 'Water Bodies',
-    description: 'Tanks, ponds, and lakes',
-    color: '#42A5F5',
-  },
-  {
     key: 'burialGrounds',
     label: 'Burial Grounds',
     description: 'Burial grounds and tombs',
-    color: '#5D4037',
+    color: '#FF0000',
   },
   {
     key: 'boundaries',
     label: 'R1 Boundaries',
     description: 'Village planning zone boundaries',
     color: '#FF5722',
-  },
-  {
-    key: 'surveyParcels',
-    label: 'Survey Parcels',
-    description: 'Original cadastral survey parcels',
-    color: '#795548',
   },
 ]
 
