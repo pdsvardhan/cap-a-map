@@ -283,7 +283,7 @@ export function buildSymbologyOutlineExpression() {
 }
 
 /**
- * Road reserve symbologies that should be non-clickable
+ * Road reserve symbologies — handled separately from regular plots in click handler
  */
 export const ROAD_RESERVE_SYMBOLOGIES = new Set([
   'U2 - Road reserve zone',

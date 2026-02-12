@@ -12,7 +12,7 @@ const MapContainer = forwardRef(function MapContainer(
   const loadedSourcesRef = useRef(new Set())
   const hoveredPlotRef = useRef(null)
 
-  useImperativeHandle(ref, () => mapInstanceRef.current, [])
+  useImperativeHandle(ref, () => mapInstanceRef.current)
 
   useEffect(() => {
     if (mapInstanceRef.current) return
@@ -37,7 +37,7 @@ const MapContainer = forwardRef(function MapContainer(
 
     map.on('load', async () => {
       try {
-        // Hide OSM basemap noise (minor roads, villages, buildings, paths)
+        // Hide all basemap noise — keep only background + water fills
         hideBasemapNoise(map)
 
         onLoadingStatus?.('Loading plot data...')
@@ -63,54 +63,26 @@ const MapContainer = forwardRef(function MapContainer(
   }, [])
 
   function hideBasemapNoise(map) {
-    // Hide OSM layers from CARTO Dark Matter basemap that create visual noise:
-    // - Minor/service roads, paths, tracks (grey crisscrossing lines)
-    // - Village/settlement polygons (brown patches with internal streets)
-    // - Building footprints, house numbers, minor labels
-    const layersToHide = [
-      // Minor roads & service roads
-      'road_minor', 'road_minor_construction',
-      'road_service', 'road_service_construction',
-      // Paths & tracks
-      'road_path', 'road_track',
-      // Tunnels
-      'tunnel_minor', 'tunnel_minor_construction',
-      'tunnel_service', 'tunnel_service_construction',
-      'tunnel_path',
-      // Bridges
-      'bridge_minor', 'bridge_minor_construction',
-      'bridge_service', 'bridge_service_construction',
-      'bridge_path',
-      // Land use (village/settlement polygons)
-      'landuse', 'landuse_residential',
-      'landuse-overlay',
-      // Buildings
-      'building', 'building-top',
-      // Labels & house numbers
-      'housenumber',
-      'road_label', 'roadname_minor',
-      // Place labels inside city area
-      'place_village', 'place_hamlet', 'place_suburb', 'place_neighbourhood',
-    ]
-
-    for (const layerId of layersToHide) {
-      if (map.getLayer(layerId)) {
-        map.setLayoutProperty(layerId, 'visibility', 'none')
-      }
-    }
-
-    // Also try pattern-based hiding for CARTO layer naming variants
+    // Nuclear approach: hide ALL basemap layers except essentials.
+    // The CARTO Dark Matter basemap has ~80 layers (roads, boundaries,
+    // waterways, railways, buildings, labels, etc.) that create visual
+    // noise under our plot data. Instead of enumerating layers to hide
+    // (which breaks when naming changes), we hide everything and only
+    // keep the dark background and water body fills.
     const style = map.getStyle()
-    if (style && style.layers) {
-      for (const layer of style.layers) {
-        const id = layer.id
-        // Hide any remaining minor road, service, path, building, landuse layers
-        if (
-          /^(road_minor|road_service|road_path|road_track|tunnel_minor|tunnel_service|tunnel_path|bridge_minor|bridge_service|bridge_path)/.test(id) ||
-          /^(building|landuse|housenumber)/.test(id) ||
-          /^place_(village|hamlet|suburb|neighbourhood)/.test(id)
-        ) {
-          map.setLayoutProperty(id, 'visibility', 'none')
+    if (!style || !style.layers) return
+
+    const keepVisible = new Set([
+      'background',     // dark background color
+      'water',          // ocean/lake polygon fills
+    ])
+
+    for (const layer of style.layers) {
+      if (!keepVisible.has(layer.id)) {
+        try {
+          map.setLayoutProperty(layer.id, 'visibility', 'none')
+        } catch (e) {
+          // Some layers may not support visibility changes
         }
       }
     }
@@ -360,17 +332,69 @@ const MapContainer = forwardRef(function MapContainer(
 
   }
 
+  function computeCentroid(geometry) {
+    // Simple average of polygon exterior ring coordinates
+    if (!geometry || !geometry.coordinates) return null
+    const ring = geometry.type === 'Polygon'
+      ? geometry.coordinates[0]
+      : geometry.type === 'MultiPolygon'
+        ? geometry.coordinates[0][0]
+        : null
+    if (!ring || ring.length === 0) return null
+    let sumLon = 0, sumLat = 0
+    for (const coord of ring) {
+      sumLon += coord[0]
+      sumLat += coord[1]
+    }
+    return [
+      Math.round((sumLon / ring.length) * 1e6) / 1e6,
+      Math.round((sumLat / ring.length) * 1e6) / 1e6,
+    ]
+  }
+
   function setupInteractions(map) {
-    // Click on plot — skip road reserve zones (U2/SU2)
+    // Click on plot — handle both regular plots and road reserves (U2/SU2)
     map.on('click', LAYERS.PLOTS_FILL, (e) => {
       if (e.features && e.features.length > 0) {
-        // Find first non-road-reserve feature
-        const feature = e.features.find(f => !ROAD_RESERVE_SYMBOLOGIES.has(f.properties.symbology))
-        if (!feature) return
+        // Try to find a non-road-reserve feature first
+        const plotFeature = e.features.find(f => !ROAD_RESERVE_SYMBOLOGIES.has(f.properties.symbology))
 
-        const props = feature.properties
-        map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['id'], feature.id])
-        onPlotClick?.(props)
+        if (plotFeature) {
+          // Regular plot click (unchanged)
+          map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['id'], plotFeature.id])
+          onPlotClick?.(plotFeature.properties)
+        } else {
+          // Road reserve click — all features at this point are U2/SU2
+          const roadFeature = e.features[0]
+          map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['id'], roadFeature.id])
+          const props = { ...roadFeature.properties }
+
+          // Compute centroid if lat/lon missing
+          if (!props.lat || props.lat === 'N/A' || !props.lon || props.lon === 'N/A') {
+            const centroid = computeCentroid(roadFeature.geometry)
+            if (centroid) {
+              props.lat = centroid[1]
+              props.lon = centroid[0]
+            }
+          }
+
+          // Use MapLibre auto-generated feature id as storage key (unique per feature)
+          const locKey = roadFeature.id != null ? String(roadFeature.id) : null
+
+          // Check localStorage for saved road name
+          let savedName = null
+          if (locKey) {
+            try {
+              const roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}')
+              savedName = roadNames[locKey] || null
+            } catch (err) { /* ignore parse errors */ }
+          }
+
+          props._type = 'road'
+          props._locKey = locKey
+          props._roadName = savedName
+          onPlotClick?.(props)
+        }
       }
     })
 
@@ -419,7 +443,7 @@ const MapContainer = forwardRef(function MapContainer(
     const map = mapInstanceRef.current
     if (!map || !map.isStyleLoaded() || !map.getLayer(LAYERS.PLOTS_HIGHLIGHT)) return
 
-    if (selectedPlot && selectedPlot.regcode) {
+    if (selectedPlot && (selectedPlot.regcode || selectedPlot._type === 'road')) {
       // Highlight is set on click in setupInteractions
     } else {
       map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['id'], -1])

@@ -54,6 +54,11 @@ export default function PlotDetailPanel({ plot, onClose }) {
     )
   }
 
+  // Handle road reserve type
+  if (plot._type === 'road') {
+    return <RoadDetailPanel key={plot._locKey} plot={plot} onClose={onClose} />
+  }
+
   // Regular plot
   const color = getColorForSymbology(plot.symbology)
   const groupKey = getGroupForSymbology(plot.symbology)
@@ -247,6 +252,143 @@ function NeighbourCell({ label, value }) {
     >
       <div className="font-semibold text-[9px] text-gray-400 mb-0.5">{label}</div>
       <div className="truncate">{displayValue === 'N/A' ? '—' : displayValue}</div>
+    </div>
+  )
+}
+
+function RoadDetailPanel({ plot, onClose }) {
+  const [roadName, setRoadName] = React.useState(plot._roadName || '')
+  const [saved, setSaved] = React.useState(!!plot._roadName)
+
+  const googleMapsLink = plot.lat && plot.lon
+    ? `https://www.google.com/maps?q=${plot.lat},${plot.lon}`
+    : null
+
+  function handleSave() {
+    if (!plot._locKey || !roadName.trim()) return
+    try {
+      const roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}')
+      roadNames[plot._locKey] = roadName.trim()
+      localStorage.setItem('roadNames', JSON.stringify(roadNames))
+      setSaved(true)
+    } catch (e) { /* ignore */ }
+  }
+
+  function handleClear() {
+    if (!plot._locKey) return
+    try {
+      const roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}')
+      delete roadNames[plot._locKey]
+      localStorage.setItem('roadNames', JSON.stringify(roadNames))
+      setRoadName('')
+      setSaved(false)
+    } catch (e) { /* ignore */ }
+  }
+
+  return (
+    <div className="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl z-20 flex flex-col animate-slide-in">
+      {/* Header */}
+      <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-4 h-4 rounded bg-gray-800 border border-gray-600" />
+              <span className="text-xs font-medium text-gray-600">Road Reserve</span>
+            </div>
+            <h2 className="text-lg font-bold text-gray-900">
+              {plot._roadName || 'Unnamed Road'}
+            </h2>
+            <p className="text-sm text-gray-500">{plot.symbology}</p>
+          </div>
+          <CloseButton onClick={onClose} />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto panel-scroll px-5 py-4 space-y-5">
+
+        {/* Road Name Editor */}
+        <Section title="Road Name">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={roadName}
+              onChange={(e) => { setRoadName(e.target.value); setSaved(false) }}
+              placeholder="e.g. E8, N3..."
+              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <button
+              onClick={handleSave}
+              disabled={!roadName.trim() || saved}
+              className={`px-3 py-2 text-sm rounded-lg font-medium transition-colors ${
+                saved
+                  ? 'bg-green-100 text-green-700 cursor-default'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              {saved ? 'Saved' : 'Save'}
+            </button>
+          </div>
+          {saved && roadName && (
+            <button
+              onClick={handleClear}
+              className="mt-2 text-xs text-red-500 hover:text-red-700 underline"
+            >
+              Remove name
+            </button>
+          )}
+        </Section>
+
+        {/* Area */}
+        <Section title="Area">
+          <InfoGrid items={[
+            { label: 'Reserve Area', value: formatArea(plot.alloted_ex, plot.nbr || 'Sq.Yards') },
+          ]} />
+        </Section>
+
+        {/* Location (when available) */}
+        {plot.village && plot.village !== 'N/A' && (
+          <Section title="Location">
+            <InfoGrid items={[
+              { label: 'Village', value: plot.village },
+              { label: 'Township', value: plot.township && plot.township !== '0' && plot.township !== 0 ? plot.township : undefined },
+            ]} />
+          </Section>
+        )}
+
+        {/* Coordinates */}
+        {plot.lat && plot.lon && (
+          <Section title="Position">
+            <InfoGrid items={[
+              { label: 'Latitude', value: typeof plot.lat === 'number' ? plot.lat.toFixed(6) : plot.lat },
+              { label: 'Longitude', value: typeof plot.lon === 'number' ? plot.lon.toFixed(6) : plot.lon },
+            ]} />
+          </Section>
+        )}
+
+        {/* Google Maps Link */}
+        {googleMapsLink && (
+          <Section title="External Links">
+            <a
+              href={googleMapsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Open in Google Maps
+            </a>
+          </Section>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="px-5 py-3 border-t border-gray-100 flex-shrink-0">
+        <p className="text-[10px] text-gray-400">Click road segments to name them. Names saved in browser.</p>
+      </div>
     </div>
   )
 }
