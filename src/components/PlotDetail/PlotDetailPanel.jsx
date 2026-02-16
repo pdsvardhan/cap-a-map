@@ -1,8 +1,9 @@
 import React from 'react'
 import { getColorForSymbology, getGroupForSymbology, ZONING_GROUPS } from '../../utils/colors'
 import { formatArea, formatDimensions, formatFarmerName, formatNeighbour } from '../../utils/formatters'
+import { getRoadType, getROW, getRoadData, getLanePattern } from '../../utils/roadAttributes'
 
-export default function PlotDetailPanel({ plot, onClose }) {
+export default function PlotDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] }) {
   if (!plot) return null
 
   // Handle landmark type
@@ -56,7 +57,15 @@ export default function PlotDetailPanel({ plot, onClose }) {
 
   // Handle road reserve type
   if (plot._type === 'road') {
-    return <RoadDetailPanel key={plot._locKey} plot={plot} onClose={onClose} />
+    return (
+      <RoadDetailPanel
+        key={plot._locKey}
+        plot={plot}
+        onClose={onClose}
+        onRoadNameSaved={onRoadNameSaved}
+        namedRoadsIndex={namedRoadsIndex}
+      />
+    )
   }
 
   // Regular plot
@@ -256,9 +265,12 @@ function NeighbourCell({ label, value }) {
   )
 }
 
-function RoadDetailPanel({ plot, onClose }) {
+function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] }) {
   const [roadName, setRoadName] = React.useState(plot._roadName || '')
   const [saved, setSaved] = React.useState(!!plot._roadName)
+  const displayName = (plot._roadName || roadName) || ''
+  const roadMeta = namedRoadsIndex.find(r => (r.name || '').toUpperCase() === displayName.toUpperCase())
+  const meets = (roadMeta && roadMeta.meets) || []
 
   const googleMapsLink = plot.lat && plot.lon
     ? `https://www.google.com/maps?q=${plot.lat},${plot.lon}`
@@ -271,6 +283,7 @@ function RoadDetailPanel({ plot, onClose }) {
       roadNames[plot._locKey] = roadName.trim()
       localStorage.setItem('roadNames', JSON.stringify(roadNames))
       setSaved(true)
+      onRoadNameSaved?.()
     } catch (e) { /* ignore */ }
   }
 
@@ -282,6 +295,7 @@ function RoadDetailPanel({ plot, onClose }) {
       localStorage.setItem('roadNames', JSON.stringify(roadNames))
       setRoadName('')
       setSaved(false)
+      onRoadNameSaved?.()
     } catch (e) { /* ignore */ }
   }
 
@@ -294,6 +308,11 @@ function RoadDetailPanel({ plot, onClose }) {
             <div className="flex items-center gap-2 mb-2">
               <div className="w-4 h-4 rounded bg-gray-800 border border-gray-600" />
               <span className="text-xs font-medium text-gray-600">Road Reserve</span>
+              {plot._segmentId != null && (
+                <span className="text-3xl font-mono font-bold text-orange-500 ml-auto">
+                  #{String(plot._segmentId).padStart(4, '0')}
+                </span>
+              )}
             </div>
             <h2 className="text-lg font-bold text-gray-900">
               {plot._roadName || 'Unnamed Road'}
@@ -338,6 +357,45 @@ function RoadDetailPanel({ plot, onClose }) {
             </button>
           )}
         </Section>
+
+        {/* Road attributes (from Amaravati road data) */}
+        {getRoadData(displayName) && (() => {
+          const rd = getRoadData(displayName)
+          const star = rd.confidence === 'B' ? ' *' : rd.confidence === 'C' ? ' **' : ''
+          const laneDesc = rd.brt_lanes > 0
+            ? `${rd.carriageway_lanes} + ${rd.brt_lanes} BRT + ${rd.carriageway_lanes}`
+            : `${rd.carriageway_lanes} + ${rd.carriageway_lanes}`
+          return (
+            <Section title="Road attributes">
+              <InfoGrid items={[
+                { label: 'Type', value: (rd.category || '—') + star },
+                { label: 'ROW', value: rd.row_m ? `${rd.row_m} m${star}` : '—' },
+                { label: 'Lane Pattern', value: rd.lane_pattern ? `${rd.lane_pattern} (${laneDesc})${star}` : '—' },
+                { label: 'Orientation', value: rd.orientation || '—' },
+              ]} />
+              <div className="flex gap-3 mt-2">
+                {rd.brt_present && (
+                  <span className="text-[10px] px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">BRT</span>
+                )}
+                {rd.connects_nh16 && (
+                  <span className="text-[10px] px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">NH-16</span>
+                )}
+              </div>
+              {star && (
+                <p className="text-[9px] text-gray-400 mt-1">* high confidence | ** indicative</p>
+              )}
+            </Section>
+          )
+        })()}
+
+        {/* Junctions: which roads this one meets (for directions) */}
+        {meets.length > 0 && (
+          <Section title="Connects to">
+            <p className="text-sm text-gray-700">
+              {meets.sort((a, b) => a.localeCompare(b)).join(', ')}
+            </p>
+          </Section>
+        )}
 
         {/* Area */}
         <Section title="Area">

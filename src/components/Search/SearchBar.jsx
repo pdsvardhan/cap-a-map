@@ -54,7 +54,7 @@ const LANDMARK_FUSE_OPTIONS = {
   limit: 10,
 }
 
-export default function SearchBar({ onSelect }) {
+export default function SearchBar({ onSelect, namedRoadsIndex = [] }) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
   const [isOpen, setIsOpen] = useState(false)
@@ -101,26 +101,32 @@ export default function SearchBar({ onSelect }) {
 
   // Debounced search
   useEffect(() => {
-    if (!query || query.length < 2 || !plotFuseRef.current) {
+    if (!query || query.length < 2) {
       setResults([])
       setIsOpen(false)
       return
     }
 
     const timer = setTimeout(() => {
-      // Search plots
-      const plotResults = plotFuseRef.current.search(query).slice(0, 12)
-
-      // Search landmarks
-      let landmarkResults = []
-      if (landmarkFuseRef.current) {
-        landmarkResults = landmarkFuseRef.current.search(query).slice(0, 5)
+      const q = query.trim().toLowerCase()
+      let roadResults = []
+      if (namedRoadsIndex.length > 0 && q.length >= 1) {
+        roadResults = namedRoadsIndex
+          .filter(r => (r.name || '').toLowerCase().includes(q))
+          .slice(0, 5)
+          .map(r => ({ item: { _type: 'namedRoad', name: r.name, la: r.center?.[1], lo: r.center?.[0], bbox: r.bbox }, _resultType: 'namedRoad' }))
       }
 
-      // Combine: landmarks first, then plots
+      let plotResults = []
+      if (plotFuseRef.current) plotResults = plotFuseRef.current.search(query).slice(0, 12).map(r => ({ ...r, _resultType: 'plot' }))
+
+      let landmarkResults = []
+      if (landmarkFuseRef.current) landmarkResults = landmarkFuseRef.current.search(query).slice(0, 5).map(r => ({ ...r, _resultType: 'landmark' }))
+
       const combined = [
-        ...landmarkResults.map(r => ({ ...r, _resultType: 'landmark' })),
-        ...plotResults.map(r => ({ ...r, _resultType: 'plot' })),
+        ...roadResults,
+        ...landmarkResults,
+        ...plotResults,
       ]
 
       setResults(combined.slice(0, 15))
@@ -129,7 +135,7 @@ export default function SearchBar({ onSelect }) {
     }, 150)
 
     return () => clearTimeout(timer)
-  }, [query])
+  }, [query, namedRoadsIndex])
 
   // Keyboard navigation
   const handleKeyDown = useCallback((e) => {
@@ -152,11 +158,9 @@ export default function SearchBar({ onSelect }) {
 
   // Handle selection
   function handleSelect(item) {
-    if (item._type === 'landmark') {
-      setQuery(item.nm || '')
-    } else {
-      setQuery(item.rc || item.pc || '')
-    }
+    if (item._type === 'landmark') setQuery(item.nm || '')
+    else if (item._type === 'namedRoad') setQuery(item.name || '')
+    else setQuery(item.rc || item.pc || '')
     setIsOpen(false)
     onSelect?.(item)
   }
@@ -174,6 +178,7 @@ export default function SearchBar({ onSelect }) {
 
   // Get matched field label
   function getMatchLabel(result) {
+    if (result._resultType === 'namedRoad') return 'Road'
     if (!result.matches || result.matches.length === 0) return ''
     if (result._resultType === 'landmark') {
       const keyMap = { nm: 'Name', cat: 'Category' }
@@ -226,6 +231,30 @@ export default function SearchBar({ onSelect }) {
             const isSelected = idx === selectedIndex
             const matchLabel = getMatchLabel(result)
             const isLandmark = result._resultType === 'landmark'
+            const isNamedRoad = result._resultType === 'namedRoad'
+
+            if (isNamedRoad) {
+              const road = result.item
+              return (
+                <button
+                  key={`road-${road.name}-${idx}`}
+                  onClick={() => handleSelect(road)}
+                  className={`w-full text-left px-3 py-2 hover:bg-orange-50 border-b border-gray-50 last:border-0 transition-colors ${
+                    isSelected ? 'bg-orange-50' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm flex-shrink-0 bg-[#8B5A2B]" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-800 truncate">{truncate(road.name, 40)}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded font-medium">Road</span>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              )
+            }
 
             if (isLandmark) {
               return (

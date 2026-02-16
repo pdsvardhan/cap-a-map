@@ -347,3 +347,70 @@ export function categorizeAllocatedLand(label) {
   }
   return 'private'
 }
+
+/**
+ * Hierarchical grouping of zoning categories for the interactive legend.
+ * Each category contains group keys from ZONING_GROUPS.
+ */
+export const ZONING_HIERARCHY = [
+  {
+    id: 'residential',
+    label: 'Residential',
+    groups: ['residential-high', 'residential-low', 'residential-vacant'],
+  },
+  {
+    id: 'commercial',
+    label: 'Commercial',
+    groups: ['commercial', 'commercial-vacant'],
+  },
+  {
+    id: 'parks-environment',
+    label: 'Parks & Environment',
+    groups: ['parks-active', 'parks-passive', 'water', 'green-belt', 'village-green'],
+  },
+  {
+    id: 'public-institutional',
+    label: 'Public & Institutional',
+    groups: ['education', 'cultural', 'health', 'government'],
+  },
+  {
+    id: 'special-industrial',
+    label: 'Special & Industrial',
+    groups: ['industrial', 'special', 'special-zone', 'recreation'],
+  },
+  {
+    id: 'mobility',
+    label: 'Mobility',
+    groups: ['road-reserve', 'roads-infra'],
+  },
+  {
+    id: 'other',
+    label: 'Other',
+    groups: ['burial-ground'],
+  },
+]
+
+/**
+ * Build a filtered color expression for MapLibre.
+ * Active groups get their normal color, inactive groups get a faint muted color.
+ * Pass null or a Set containing all group keys to show everything normally.
+ */
+export function buildFilteredColorExpression(activeGroups) {
+  const allKeys = Object.keys(ZONING_GROUPS)
+  if (!activeGroups || activeGroups.size === allKeys.length) {
+    return buildSymbologyColorExpression()
+  }
+  const expr = ['match', ['get', 'symbology']]
+  for (const [groupKey, group] of Object.entries(ZONING_GROUPS)) {
+    const isActive = activeGroups.has(groupKey)
+    for (const sym of group.symbologies) {
+      if (group.color === 'transparent') {
+        expr.push(sym, isActive ? 'rgba(100,100,100,0.15)' : 'rgba(0,0,0,0)')
+      } else {
+        expr.push(sym, isActive ? group.color : 'rgba(255,255,255,0.08)')
+      }
+    }
+  }
+  expr.push('rgba(255,255,255,0.08)')
+  return expr
+}

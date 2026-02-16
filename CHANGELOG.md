@@ -4,46 +4,78 @@ All notable changes to the Amaravati Capital City Interactive Map (Cap A) are do
 
 ---
 
-## [Unreleased] — Current best version (Feb 2025)
+## [v2.0] - Interactive Legend, Road Mapping, Layers Cleanup (Feb 2025)
+
+**Merged: dev -> master**
+
+### Major Features
+
+- **Interactive Zoning Legend ("Zoning Explorer")**
+  - Complete rewrite of the passive legend into an interactive filter panel
+  - 7 hierarchical categories with collapsible groups, checkboxes, color swatches
+  - Quick filter pills (Residential, Commercial, Parks, Public, Industrial, Mobility)
+  - Select All / Clear buttons; Allocated Lands toggle
+  - Live plot count; inactive groups fade to near-invisible on map
+
+- **Road Segment ID System**
+  - 3,750 road reserve polygons indexed with spatially stable IDs
+  - Flash overlay (90px, 2 sec) and large panel display for easy identification
+  - Mapping table with 53 entries covering E1-E16, N1-N18
+
+- **Named Roads Color-Coded by Category**
+  - Red = Arterial, Black = Major Arterial, Green = Seed Access, Blue = Sub Arterial
+  - Bold labels, zoom-responsive sizing, road attributes in detail panel
+
+- **Road Mode Click Fix**
+  - Bounding box query with 10px tolerance for thin road polygons
+  - Fixes Weird1/Weird2/N5 clickability issues
+
+### Layers Cleanup
+- Removed legacy overlays (old village roads, burial grounds, R1 boundaries)
+- Deleted LayerControls.jsx and Layers button
+- Allocated Lands toggle moved into Legend panel
+
+### New Files
+- `src/utils/roadSegmentMapping.js`, `src/components/SegmentIdFlash.jsx`
+- `docs/FILE_GUIDE.md`, `docs/FEATURES.md`
+
+### Deleted Files
+- `src/components/Legend/LayerControls.jsx`
+
+---
+
+## [v1.0] - Base Version (5dba5eb) (Feb 2025)
+
+**Tag: mvp1**
 
 ### Summary
-
-This release improves the loading experience, simplifies basemap handling, and adds full support for road reserves (U2/SU2): users can click road segments, name them, and persist names in the browser.
+Loading screen, basemap cleanup, and road reserve naming support.
 
 ### Changes
 
 - **Loading screen**
-  - Replaced simple spinner with a staged word spinner (“loading map”, “loading plots”, “rendering”, “ready”, etc.) and an animated progress bar (0–100%).
-  - Progress is derived from loading status messages; percentage animates smoothly.
-  - Visual refresh: “Cap A” branding, gradient progress bar (orange → purple), cleaner typography.
+  - Staged word spinner with animated progress bar
+  - "Cap A" branding, gradient progress bar
 
 - **Map (MapContainer)**
-  - **Basemap:** Switched to a “nuclear” approach: hide all CARTO Dark Matter layers except `background` and `water`. This removes roads, labels, buildings, and other basemap noise without maintaining a long list of layer IDs that can change.
-  - **Road reserves:** Clicking a road reserve (U2/SU2) now opens a detail panel instead of being ignored. Centroid is computed when lat/lon are missing. Road names can be entered, saved, and cleared; they are stored in `localStorage` keyed by feature id.
-  - **Highlight:** Selected road reserves are highlighted on the map like regular plots.
-  - Minor: `useImperativeHandle` dependency array removed (no functional change).
+  - Nuclear basemap: hide all CARTO Dark Matter layers except background + water
+  - Road reserve click handling with name save/edit in localStorage
+  - Selected road reserves highlighted on map
 
-- **Plot detail panel (PlotDetailPanel)**
-  - **Landmark panel:** Existing allocated-land/landmark view retained (category, Google Maps link).
-  - **Road panel (new):** Dedicated panel for road reserves with:
-    - Header: “Road Reserve”, symbology, editable name (default “Unnamed Road”).
-    - “Road Name” section: text input, Save, and “Remove name” when saved.
-    - Area, optional location (village/township), position (lat/lon), and Google Maps link.
-    - Footer note that names are saved in the browser.
+- **Plot detail panel**
+  - Landmark panel for allocated lands
+  - Road panel with editable name, area, location, Google Maps link
 
-- **Styles (index.css)**
-  - New/updated styles for the loading screen: word-spinner container, `.word-slot` enter/exit animations, `.progress-track` / `.progress-fill`, gradient and typography tweaks.
-
-- **Utils (colors.js)**
-  - Small fix/consistency update in zoning color handling (no behavioral change to map rendering).
+- **Styles**
+  - Loading screen animations, panel slide-in, scrollbar styling
 
 ---
 
-## Previous versions
+## Previous Commits
 
-- **0e14856** — Fix plot outlines: dark lines, high opacity for clear demarcation.
-- **793856e** — Fix basemap noise, update color palette, improve plot outlines.
-- **8fc97a4** — Remove named roads (E/N) layer (incorrect geometry).
-- **4831e97** — Phase 1.2: Anchor-verified E/N named roads.
-- **9152185** — Phase 1.1: ArcGIS colors, dark basemap, water fix, named roads, search improvements.
-- **d159b82** — Initial commit: Amaravati Capital City Interactive Map (Phase 1).
+- **0e14856** - Fix plot outlines: dark lines, high opacity for clear demarcation
+- **793856e** - Fix basemap noise, update color palette, improve plot outlines
+- **8fc97a4** - Remove named roads (E/N) layer (incorrect wiggly geometry)
+- **4831e97** - Phase 1.2: Anchor-verified E/N named roads
+- **9152185** - Phase 1.1: ArcGIS colors, dark basemap, water fix, named roads, search
+- **d159b82** - Initial commit: Amaravati Capital City Interactive Map (Phase 1)

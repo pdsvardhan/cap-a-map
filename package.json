@@ -9,10 +9,18 @@
     "preview": "vite preview",
     "data": "python scripts/process_all.py"
   },
-  "keywords": ["amaravati", "map", "gis", "apcrda"],
+  "keywords": [
+    "amaravati",
+    "map",
+    "gis",
+    "apcrda"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@turf/bbox": "^7.3.4",
+    "@turf/boolean-touches": "^7.3.4",
+    "@turf/helpers": "^7.3.4",
     "fuse.js": "^7.1.0",
     "maplibre-gl": "^5.18.0",
     "pmtiles": "^4.4.0",

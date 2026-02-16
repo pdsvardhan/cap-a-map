@@ -1,77 +1,255 @@
-import React from 'react'
-import { ZONING_GROUPS } from '../../utils/colors'
+import React, { useState, useMemo, useCallback } from 'react'
+import { ZONING_GROUPS, ZONING_HIERARCHY } from '../../utils/colors'
 
-export default function Legend({ onClose }) {
-  const groups = Object.entries(ZONING_GROUPS)
+const ALL_GROUP_KEYS = Object.keys(ZONING_GROUPS)
+
+const QUICK_FILTERS = {
+  residential: { label: 'Residential', groups: ['residential-high', 'residential-low', 'residential-vacant'] },
+  commercial: { label: 'Commercial', groups: ['commercial', 'commercial-vacant'] },
+  'parks-green': { label: 'Parks & Green', groups: ['parks-active', 'parks-passive', 'water', 'green-belt', 'village-green'] },
+  public: { label: 'Public', groups: ['education', 'cultural', 'health', 'government'] },
+  'industrial-special': { label: 'Industrial', groups: ['industrial', 'special', 'special-zone', 'recreation'] },
+  mobility: { label: 'Mobility', groups: ['road-reserve', 'roads-infra'] },
+}
+
+export default function Legend({ onClose, activeZoningGroups, onActiveZoningGroupsChange, plotCounts, allocatedLandsVisible, onAllocatedLandsToggle }) {
+  const [collapsedCategories, setCollapsedCategories] = useState(new Set())
+  const [activeQuickFilter, setActiveQuickFilter] = useState(null)
+
+  const isAllActive = !activeZoningGroups || activeZoningGroups.size === ALL_GROUP_KEYS.length
+
+  const isGroupActive = useCallback((groupKey) => {
+    return isAllActive || (activeZoningGroups && activeZoningGroups.has(groupKey))
+  }, [activeZoningGroups, isAllActive])
+
+  const totalVisible = useMemo(() => {
+    if (isAllActive || !plotCounts) {
+      return plotCounts ? Object.values(plotCounts).reduce((sum, c) => sum + c, 0) : 0
+    }
+    let total = 0
+    for (const key of activeZoningGroups) {
+      total += (plotCounts[key] || 0)
+    }
+    return total
+  }, [activeZoningGroups, isAllActive, plotCounts])
+
+  const toggleGroup = useCallback((groupKey) => {
+    setActiveQuickFilter(null)
+    const current = activeZoningGroups ? new Set(activeZoningGroups) : new Set(ALL_GROUP_KEYS)
+    if (current.has(groupKey)) {
+      current.delete(groupKey)
+    } else {
+      current.add(groupKey)
+    }
+    onActiveZoningGroupsChange(current.size === ALL_GROUP_KEYS.length ? null : current)
+  }, [activeZoningGroups, onActiveZoningGroupsChange])
+
+  const toggleCategory = useCallback((categoryId) => {
+    setActiveQuickFilter(null)
+    const cat = ZONING_HIERARCHY.find(c => c.id === categoryId)
+    if (!cat) return
+    const current = activeZoningGroups ? new Set(activeZoningGroups) : new Set(ALL_GROUP_KEYS)
+    const allActive = cat.groups.every(g => current.has(g))
+    for (const g of cat.groups) {
+      if (allActive) current.delete(g)
+      else current.add(g)
+    }
+    onActiveZoningGroupsChange(current.size === ALL_GROUP_KEYS.length ? null : current)
+  }, [activeZoningGroups, onActiveZoningGroupsChange])
+
+  const handleSelectAll = useCallback(() => {
+    setActiveQuickFilter(null)
+    onActiveZoningGroupsChange(null)
+  }, [onActiveZoningGroupsChange])
+
+  const handleClearAll = useCallback(() => {
+    setActiveQuickFilter(null)
+    onActiveZoningGroupsChange(new Set())
+  }, [onActiveZoningGroupsChange])
+
+  const handleQuickFilter = useCallback((filterId) => {
+    if (activeQuickFilter === filterId) {
+      setActiveQuickFilter(null)
+      onActiveZoningGroupsChange(null)
+      return
+    }
+    setActiveQuickFilter(filterId)
+    const groups = QUICK_FILTERS[filterId]?.groups || []
+    onActiveZoningGroupsChange(new Set(groups))
+  }, [activeQuickFilter, onActiveZoningGroupsChange])
+
+  const toggleCollapse = useCallback((categoryId) => {
+    setCollapsedCategories(prev => {
+      const next = new Set(prev)
+      if (next.has(categoryId)) next.delete(categoryId)
+      else next.add(categoryId)
+      return next
+    })
+  }, [])
 
   return (
-    <div className="absolute top-16 right-4 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-30 max-h-[calc(100vh-120px)] flex flex-col">
+    <div className="absolute top-16 right-4 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-30 max-h-[calc(100vh-120px)] flex flex-col">
       {/* Header */}
       <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
-        <h3 className="text-sm font-semibold text-gray-800">Zoning Legend</h3>
-        <button
-          onClick={onClose}
-          className="p-1 hover:bg-gray-100 rounded transition-colors"
-        >
+        <h3 className="text-sm font-semibold text-gray-800">Zoning Explorer</h3>
+        <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded transition-colors">
           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
-      {/* Legend items */}
-      <div className="overflow-y-auto panel-scroll px-4 py-3 space-y-1.5">
-        {groups.map(([key, group]) => {
-          // Road reserve is transparent — show with hatching pattern
-          const isTransparent = group.color === 'transparent'
+      {/* Action buttons */}
+      <div className="px-4 py-2 border-b border-gray-100 flex gap-2 flex-shrink-0">
+        <button
+          onClick={handleSelectAll}
+          className={`px-2.5 py-1 text-[10px] font-medium rounded transition-colors ${isAllActive ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+        >
+          Select All
+        </button>
+        <button
+          onClick={handleClearAll}
+          className="px-2.5 py-1 text-[10px] font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 rounded transition-colors"
+        >
+          Clear
+        </button>
+      </div>
+
+      {/* Quick filters */}
+      <div className="px-4 py-2 border-b border-gray-100 flex-shrink-0">
+        <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Quick Filters</p>
+        <div className="flex flex-wrap gap-1.5">
+          {Object.entries(QUICK_FILTERS).map(([filterId, filter]) => (
+            <button
+              key={filterId}
+              onClick={() => handleQuickFilter(filterId)}
+              className={`px-2 py-0.5 text-[10px] font-medium rounded-full transition-colors ${
+                activeQuickFilter === filterId
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Hierarchical groups */}
+      <div className="overflow-y-auto panel-scroll flex-1 px-3 py-2 space-y-0.5">
+        {ZONING_HIERARCHY.map((category) => {
+          const isCollapsed = collapsedCategories.has(category.id)
+          const catGroupsActive = category.groups.filter(g => isGroupActive(g)).length
+          const catGroupsTotal = category.groups.length
+          const allCatActive = catGroupsActive === catGroupsTotal
+          const someCatActive = catGroupsActive > 0 && !allCatActive
+
           return (
-            <div key={key} className="flex items-center gap-2.5 py-1">
-              <div
-                className="w-5 h-4 rounded-sm flex-shrink-0"
-                style={isTransparent ? {
-                  backgroundColor: '#f5f5f5',
-                  border: '1px solid #999',
-                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, #ccc 2px, #ccc 3px)',
-                } : {
-                  backgroundColor: group.color,
-                  border: '1px solid ' + (group.outlineColor || '#ddd'),
-                }}
-              />
-              <span className="text-xs text-gray-700">{group.label}</span>
+            <div key={category.id} className="mb-0.5">
+              {/* Category header */}
+              <div className="flex items-center gap-1.5 py-1.5 cursor-pointer group" onClick={() => toggleCollapse(category.id)}>
+                <svg
+                  className={`w-3 h-3 text-gray-400 transition-transform ${isCollapsed ? '' : 'rotate-90'}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleCategory(category.id) }}
+                  className={`w-3.5 h-3.5 rounded-sm border flex-shrink-0 flex items-center justify-center transition-colors ${
+                    allCatActive ? 'bg-blue-600 border-blue-600' : someCatActive ? 'bg-blue-200 border-blue-400' : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                >
+                  {allCatActive && (
+                    <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                  {someCatActive && (
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-sm" />
+                  )}
+                </button>
+                <span className="text-xs font-semibold text-gray-700 group-hover:text-gray-900">{category.label}</span>
+                <span className="text-[9px] text-gray-400 ml-auto">{catGroupsActive}/{catGroupsTotal}</span>
+              </div>
+
+              {/* Individual groups */}
+              {!isCollapsed && (
+                <div className="ml-5 space-y-0">
+                  {category.groups.map((groupKey) => {
+                    const group = ZONING_GROUPS[groupKey]
+                    if (!group) return null
+                    const active = isGroupActive(groupKey)
+                    const isTransparent = group.color === 'transparent'
+                    const count = plotCounts?.[groupKey] || 0
+
+                    return (
+                      <div
+                        key={groupKey}
+                        className={`flex items-center gap-2 py-1 px-1.5 rounded cursor-pointer transition-colors hover:bg-gray-50 ${!active ? 'opacity-40' : ''}`}
+                        onClick={() => toggleGroup(groupKey)}
+                      >
+                        <button
+                          className={`w-3.5 h-3.5 rounded-sm border flex-shrink-0 flex items-center justify-center transition-colors ${
+                            active ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
+                          }`}
+                        >
+                          {active && (
+                            <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </button>
+                        <div
+                          className="w-4 h-3 rounded-sm flex-shrink-0"
+                          style={isTransparent ? {
+                            backgroundColor: '#f5f5f5',
+                            border: '1px solid #999',
+                            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, #ccc 2px, #ccc 3px)',
+                          } : {
+                            backgroundColor: group.color,
+                            border: '1px solid ' + (group.outlineColor || '#ddd'),
+                          }}
+                        />
+                        <span className="text-[11px] text-gray-700 flex-1">{group.label}</span>
+                        <span className="text-[9px] text-gray-400 tabular-nums">{count.toLocaleString()}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           )
         })}
 
-        {/* Additional overlay indicators */}
-        <div className="pt-3 mt-3 border-t border-gray-100 space-y-1.5">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
-            Overlays
-          </p>
-          <div className="flex items-center gap-2.5 py-1">
-            <div className="w-5 h-0.5 bg-[#78909C] flex-shrink-0" />
-            <span className="text-xs text-gray-700">Roads</span>
-          </div>
-          <div className="flex items-center gap-2.5 py-1">
-            <div className="w-5 h-4 rounded-sm bg-[#FF0000] border border-gray-200 flex-shrink-0" style={{ opacity: 0.4 }} />
-            <span className="text-xs text-gray-700">Burial Grounds</span>
-          </div>
-          <div className="flex items-center gap-2.5 py-1">
-            <div className="w-5 h-4 rounded-sm bg-[#FF6F00] border border-gray-200 flex-shrink-0" />
-            <span className="text-xs text-gray-700">Allocated Lands</span>
-          </div>
-          <div className="flex items-center gap-2.5 py-1">
-            <div className="w-5 h-0.5 flex-shrink-0" style={{ borderTop: '2px dashed #FF5722' }} />
-            <span className="text-xs text-gray-700">Boundaries (R1)</span>
+        {/* Allocated Lands toggle */}
+        <div className="pt-2 mt-1 border-t border-gray-100">
+          <div
+            className={`flex items-center gap-2 py-1.5 px-1.5 rounded cursor-pointer transition-colors hover:bg-gray-50 ${!allocatedLandsVisible ? 'opacity-40' : ''}`}
+            onClick={() => onAllocatedLandsToggle?.()}
+          >
+            <button
+              className={`w-3.5 h-3.5 rounded-sm border flex-shrink-0 flex items-center justify-center transition-colors ${
+                allocatedLandsVisible ? 'bg-orange-500 border-orange-500' : 'border-gray-300'
+              }`}
+            >
+              {allocatedLandsVisible && (
+                <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </button>
+            <div className="w-4 h-3 rounded-sm flex-shrink-0 bg-[#FF6F00] border border-[#CC5800]" />
+            <span className="text-[11px] text-gray-700">Allocated Lands</span>
           </div>
         </div>
+      </div>
 
-        {/* Unknown */}
-        <div className="pt-2 mt-2 border-t border-gray-100">
-          <div className="flex items-center gap-2.5 py-1">
-            <div className="w-5 h-4 rounded-sm bg-[#BDBDBD] border border-gray-200 flex-shrink-0" />
-            <span className="text-xs text-gray-500">Unknown / Other</span>
-          </div>
-        </div>
+      {/* Footer: visible count */}
+      <div className="px-4 py-2 border-t border-gray-100 flex-shrink-0">
+        <span className="text-[10px] text-gray-500">
+          {totalVisible.toLocaleString()} plots visible
+        </span>
       </div>
     </div>
   )
