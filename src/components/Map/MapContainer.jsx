@@ -427,16 +427,20 @@ const MapContainer = forwardRef(function MapContainer(
 
     // Load user-unnamed overrides: segments the user explicitly marked as NOT part of a named road
     let unnamedKeys = new Set()
+    let unnamedMigrated = false
     try {
       const raw = JSON.parse(localStorage.getItem('roadUnnamed') || '[]')
       unnamedKeys = new Set(raw)
     } catch (e) { /* ignore */ }
 
-    // Migrate old "lat,lon" format keys to new "lon_lat_area" format
+    // Migrate old format keys to current "lon_lat_area" format
+    // Format 1: "lat,lon" (comma-separated, no area)
+    // Format 2: "lon_lat_0.00" (underscore-separated, area=0.00 from older stableKey)
     const oldLatLonKeys = Object.keys(roadNames).filter(k => /^\d+\.\d+,\d+\.\d+$/.test(k))
+    const oldUnderscoreKeys = Object.keys(roadNames).filter(k => /^\d+\.\d+_\d+\.\d+_0\.00$/.test(k))
     let migrated = false
-    if (oldLatLonKeys.length > 0) {
-      // Build a lookup of road reserve centroids -> stableKey
+    if (oldLatLonKeys.length > 0 || oldUnderscoreKeys.length > 0) {
+      // Build a lookup of road reserve centroids -> stableKey (fuzzy by lon/lat)
       const centroidToStable = new Map()
       for (const f of plotFeatures) {
         if (!ROAD_RESERVE_SYMBOLOGIES.has(f.properties?.symbology)) continue
@@ -444,14 +448,22 @@ const MapContainer = forwardRef(function MapContainer(
         if (!sk) continue
         const centroid = computeCentroid(f.geometry)
         if (!centroid) continue
-        // Round to 4 decimals for fuzzy matching with old keys
-        const approxKey = `${centroid[1].toFixed(4)},${centroid[0].toFixed(4)}`
-        centroidToStable.set(approxKey, sk)
+        // Multiple fuzzy keys for matching different precisions
+        for (const decimals of [4, 5, 6]) {
+          const key = `${centroid[0].toFixed(decimals)}_${centroid[1].toFixed(decimals)}`
+          centroidToStable.set(key, sk)
+        }
+        // Also old "lat,lon" format
+        const latLonKey = `${centroid[1].toFixed(4)},${centroid[0].toFixed(4)}`
+        centroidToStable.set(latLonKey, sk)
+        // Also the exact old key format: lon_lat_0.00
+        const oldExact = `${centroid[0].toFixed(6)}_${centroid[1].toFixed(6)}_0.00`
+        centroidToStable.set(oldExact, sk)
       }
+      // Migrate "lat,lon" format
       for (const oldKey of oldLatLonKeys) {
         const name = roadNames[oldKey]
         if (!name?.trim()) { delete roadNames[oldKey]; migrated = true; continue }
-        // oldKey is "lat,lon" with ~4 decimal places
         const approx = oldKey.split(',').map(v => parseFloat(v).toFixed(4)).join(',')
         const stableKey = centroidToStable.get(approx)
         if (stableKey && !roadNames[stableKey]) {
@@ -459,6 +471,48 @@ const MapContainer = forwardRef(function MapContainer(
         }
         delete roadNames[oldKey]
         migrated = true
+      }
+      // Migrate "lon_lat_0.00" format
+      for (const oldKey of oldUnderscoreKeys) {
+        const name = roadNames[oldKey]
+        if (!name?.trim()) { delete roadNames[oldKey]; migrated = true; continue }
+        // Try exact match first (the centroidToStable has oldExact keys)
+        let stableKey = centroidToStable.get(oldKey)
+        if (!stableKey) {
+          const parts = oldKey.split('_')
+          for (const decimals of [4, 5, 6]) {
+            const k = `${parseFloat(parts[0]).toFixed(decimals)}_${parseFloat(parts[1]).toFixed(decimals)}`
+            stableKey = centroidToStable.get(k)
+            if (stableKey) break
+          }
+        }
+        if (stableKey && !roadNames[stableKey]) {
+          roadNames[stableKey] = name.trim()
+        }
+        delete roadNames[oldKey]
+        migrated = true
+      }
+
+      // Also migrate unnamed keys from old "lon_lat_0.00" format
+      const oldUnnamedKeys = [...unnamedKeys].filter(k => /^\d+\.\d+_\d+\.\d+_0\.00$/.test(k))
+      for (const oldKey of oldUnnamedKeys) {
+        let stableKey = centroidToStable.get(oldKey)
+        if (!stableKey) {
+          const parts = oldKey.split('_')
+          for (const decimals of [4, 5, 6]) {
+            const k = `${parseFloat(parts[0]).toFixed(decimals)}_${parseFloat(parts[1]).toFixed(decimals)}`
+            stableKey = centroidToStable.get(k)
+            if (stableKey) break
+          }
+        }
+        unnamedKeys.delete(oldKey)
+        if (stableKey) unnamedKeys.add(stableKey)
+        unnamedMigrated = true
+      }
+      if (unnamedMigrated) {
+        try {
+          localStorage.setItem('roadUnnamed', JSON.stringify([...unnamedKeys]))
+        } catch (e) { /* ignore */ }
       }
     }
 
@@ -532,8 +586,8 @@ const MapContainer = forwardRef(function MapContainer(
     // 3. Large enough to be a grid road (not a small internal road)
     //    Uses alloted_ex (Sq.Yards) — internal roads are typically <500 SqYd
     const mappedKeys = new Set(segmentFeatures.map(f => f.id))
-    const CORRIDOR_TOL = 0.0012 // ~130m tolerance for corridor alignment
-    const MAX_GAP_DEG = 0.0015  // ~165m max gap between chain segments (increased for better fill)
+    const CORRIDOR_TOL = 0.002  // ~220m tolerance for corridor alignment
+    const MAX_GAP_DEG = 0.003   // ~330m max gap between chain segments
     const MIN_AREA_SQYD = 500   // Minimum reserve area in Sq.Yards to qualify for gap-fill
 
     // Pre-compute all unmapped road reserve centroids + areas for efficiency
