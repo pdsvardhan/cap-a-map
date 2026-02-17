@@ -18,6 +18,7 @@ export default function App() {
   const [plotCounts, setPlotCounts] = useState({})
   const [allocatedLandsVisible, setAllocatedLandsVisible] = useState(true)
   const [colorMode, setColorMode] = useState('zoning') // 'zoning' or 'area'
+  const [showNamedOnly, setShowNamedOnly] = useState(false)
 
   const mapRef = useRef(null)
 
@@ -101,6 +102,7 @@ export default function App() {
         allocatedLandsVisible={allocatedLandsVisible}
         onPlotCountsReady={setPlotCounts}
         colorMode={colorMode}
+        showNamedOnly={showNamedOnly}
       />
 
       {/* Top Bar: Search + Controls */}
@@ -143,6 +145,23 @@ export default function App() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                 </svg>
                 Roads
+              </span>
+            </button>
+            <button
+              onClick={() => setShowNamedOnly(!showNamedOnly)}
+              className={`px-3 py-2.5 rounded-lg shadow-md text-sm font-medium transition-colors ${
+                showNamedOnly
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+              title="Show only named roads on dark background"
+            >
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                Grid
               </span>
             </button>
           </div>

@@ -7,7 +7,7 @@ import { buildJunctionMatrix } from '../../utils/junctionMatrix'
 import { SEGMENT_TO_ROAD } from '../../utils/roadSegmentMapping'
 
 const MapContainer = forwardRef(function MapContainer(
-  { onMapReady, onPlotClick, onLoadingStatus, selectedPlot, onNamedRoadsIndexReady, roadMode, activeZoningGroups, allocatedLandsVisible, onPlotCountsReady, colorMode },
+  { onMapReady, onPlotClick, onLoadingStatus, selectedPlot, onNamedRoadsIndexReady, roadMode, activeZoningGroups, allocatedLandsVisible, onPlotCountsReady, colorMode, showNamedOnly },
   ref
 ) {
   const mapContainerRef = useRef(null)
@@ -411,7 +411,7 @@ const MapContainer = forwardRef(function MapContainer(
       area += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1]
     }
     area = Math.abs(area) / 2
-    return `${centroid[0].toFixed(6)}_${centroid[1].toFixed(6)}_${area.toFixed(2)}`
+    return `${centroid[0].toFixed(6)}_${centroid[1].toFixed(6)}_${area.toFixed(8)}`
   }
 
   /**
@@ -427,94 +427,12 @@ const MapContainer = forwardRef(function MapContainer(
 
     // Load user-unnamed overrides: segments the user explicitly marked as NOT part of a named road
     let unnamedKeys = new Set()
-    let unnamedMigrated = false
     try {
       const raw = JSON.parse(localStorage.getItem('roadUnnamed') || '[]')
       unnamedKeys = new Set(raw)
     } catch (e) { /* ignore */ }
 
-    // Migrate old format keys to current "lon_lat_area" format
-    // Format 1: "lat,lon" (comma-separated, no area)
-    // Format 2: "lon_lat_0.00" (underscore-separated, area=0.00 from older stableKey)
-    const oldLatLonKeys = Object.keys(roadNames).filter(k => /^\d+\.\d+,\d+\.\d+$/.test(k))
-    const oldUnderscoreKeys = Object.keys(roadNames).filter(k => /^\d+\.\d+_\d+\.\d+_0\.00$/.test(k))
-    let migrated = false
-    if (oldLatLonKeys.length > 0 || oldUnderscoreKeys.length > 0) {
-      // Build a lookup of road reserve centroids -> stableKey (fuzzy by lon/lat)
-      const centroidToStable = new Map()
-      for (const f of plotFeatures) {
-        if (!ROAD_RESERVE_SYMBOLOGIES.has(f.properties?.symbology)) continue
-        const sk = getStableRoadKey(f.geometry)
-        if (!sk) continue
-        const centroid = computeCentroid(f.geometry)
-        if (!centroid) continue
-        // Multiple fuzzy keys for matching different precisions
-        for (const decimals of [4, 5, 6]) {
-          const key = `${centroid[0].toFixed(decimals)}_${centroid[1].toFixed(decimals)}`
-          centroidToStable.set(key, sk)
-        }
-        // Also old "lat,lon" format
-        const latLonKey = `${centroid[1].toFixed(4)},${centroid[0].toFixed(4)}`
-        centroidToStable.set(latLonKey, sk)
-        // Also the exact old key format: lon_lat_0.00
-        const oldExact = `${centroid[0].toFixed(6)}_${centroid[1].toFixed(6)}_0.00`
-        centroidToStable.set(oldExact, sk)
-      }
-      // Migrate "lat,lon" format
-      for (const oldKey of oldLatLonKeys) {
-        const name = roadNames[oldKey]
-        if (!name?.trim()) { delete roadNames[oldKey]; migrated = true; continue }
-        const approx = oldKey.split(',').map(v => parseFloat(v).toFixed(4)).join(',')
-        const stableKey = centroidToStable.get(approx)
-        if (stableKey && !roadNames[stableKey]) {
-          roadNames[stableKey] = name.trim()
-        }
-        delete roadNames[oldKey]
-        migrated = true
-      }
-      // Migrate "lon_lat_0.00" format
-      for (const oldKey of oldUnderscoreKeys) {
-        const name = roadNames[oldKey]
-        if (!name?.trim()) { delete roadNames[oldKey]; migrated = true; continue }
-        // Try exact match first (the centroidToStable has oldExact keys)
-        let stableKey = centroidToStable.get(oldKey)
-        if (!stableKey) {
-          const parts = oldKey.split('_')
-          for (const decimals of [4, 5, 6]) {
-            const k = `${parseFloat(parts[0]).toFixed(decimals)}_${parseFloat(parts[1]).toFixed(decimals)}`
-            stableKey = centroidToStable.get(k)
-            if (stableKey) break
-          }
-        }
-        if (stableKey && !roadNames[stableKey]) {
-          roadNames[stableKey] = name.trim()
-        }
-        delete roadNames[oldKey]
-        migrated = true
-      }
-
-      // Also migrate unnamed keys from old "lon_lat_0.00" format
-      const oldUnnamedKeys = [...unnamedKeys].filter(k => /^\d+\.\d+_\d+\.\d+_0\.00$/.test(k))
-      for (const oldKey of oldUnnamedKeys) {
-        let stableKey = centroidToStable.get(oldKey)
-        if (!stableKey) {
-          const parts = oldKey.split('_')
-          for (const decimals of [4, 5, 6]) {
-            const k = `${parseFloat(parts[0]).toFixed(decimals)}_${parseFloat(parts[1]).toFixed(decimals)}`
-            stableKey = centroidToStable.get(k)
-            if (stableKey) break
-          }
-        }
-        unnamedKeys.delete(oldKey)
-        if (stableKey) unnamedKeys.add(stableKey)
-        unnamedMigrated = true
-      }
-      if (unnamedMigrated) {
-        try {
-          localStorage.setItem('roadUnnamed', JSON.stringify([...unnamedKeys]))
-        } catch (e) { /* ignore */ }
-      }
-    }
+    // No migration needed — localStorage was reset, all keys use current format
 
     const segmentFeatures = []
     const byName = {} // name -> { centroids: [], bbox: [minLon, minLat, maxLon, maxLat] }
@@ -535,17 +453,8 @@ const MapContainer = forwardRef(function MapContainer(
       const segId = keyToId.get(stableKey)
       let name = (segId != null && SEGMENT_TO_ROAD[segId]) || null
       if (!name) name = roadNames[stableKey] || null
-      if (!name || !name.trim()) {
-        const oldKey = String(i)
-        if (roadNames[oldKey] && roadNames[oldKey].trim()) {
-          name = roadNames[oldKey].trim()
-          roadNames[stableKey] = name
-          delete roadNames[oldKey]
-          migrated = true
-        } else continue
-      } else {
-        name = name.trim()
-      }
+      if (!name || !name.trim()) continue
+      name = name.trim()
       const roadName = name
       const roadCategory = getRoadType(roadName) || 'other'
 
@@ -573,11 +482,6 @@ const MapContainer = forwardRef(function MapContainer(
       }
     }
 
-    if (migrated) {
-      try {
-        localStorage.setItem('roadNames', JSON.stringify(roadNames))
-      } catch (e) { /* ignore */ }
-    }
 
     // Gap-fill: chain-based expansion from known road segments.
     // For each named road, iteratively add unmapped road reserves that are:
@@ -782,17 +686,20 @@ const MapContainer = forwardRef(function MapContainer(
       }
     }
 
-    let locKey = getStableRoadKey(roadFeature.geometry)
-    let segmentId = locKey ? (roadSegmentIndexRef.current.keyToId.get(locKey) ?? null) : null
-
-    // Fallback: use original GeoJSON geometry if rendered geometry key doesn't match
-    if (segmentId == null && roadFeature.id != null) {
+    // Always use ORIGINAL geometry for stable key (rendered geometry varies by zoom/tile)
+    let locKey = null
+    let segmentId = null
+    if (roadFeature.id != null) {
       const originalFeature = plotsDataRef.current?.features?.[roadFeature.id]
       if (originalFeature) {
-        const origKey = getStableRoadKey(originalFeature.geometry)
-        segmentId = origKey ? (roadSegmentIndexRef.current.keyToId.get(origKey) ?? null) : null
-        if (segmentId != null) locKey = origKey
+        locKey = getStableRoadKey(originalFeature.geometry)
+        segmentId = locKey ? (roadSegmentIndexRef.current.keyToId.get(locKey) ?? null) : null
       }
+    }
+    // Fallback to rendered geometry if original not found
+    if (!locKey) {
+      locKey = getStableRoadKey(roadFeature.geometry)
+      segmentId = locKey ? (roadSegmentIndexRef.current.keyToId.get(locKey) ?? null) : null
     }
 
     // Name priority: mapping file > localStorage
@@ -963,6 +870,25 @@ const MapContainer = forwardRef(function MapContainer(
       console.log(`Road Mode ON — ${roadSegmentIndexRef.current.segments.length} segments. Use console: roadSegmentIndexRef`)
     }
   }, [roadMode])
+
+  // Show Named Roads Only mode: hide plots, show only named roads on dark background
+  useEffect(() => {
+    const map = mapInstanceRef.current
+    if (!map || !map.isStyleLoaded()) return
+    const plotLayers = [LAYERS.PLOTS_FILL, LAYERS.PLOTS_OUTLINE, LAYERS.ALLOCATED_LANDS, LAYERS.ALLOCATED_LANDS_OUTLINE, LAYERS.ALLOCATED_LANDS_LABELS]
+    for (const layerId of plotLayers) {
+      if (map.getLayer(layerId)) {
+        map.setLayoutProperty(layerId, 'visibility', showNamedOnly ? 'none' : 'visible')
+      }
+    }
+    // Make named roads more prominent when in this mode
+    if (map.getLayer(LAYERS.NAMED_ROADS_FILL)) {
+      map.setPaintProperty(LAYERS.NAMED_ROADS_FILL, 'fill-opacity', showNamedOnly ? 1 : 1)
+    }
+    if (map.getLayer(LAYERS.NAMED_ROADS_OUTLINE)) {
+      map.setPaintProperty(LAYERS.NAMED_ROADS_OUTLINE, 'line-width', showNamedOnly ? 2 : 1.5)
+    }
+  }, [showNamedOnly])
 
   // Handle selected plot / named road highlight
   useEffect(() => {
