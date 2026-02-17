@@ -17,6 +17,7 @@ export default function App() {
   const [activeZoningGroups, setActiveZoningGroups] = useState(null)
   const [plotCounts, setPlotCounts] = useState({})
   const [allocatedLandsVisible, setAllocatedLandsVisible] = useState(true)
+  const [colorMode, setColorMode] = useState('zoning') // 'zoning' or 'area'
 
   const mapRef = useRef(null)
 
@@ -99,6 +100,7 @@ export default function App() {
         activeZoningGroups={activeZoningGroups}
         allocatedLandsVisible={allocatedLandsVisible}
         onPlotCountsReady={setPlotCounts}
+        colorMode={colorMode}
       />
 
       {/* Top Bar: Search + Controls */}
@@ -156,6 +158,8 @@ export default function App() {
           plotCounts={plotCounts}
           allocatedLandsVisible={allocatedLandsVisible}
           onAllocatedLandsToggle={handleAllocatedLandsToggle}
+          colorMode={colorMode}
+          onColorModeChange={setColorMode}
         />
       )}
 

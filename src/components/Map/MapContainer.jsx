@@ -2,12 +2,12 @@ import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react
 import maplibregl from 'maplibre-gl'
 import { MAP_CENTER, MAP_ZOOM, MAP_MIN_ZOOM, MAP_MAX_ZOOM, MAP_STYLE, DATA_PATHS, LAYERS, NAMED_ROAD_COLORS, NAMED_ROAD_OUTLINES } from '../../utils/constants'
 import { getRoadType, normalizeRoadName } from '../../utils/roadAttributes'
-import { buildSymbologyColorExpression, buildFilteredColorExpression, ROAD_RESERVE_SYMBOLOGIES, SYMBOLOGY_GROUP_MAP } from '../../utils/colors'
+import { buildSymbologyColorExpression, buildFilteredColorExpression, buildAreaHeatmapExpression, ROAD_RESERVE_SYMBOLOGIES, SYMBOLOGY_GROUP_MAP } from '../../utils/colors'
 import { buildJunctionMatrix } from '../../utils/junctionMatrix'
 import { SEGMENT_TO_ROAD } from '../../utils/roadSegmentMapping'
 
 const MapContainer = forwardRef(function MapContainer(
-  { onMapReady, onPlotClick, onLoadingStatus, selectedPlot, onNamedRoadsIndexReady, roadMode, activeZoningGroups, allocatedLandsVisible, onPlotCountsReady },
+  { onMapReady, onPlotClick, onLoadingStatus, selectedPlot, onNamedRoadsIndexReady, roadMode, activeZoningGroups, allocatedLandsVisible, onPlotCountsReady, colorMode },
   ref
 ) {
   const mapContainerRef = useRef(null)
@@ -732,14 +732,18 @@ const MapContainer = forwardRef(function MapContainer(
     })
   }
 
-  // Handle zoning filter changes — update plot fill colors
+  // Handle color mode and zoning filter changes — update plot fill colors
   useEffect(() => {
     const map = mapInstanceRef.current
     if (!map || !map.isStyleLoaded()) return
     if (!map.getLayer(LAYERS.PLOTS_FILL)) return
-    const expr = buildFilteredColorExpression(activeZoningGroups)
-    map.setPaintProperty(LAYERS.PLOTS_FILL, 'fill-color', expr)
-  }, [activeZoningGroups])
+    if (colorMode === 'area') {
+      map.setPaintProperty(LAYERS.PLOTS_FILL, 'fill-color', buildAreaHeatmapExpression())
+    } else {
+      const expr = buildFilteredColorExpression(activeZoningGroups)
+      map.setPaintProperty(LAYERS.PLOTS_FILL, 'fill-color', expr)
+    }
+  }, [activeZoningGroups, colorMode])
 
   // Handle allocated lands visibility toggle
   useEffect(() => {

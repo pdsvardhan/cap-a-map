@@ -391,6 +391,58 @@ export const ZONING_HIERARCHY = [
 ]
 
 /**
+ * Plot area heatmap: color expression based on alloted_ex (Sq.Yards).
+ * Small plots = warm (yellow), medium = orange, large = deep red/purple.
+ * Road reserves (transparent/U2) stay muted.
+ */
+export function buildAreaHeatmapExpression() {
+  // Gradient breakpoints in Sq. Yards:
+  //   0-200:     small plots (bright yellow-green)
+  //   200-500:   medium-small (yellow)
+  //   500-1000:  medium (orange)
+  //   1000-2000: medium-large (red-orange)
+  //   2000-5000: large (red)
+  //   5000+:     very large (deep purple)
+  return [
+    'case',
+    // Road reserves stay nearly invisible
+    ['any',
+      ['==', ['get', 'symbology'], 'U2 - Road reserve zone'],
+      ['==', ['get', 'symbology'], 'U2- Road reserve zone'],
+      ['==', ['get', 'symbology'], 'SU2 - Road Network'],
+    ],
+    'rgba(60,60,60,0.15)',
+    // No area data → grey
+    ['!', ['has', 'alloted_ex']],
+    'rgba(120,120,120,0.3)',
+    ['==', ['get', 'alloted_ex'], 0],
+    'rgba(120,120,120,0.3)',
+    // Area-based gradient
+    [
+      'interpolate', ['linear'], ['get', 'alloted_ex'],
+      0,    '#1a9850',   // green - tiny
+      200,  '#91cf60',   // light green
+      500,  '#fee08b',   // yellow
+      1000, '#fc8d59',   // orange
+      2000, '#d73027',   // red
+      5000, '#7b2d8e',   // purple - very large
+    ],
+  ]
+}
+
+/**
+ * Area heatmap legend breakpoints for display.
+ */
+export const AREA_HEATMAP_LEGEND = [
+  { label: '< 200 Sq.Yd', color: '#91cf60' },
+  { label: '200–500', color: '#fee08b' },
+  { label: '500–1,000', color: '#fc8d59' },
+  { label: '1,000–2,000', color: '#d73027' },
+  { label: '2,000–5,000', color: '#7b2d8e' },
+  { label: '> 5,000', color: '#4a0072' },
+]
+
+/**
  * Build a filtered color expression for MapLibre.
  * Active groups get their normal color, inactive groups get a faint muted color.
  * Pass null or a Set containing all group keys to show everything normally.
