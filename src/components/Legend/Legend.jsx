@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { ZONING_GROUPS, ZONING_HIERARCHY, AREA_HEATMAP_LEGEND } from '../../utils/colors'
-import { NAMED_ROAD_COLORS } from '../../utils/constants'
+import { NAMED_ROAD_COLOR } from '../../utils/constants'
 
 const ALL_GROUP_KEYS = Object.keys(ZONING_GROUPS)
 
@@ -13,12 +13,7 @@ const QUICK_FILTERS = {
   mobility: { label: 'Mobility', groups: ['road-reserve', 'roads-infra'] },
 }
 
-const ROAD_CATEGORIES = [
-  { key: 'arterial', label: 'Arterial' },
-  { key: 'major arterial', label: 'Major Arterial' },
-  { key: 'seed access', label: 'Seed Access' },
-  { key: 'sub-arterial', label: 'Sub Arterial' },
-]
+// Single uniform color for all grid roads (category-based coloring removed per user request)
 
 export default function Legend({ onClose, activeZoningGroups, onActiveZoningGroupsChange, plotCounts, allocatedLandsVisible, onAllocatedLandsToggle, colorMode, onColorModeChange }) {
   const [collapsedCategories, setCollapsedCategories] = useState(new Set())
@@ -348,18 +343,13 @@ export default function Legend({ onClose, activeZoningGroups, onActiveZoningGrou
           </div>
           {!roadsCollapsed && (
             <div className="ml-5 space-y-0.5">
-              {ROAD_CATEGORIES.map(({ key, label }) => (
-                <div key={key} className="flex items-center gap-2.5 py-1 px-1.5">
-                  <div
-                    className="w-5 h-2.5 rounded-sm flex-shrink-0"
-                    style={{
-                      backgroundColor: NAMED_ROAD_COLORS[key],
-                      border: `1px solid ${key === 'major arterial' ? '#333' : NAMED_ROAD_COLORS[key]}`,
-                    }}
-                  />
-                  <span className="text-[11px] text-gray-700">{label}</span>
-                </div>
-              ))}
+              <div className="flex items-center gap-2.5 py-1 px-1.5">
+                <div
+                  className="w-5 h-2.5 rounded-sm flex-shrink-0"
+                  style={{ backgroundColor: NAMED_ROAD_COLOR, border: `1px solid ${NAMED_ROAD_COLOR}` }}
+                />
+                <span className="text-[11px] text-gray-700">Grid Roads (E1-E16, N1-N18)</span>
+              </div>
             </div>
           )}
         </div>

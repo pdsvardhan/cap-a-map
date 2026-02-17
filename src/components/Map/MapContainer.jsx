@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import maplibregl from 'maplibre-gl'
-import { MAP_CENTER, MAP_ZOOM, MAP_MIN_ZOOM, MAP_MAX_ZOOM, MAP_STYLE, DATA_PATHS, LAYERS, NAMED_ROAD_COLORS, NAMED_ROAD_OUTLINES } from '../../utils/constants'
+import { MAP_CENTER, MAP_ZOOM, MAP_MIN_ZOOM, MAP_MAX_ZOOM, MAP_STYLE, DATA_PATHS, LAYERS, NAMED_ROAD_COLOR, NAMED_ROAD_OUTLINE } from '../../utils/constants'
 import { getRoadType, normalizeRoadName } from '../../utils/roadAttributes'
-import { buildSymbologyColorExpression, buildFilteredColorExpression, buildAreaHeatmapExpression, ROAD_RESERVE_SYMBOLOGIES, SYMBOLOGY_GROUP_MAP } from '../../utils/colors'
+import { buildSymbologyColorExpression, buildFilteredColorExpression, buildAreaHeatmapExpression, ROAD_RESERVE_SYMBOLOGIES, buildRoadReserveFilter, SYMBOLOGY_GROUP_MAP } from '../../utils/colors'
 import { buildJunctionMatrix } from '../../utils/junctionMatrix'
 import { SEGMENT_TO_ROAD } from '../../utils/roadSegmentMapping'
 
@@ -194,7 +194,15 @@ const MapContainer = forwardRef(function MapContainer(
             17, 1.2,
             19, 1.8,
           ],
-          'line-opacity': 0.9,
+          'line-opacity': [
+            'case',
+            // Road reserves get no outline — prevents dark outlines competing with named-roads layer
+            ['any',
+              ...Array.from(ROAD_RESERVE_SYMBOLOGIES).map(sym => ['==', ['get', 'symbology'], sym])
+            ],
+            0,
+            0.9,
+          ],
         },
       })
 
@@ -219,12 +227,7 @@ const MapContainer = forwardRef(function MapContainer(
           'fill-color': '#FF8C00',
           'fill-opacity': 0.35,
         },
-        filter: [
-          'any',
-          ['==', ['get', 'symbology'], 'U2 - Road reserve zone'],
-          ['==', ['get', 'symbology'], 'U2- Road reserve zone'],
-          ['==', ['get', 'symbology'], 'SU2 - Road Network'],
-        ],
+        filter: buildRoadReserveFilter(),
         layout: { visibility: 'none' },
       })
 
@@ -288,7 +291,12 @@ const MapContainer = forwardRef(function MapContainer(
         paint: {
           'line-color': '#1A1A1A',
           'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0, 13, 0.3, 15, 0.8, 17, 1.2, 19, 1.8],
-          'line-opacity': 0.9,
+          'line-opacity': [
+            'case',
+            ['any', ...Array.from(ROAD_RESERVE_SYMBOLOGIES).map(sym => ['==', ['get', 'symbology'], sym])],
+            0,
+            0.9,
+          ],
         },
       })
 
@@ -305,12 +313,7 @@ const MapContainer = forwardRef(function MapContainer(
         type: 'fill',
         source: 'plots',
         paint: { 'fill-color': '#FF8C00', 'fill-opacity': 0.35 },
-        filter: [
-          'any',
-          ['==', ['get', 'symbology'], 'U2 - Road reserve zone'],
-          ['==', ['get', 'symbology'], 'U2- Road reserve zone'],
-          ['==', ['get', 'symbology'], 'SU2 - Road Network'],
-        ],
+        filter: buildRoadReserveFilter(),
         layout: { visibility: 'none' },
       })
 
@@ -422,6 +425,13 @@ const MapContainer = forwardRef(function MapContainer(
       roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}')
     } catch (e) { /* ignore */ }
 
+    // Load user-unnamed overrides: segments the user explicitly marked as NOT part of a named road
+    let unnamedKeys = new Set()
+    try {
+      const raw = JSON.parse(localStorage.getItem('roadUnnamed') || '[]')
+      unnamedKeys = new Set(raw)
+    } catch (e) { /* ignore */ }
+
     // Migrate old "lat,lon" format keys to new "lon_lat_area" format
     const oldLatLonKeys = Object.keys(roadNames).filter(k => /^\d+\.\d+,\d+\.\d+$/.test(k))
     let migrated = false
@@ -463,6 +473,9 @@ const MapContainer = forwardRef(function MapContainer(
       if (!ROAD_RESERVE_SYMBOLOGIES.has(props.symbology)) continue
       const stableKey = getStableRoadKey(f.geometry)
       if (!stableKey) continue
+
+      // Skip segments explicitly marked as unnamed by the user
+      if (unnamedKeys.has(stableKey)) continue
 
       // Name priority: mapping file > localStorage
       const segId = keyToId.get(stableKey)
@@ -510,6 +523,91 @@ const MapContainer = forwardRef(function MapContainer(
       try {
         localStorage.setItem('roadNames', JSON.stringify(roadNames))
       } catch (e) { /* ignore */ }
+    }
+
+    // Gap-fill: chain-based expansion from known road segments.
+    // For each named road, iteratively add unmapped road reserves that are:
+    // 1. Aligned with the road's corridor (longitude for N-roads, latitude for E-roads)
+    // 2. Close to an existing segment in the chain (within MAX_GAP)
+    // 3. Large enough to be a grid road (not a small internal road)
+    //    Uses alloted_ex (Sq.Yards) — internal roads are typically <500 SqYd
+    const mappedKeys = new Set(segmentFeatures.map(f => f.id))
+    const CORRIDOR_TOL = 0.0012 // ~130m tolerance for corridor alignment
+    const MAX_GAP_DEG = 0.0015  // ~165m max gap between chain segments (increased for better fill)
+    const MIN_AREA_SQYD = 500   // Minimum reserve area in Sq.Yards to qualify for gap-fill
+
+    // Pre-compute all unmapped road reserve centroids + areas for efficiency
+    const unmappedRoadFeats = []
+    for (let i = 0; i < plotFeatures.length; i++) {
+      const f = plotFeatures[i]
+      if (!ROAD_RESERVE_SYMBOLOGIES.has(f.properties?.symbology)) continue
+      const sk = getStableRoadKey(f.geometry)
+      if (!sk || mappedKeys.has(sk) || unnamedKeys.has(sk)) continue
+      const centroid = computeCentroid(f.geometry)
+      if (!centroid) continue
+      // Use alloted_ex (Sq.Yards) to filter out small internal roads
+      const areaSqYd = parseFloat(f.properties?.alloted_ex) || 0
+      if (areaSqYd > 0 && areaSqYd < MIN_AREA_SQYD) continue
+      unmappedRoadFeats.push({ idx: i, sk, centroid, geometry: f.geometry, areaSqYd })
+    }
+
+    // For each named road, build corridor params and expand chain
+    for (const [roadName, meta] of Object.entries(byName)) {
+      const bb = meta.bbox
+      if (bb[0] === Infinity) continue
+      const isN = roadName.startsWith('N')
+
+      // Corridor center: median of the fixed coordinate
+      const fixedCoord = isN ? (bb[0] + bb[2]) / 2 : (bb[1] + bb[3]) / 2
+
+      // Current chain centroids for this road
+      const chainCentroids = [...meta.centroids]
+
+      // Iterative chain expansion
+      let added = true
+      while (added) {
+        added = false
+        for (const uf of unmappedRoadFeats) {
+          if (mappedKeys.has(uf.sk)) continue
+          const [cx, cy] = uf.centroid
+
+          // Check corridor alignment
+          const dist = isN
+            ? Math.abs(cx - fixedCoord)
+            : Math.abs(cy - fixedCoord)
+          if (dist > CORRIDOR_TOL) continue
+
+          // Check proximity to any segment in the chain
+          let closeEnough = false
+          for (const cc of chainCentroids) {
+            const dx = cx - cc[0]
+            const dy = cy - cc[1]
+            if (Math.abs(dx) < MAX_GAP_DEG && Math.abs(dy) < MAX_GAP_DEG) {
+              closeEnough = true
+              break
+            }
+          }
+          if (!closeEnough) continue
+
+          const roadCategory = getRoadType(roadName) || 'other'
+          segmentFeatures.push({
+            type: 'Feature',
+            id: uf.sk,
+            geometry: uf.geometry,
+            properties: { roadName, roadCategory },
+          })
+          mappedKeys.add(uf.sk)
+          chainCentroids.push(uf.centroid)
+          meta.centroids.push(uf.centroid)
+          meta.bbox = [
+            Math.min(bb[0], cx),
+            Math.min(bb[1], cy),
+            Math.max(bb[2], cx),
+            Math.max(bb[3], cy),
+          ]
+          added = true
+        }
+      }
     }
 
     const junctionMatrix = buildJunctionMatrix(segmentFeatures)
@@ -568,15 +666,8 @@ const MapContainer = forwardRef(function MapContainer(
         type: 'fill',
         source: 'namedRoads',
         paint: {
-          'fill-color': [
-            'match', ['get', 'roadCategory'],
-            'arterial', NAMED_ROAD_COLORS['arterial'],
-            'major arterial', NAMED_ROAD_COLORS['major arterial'],
-            'seed access', NAMED_ROAD_COLORS['seed access'],
-            'sub-arterial', NAMED_ROAD_COLORS['sub-arterial'],
-            NAMED_ROAD_COLORS['other'],
-          ],
-          'fill-opacity': 0.9,
+          'fill-color': NAMED_ROAD_COLOR,
+          'fill-opacity': 1,
         },
       })
       map.addLayer({
@@ -584,14 +675,7 @@ const MapContainer = forwardRef(function MapContainer(
         type: 'line',
         source: 'namedRoads',
         paint: {
-          'line-color': [
-            'match', ['get', 'roadCategory'],
-            'arterial', NAMED_ROAD_OUTLINES['arterial'],
-            'major arterial', NAMED_ROAD_OUTLINES['major arterial'],
-            'seed access', NAMED_ROAD_OUTLINES['seed access'],
-            'sub-arterial', NAMED_ROAD_OUTLINES['sub-arterial'],
-            NAMED_ROAD_OUTLINES['other'],
-          ],
+          'line-color': NAMED_ROAD_OUTLINE,
           'line-width': ['interpolate', ['linear'], ['zoom'], 12, 1.5, 16, 2.5, 19, 4],
           'line-opacity': 1,
         },
@@ -669,10 +753,65 @@ const MapContainer = forwardRef(function MapContainer(
       } catch (err) { /* ignore */ }
     }
 
+    // If no saved name, try to infer from the named roads data source
+    let inferredName = null
+    if (!savedName) {
+      const centroid = props.lat && props.lon ? [parseFloat(props.lon), parseFloat(props.lat)] : null
+      if (centroid) {
+        const namedSrc = mapInstanceRef.current?.getSource('namedRoads')
+        if (namedSrc) {
+          try {
+            const namedData = namedSrc._data || namedSrc.serialize?.()?.data
+            if (namedData?.features) {
+              // Check which named road corridor this centroid falls in
+              const roadBboxes = {}
+              for (const nf of namedData.features) {
+                const rn = nf.properties?.roadName
+                if (!rn) continue
+                if (!roadBboxes[rn]) roadBboxes[rn] = [Infinity, Infinity, -Infinity, -Infinity]
+                const nc = computeCentroid(nf.geometry)
+                if (!nc) continue
+                const bb = roadBboxes[rn]
+                roadBboxes[rn] = [Math.min(bb[0], nc[0]), Math.min(bb[1], nc[1]), Math.max(bb[2], nc[0]), Math.max(bb[3], nc[1])]
+              }
+              for (const [rn, bb] of Object.entries(roadBboxes)) {
+                const isN = rn.startsWith('N')
+                const [cx, cy] = centroid
+                if (isN) {
+                  const roadLon = (bb[0] + bb[2]) / 2
+                  if (Math.abs(cx - roadLon) < 0.001 && cy >= bb[1] - 0.003 && cy <= bb[3] + 0.003) {
+                    inferredName = rn
+                    break
+                  }
+                } else {
+                  const roadLat = (bb[1] + bb[3]) / 2
+                  if (Math.abs(cy - roadLat) < 0.001 && cx >= bb[0] - 0.003 && cx <= bb[2] + 0.003) {
+                    inferredName = rn
+                    break
+                  }
+                }
+              }
+            }
+          } catch (e) { /* ignore */ }
+        }
+      }
+    }
+
+    // Check if user explicitly marked this as unnamed
+    let isUnnamed = false
+    if (locKey) {
+      try {
+        const raw = JSON.parse(localStorage.getItem('roadUnnamed') || '[]')
+        isUnnamed = raw.includes(locKey)
+      } catch (e) { /* ignore */ }
+    }
+
     props._type = 'road'
     props._locKey = locKey
     props._segmentId = segmentId
-    props._roadName = savedName
+    props._roadName = isUnnamed ? null : savedName
+    props._inferredRoadName = isUnnamed ? null : inferredName
+    props._isUnnamed = isUnnamed
     onPlotClick?.(props)
   }
 

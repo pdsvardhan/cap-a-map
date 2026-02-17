@@ -39,19 +39,6 @@ export const LAYERS = {
   ROAD_MODE_OVERLAY: 'road-mode-overlay',
 }
 
-// Named roads styling: color-coded by road category (matches official Capital City Roads map)
-export const NAMED_ROAD_COLORS = {
-  'arterial':       '#CC2222',   // red
-  'major arterial': '#1A1A1A',   // black/very dark
-  'seed access':    '#228B22',   // green
-  'sub-arterial':   '#2266CC',   // blue
-  'other':          '#5D6D7E',   // fallback grey
-}
-// Outline colors (slightly darker/more saturated for contrast)
-export const NAMED_ROAD_OUTLINES = {
-  'arterial':       '#991111',
-  'major arterial': '#000000',
-  'seed access':    '#1A6B1A',
-  'sub-arterial':   '#1A4499',
-  'other':          '#3D4D5E',
-}
+// Named roads: uniform light grey (user will add category-based features later)
+export const NAMED_ROAD_COLOR = '#D0D0D0'
+export const NAMED_ROAD_OUTLINE = '#A0A0A0'

@@ -134,6 +134,7 @@ export const ZONING_GROUPS = {
       'U2 - Road reserve zone',
       'U2- Road reserve zone',
       'SU2 - Road Network',
+      'U2-Road Reserve Zone',
     ],
   },
   'education': {
@@ -257,9 +258,11 @@ export function getGroupForSymbology(symbology) {
 export function buildSymbologyColorExpression() {
   const expr = ['match', ['get', 'symbology']]
   for (const [sym, color] of Object.entries(SYMBOLOGY_COLOR_MAP)) {
-    // Road reserve zones are transparent in ArcGIS — use near-transparent
+    // Road reserve zones: use dark grey fill instead of transparent
+    // This prevents the black basemap from showing through and causing
+    // the "color goes black on zoom" issue
     if (color === 'transparent') {
-      expr.push(sym, 'rgba(0,0,0,0)')
+      expr.push(sym, '#1E1E1E')
     } else {
       expr.push(sym, color)
     }
@@ -289,7 +292,19 @@ export const ROAD_RESERVE_SYMBOLOGIES = new Set([
   'U2 - Road reserve zone',
   'U2- Road reserve zone',
   'SU2 - Road Network',
+  'U2-Road Reserve Zone',
 ])
+
+/**
+ * Build a MapLibre filter expression that matches all road reserve symbologies.
+ * Use this instead of duplicating symbology strings in multiple places.
+ */
+export function buildRoadReserveFilter() {
+  return [
+    'any',
+    ...Array.from(ROAD_RESERVE_SYMBOLOGIES).map(sym => ['==', ['get', 'symbology'], sym])
+  ]
+}
 
 // Allocated lands categories
 export const ALLOCATED_LAND_CATEGORIES = {
@@ -410,6 +425,7 @@ export function buildAreaHeatmapExpression() {
       ['==', ['get', 'symbology'], 'U2 - Road reserve zone'],
       ['==', ['get', 'symbology'], 'U2- Road reserve zone'],
       ['==', ['get', 'symbology'], 'SU2 - Road Network'],
+      ['==', ['get', 'symbology'], 'U2-Road Reserve Zone'],
     ],
     'rgba(60,60,60,0.15)',
     // No area data → grey
@@ -457,7 +473,7 @@ export function buildFilteredColorExpression(activeGroups) {
     const isActive = activeGroups.has(groupKey)
     for (const sym of group.symbologies) {
       if (group.color === 'transparent') {
-        expr.push(sym, isActive ? 'rgba(100,100,100,0.15)' : 'rgba(0,0,0,0)')
+        expr.push(sym, isActive ? '#1E1E1E' : '#1E1E1E')
       } else {
         expr.push(sym, isActive ? group.color : 'rgba(255,255,255,0.08)')
       }

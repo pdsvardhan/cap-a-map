@@ -266,8 +266,9 @@ function NeighbourCell({ label, value }) {
 }
 
 function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] }) {
-  const [roadName, setRoadName] = React.useState(plot._roadName || '')
+  const [roadName, setRoadName] = React.useState(plot._roadName || plot._inferredRoadName || '')
   const [saved, setSaved] = React.useState(!!plot._roadName)
+  const [isUnnamed, setIsUnnamed] = React.useState(!!plot._isUnnamed)
   const displayName = (plot._roadName || roadName) || ''
   const roadMeta = namedRoadsIndex.find(r => (r.name || '').toUpperCase() === displayName.toUpperCase())
   const meets = (roadMeta && roadMeta.meets) || []
@@ -282,7 +283,10 @@ function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] 
       const roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}')
       roadNames[plot._locKey] = roadName.trim()
       localStorage.setItem('roadNames', JSON.stringify(roadNames))
+      // Remove from unnamed set if it was there
+      removeFromUnnamed(plot._locKey)
       setSaved(true)
+      setIsUnnamed(false)
       onRoadNameSaved?.()
     } catch (e) { /* ignore */ }
   }
@@ -296,6 +300,40 @@ function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] 
       setRoadName('')
       setSaved(false)
       onRoadNameSaved?.()
+    } catch (e) { /* ignore */ }
+  }
+
+  function handleMarkUnnamed() {
+    if (!plot._locKey) return
+    try {
+      const raw = JSON.parse(localStorage.getItem('roadUnnamed') || '[]')
+      const set = new Set(raw)
+      set.add(plot._locKey)
+      localStorage.setItem('roadUnnamed', JSON.stringify([...set]))
+      // Also clear any saved name
+      const roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}')
+      delete roadNames[plot._locKey]
+      localStorage.setItem('roadNames', JSON.stringify(roadNames))
+      setIsUnnamed(true)
+      setRoadName('')
+      setSaved(false)
+      onRoadNameSaved?.()
+    } catch (e) { /* ignore */ }
+  }
+
+  function handleMarkNamed() {
+    if (!plot._locKey) return
+    removeFromUnnamed(plot._locKey)
+    setIsUnnamed(false)
+    onRoadNameSaved?.()
+  }
+
+  function removeFromUnnamed(key) {
+    try {
+      const raw = JSON.parse(localStorage.getItem('roadUnnamed') || '[]')
+      const set = new Set(raw)
+      set.delete(key)
+      localStorage.setItem('roadUnnamed', JSON.stringify([...set]))
     } catch (e) { /* ignore */ }
   }
 
@@ -315,7 +353,7 @@ function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] 
               )}
             </div>
             <h2 className="text-lg font-bold text-gray-900">
-              {plot._roadName || 'Unnamed Road'}
+              {isUnnamed ? 'Marked as Unnamed' : (plot._roadName || 'Unnamed Road')}
             </h2>
             <p className="text-sm text-gray-500">{plot.symbology}</p>
           </div>
@@ -326,7 +364,41 @@ function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] 
       {/* Content */}
       <div className="flex-1 overflow-y-auto panel-scroll px-5 py-4 space-y-5">
 
-        {/* Road Name Editor */}
+        {/* Named / Unnamed Toggle */}
+        <Section title="Road Status">
+          <div className="flex gap-4">
+            <label className={`flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border transition-colors ${
+              !isUnnamed ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'
+            }`}>
+              <input
+                type="radio"
+                name="roadStatus"
+                checked={!isUnnamed}
+                onChange={handleMarkNamed}
+                className="accent-blue-600"
+              />
+              <span className="text-sm font-medium text-gray-700">Named</span>
+            </label>
+            <label className={`flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border transition-colors ${
+              isUnnamed ? 'border-red-500 bg-red-50' : 'border-gray-200 hover:bg-gray-50'
+            }`}>
+              <input
+                type="radio"
+                name="roadStatus"
+                checked={isUnnamed}
+                onChange={handleMarkUnnamed}
+                className="accent-red-600"
+              />
+              <span className="text-sm font-medium text-gray-700">Unnamed</span>
+            </label>
+          </div>
+          {isUnnamed && (
+            <p className="mt-2 text-xs text-red-600">This segment is excluded from named road rendering.</p>
+          )}
+        </Section>
+
+        {/* Road Name Editor (only when not marked unnamed) */}
+        {!isUnnamed && (
         <Section title="Road Name">
           <div className="flex gap-2">
             <input
@@ -357,6 +429,7 @@ function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] 
             </button>
           )}
         </Section>
+        )}
 
         {/* Road attributes (from Amaravati road data) */}
         {getRoadData(displayName) && (() => {
