@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Fuse from 'fuse.js'
+import useMapStore from '../../stores/mapStore'
 import { getColorForSymbology } from '../../utils/colors'
 import { truncate } from '../../utils/formatters'
 
@@ -8,13 +9,13 @@ import { truncate } from '../../utils/formatters'
 function unpackRecord(arr) {
   return {
     id: arr[0],
-    rc: arr[1] || '',   // regcode
-    pc: arr[2] || '',   // plot_code
-    vi: arr[3] || '',   // village
-    sy: arr[4] || '',   // symbology
-    ae: arr[5] || 0,    // alloted extent
-    la: arr[6] || 0,    // latitude
-    lo: arr[7] || 0,    // longitude
+    rc: arr[1] || '',
+    pc: arr[2] || '',
+    vi: arr[3] || '',
+    sy: arr[4] || '',
+    ae: arr[5] || 0,
+    la: arr[6] || 0,
+    lo: arr[7] || 0,
   }
 }
 
@@ -22,10 +23,10 @@ function unpackRecord(arr) {
 function unpackLandmark(arr) {
   return {
     _type: 'landmark',
-    nm: arr[0] || '',    // name
-    cat: arr[1] || '',   // category
-    la: arr[2] || 0,     // latitude
-    lo: arr[3] || 0,     // longitude
+    nm: arr[0] || '',
+    cat: arr[1] || '',
+    la: arr[2] || 0,
+    lo: arr[3] || 0,
   }
 }
 
@@ -54,7 +55,10 @@ const LANDMARK_FUSE_OPTIONS = {
   limit: 10,
 }
 
-export default function SearchBar({ onSelect, namedRoadsIndex = [] }) {
+export default function SearchBar() {
+  const namedRoadsIndex = useMapStore((s) => s.namedRoadsIndex)
+  const selectPlot = useMapStore((s) => s.selectPlot)
+
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
   const [isOpen, setIsOpen] = useState(false)
@@ -71,13 +75,11 @@ export default function SearchBar({ onSelect, namedRoadsIndex = [] }) {
   useEffect(() => {
     async function loadIndices() {
       try {
-        // Load plot search index
         const plotRes = await fetch('/data/search_index.json')
         const rawPlotData = await plotRes.json()
         const plotData = rawPlotData.map(unpackRecord)
         plotFuseRef.current = new Fuse(plotData, PLOT_FUSE_OPTIONS)
 
-        // Load allocated lands index
         try {
           const landmarkRes = await fetch('/data/allocated_lands_index.json')
           if (landmarkRes.ok) {
@@ -162,7 +164,24 @@ export default function SearchBar({ onSelect, namedRoadsIndex = [] }) {
     else if (item._type === 'namedRoad') setQuery(item.name || '')
     else setQuery(item.rc || item.pc || '')
     setIsOpen(false)
-    onSelect?.(item)
+
+    // FlyTo using map instance from store
+    const map = useMapStore.getState()._mapInstance
+    if (map && item.la != null && item.lo != null) {
+      map.flyTo({
+        center: [item.lo, item.la],
+        zoom: item._type === 'landmark' ? 16 : item._type === 'namedRoad' ? 15 : 18,
+        duration: 1500,
+      })
+    }
+
+    if (item._type === 'landmark') {
+      selectPlot({ _type: 'landmark', name: item.nm, category: item.cat, lat: item.la, lon: item.lo })
+    } else if (item._type === 'namedRoad') {
+      selectPlot({ _type: 'namedRoad', name: item.name, bbox: item.bbox })
+    } else {
+      selectPlot({ regcode: item.rc, plot_code: item.pc, village: item.vi, symbology: item.sy, alloted_ex: item.ae, lat: item.la, lon: item.lo })
+    }
   }
 
   // Close on outside click
@@ -206,12 +225,14 @@ export default function SearchBar({ onSelect, namedRoadsIndex = [] }) {
           onFocus={() => query.length >= 2 && results.length > 0 && setIsOpen(true)}
           placeholder={isLoading ? 'Loading search index...' : `Search ${totalRecords.toLocaleString()} plots, landmarks...`}
           disabled={isLoading}
+          aria-label="Search plots, landmarks, and roads"
           className="w-full pl-10 pr-10 py-2.5 bg-white rounded-lg shadow-md border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 outline-none text-sm text-gray-800 placeholder-gray-400 disabled:bg-gray-100 transition-all"
         />
         {query && (
           <button
             onClick={() => { setQuery(''); setResults([]); setIsOpen(false) }}
             className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            aria-label="Clear search"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -266,7 +287,6 @@ export default function SearchBar({ onSelect, namedRoadsIndex = [] }) {
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    {/* Landmark icon */}
                     <div className="w-3 h-3 rounded-sm flex-shrink-0 bg-[#FF6F00]" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -296,12 +316,10 @@ export default function SearchBar({ onSelect, namedRoadsIndex = [] }) {
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  {/* Color indicator */}
                   <div
                     className="w-3 h-3 rounded-sm flex-shrink-0"
                     style={{ backgroundColor: color }}
                   />
-                  {/* Main info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-gray-800 truncate">
@@ -317,7 +335,6 @@ export default function SearchBar({ onSelect, namedRoadsIndex = [] }) {
                       {item.vi ? item.vi : ''}
                     </div>
                   </div>
-                  {/* Area */}
                   <div className="text-xs text-gray-400 flex-shrink-0">
                     {item.ae ? `${Number(item.ae).toLocaleString()} sq.yd` : ''}
                   </div>

@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    container_name: project-cap-a
+    ports:
+      - "8502:80"
+    networks:
+      - projects-net
+    restart: unless-stopped
+
+networks:
+  projects-net:
+    external: true

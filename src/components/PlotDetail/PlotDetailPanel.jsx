@@ -1,9 +1,12 @@
 import React from 'react'
+import useMapStore from '../../stores/mapStore'
 import { getColorForSymbology, getGroupForSymbology, ZONING_GROUPS } from '../../utils/colors'
 import { formatArea, formatDimensions, formatFarmerName, formatNeighbour } from '../../utils/formatters'
 import { getRoadType, getROW, getRoadData, getLanePattern } from '../../utils/roadAttributes'
 
-export default function PlotDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] }) {
+export default function PlotDetailPanel({ plot, onClose }) {
+  const namedRoadsIndex = useMapStore((s) => s.namedRoadsIndex)
+
   if (!plot) return null
 
   // Handle landmark type
@@ -62,7 +65,6 @@ export default function PlotDetailPanel({ plot, onClose, onRoadNameSaved, namedR
         key={plot._locKey}
         plot={plot}
         onClose={onClose}
-        onRoadNameSaved={onRoadNameSaved}
         namedRoadsIndex={namedRoadsIndex}
       />
     )
@@ -260,12 +262,12 @@ function NeighbourCell({ label, value }) {
       title={displayValue}
     >
       <div className="font-semibold text-[9px] text-gray-400 mb-0.5">{label}</div>
-      <div className="truncate">{displayValue === 'N/A' ? '—' : displayValue}</div>
+      <div className="truncate">{displayValue === 'N/A' ? '\u2014' : displayValue}</div>
     </div>
   )
 }
 
-function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] }) {
+function RoadDetailPanel({ plot, onClose, namedRoadsIndex = [] }) {
   const [roadName, setRoadName] = React.useState(plot._roadName || plot._inferredRoadName || '')
   const [saved, setSaved] = React.useState(!!plot._roadName)
   const [isUnnamed, setIsUnnamed] = React.useState(!!plot._isUnnamed)
@@ -277,6 +279,10 @@ function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] 
     ? `https://www.google.com/maps?q=${plot.lat},${plot.lon}`
     : null
 
+  function refreshNamedRoads() {
+    useMapStore.getState()._refreshNamedRoads?.()
+  }
+
   function handleSave() {
     if (!plot._locKey || !roadName.trim()) return
     try {
@@ -287,7 +293,7 @@ function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] 
       removeFromUnnamed(plot._locKey)
       setSaved(true)
       setIsUnnamed(false)
-      onRoadNameSaved?.()
+      refreshNamedRoads()
     } catch (e) { /* ignore */ }
   }
 
@@ -299,7 +305,7 @@ function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] 
       localStorage.setItem('roadNames', JSON.stringify(roadNames))
       setRoadName('')
       setSaved(false)
-      onRoadNameSaved?.()
+      refreshNamedRoads()
     } catch (e) { /* ignore */ }
   }
 
@@ -317,7 +323,7 @@ function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] 
       setIsUnnamed(true)
       setRoadName('')
       setSaved(false)
-      onRoadNameSaved?.()
+      refreshNamedRoads()
     } catch (e) { /* ignore */ }
   }
 
@@ -325,7 +331,7 @@ function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] 
     if (!plot._locKey) return
     removeFromUnnamed(plot._locKey)
     setIsUnnamed(false)
-    onRoadNameSaved?.()
+    refreshNamedRoads()
   }
 
   function removeFromUnnamed(key) {
@@ -441,10 +447,10 @@ function RoadDetailPanel({ plot, onClose, onRoadNameSaved, namedRoadsIndex = [] 
           return (
             <Section title="Road attributes">
               <InfoGrid items={[
-                { label: 'Type', value: (rd.category || '—') + star },
-                { label: 'ROW', value: rd.row_m ? `${rd.row_m} m${star}` : '—' },
-                { label: 'Lane Pattern', value: rd.lane_pattern ? `${rd.lane_pattern} (${laneDesc})${star}` : '—' },
-                { label: 'Orientation', value: rd.orientation || '—' },
+                { label: 'Type', value: (rd.category || '\u2014') + star },
+                { label: 'ROW', value: rd.row_m ? `${rd.row_m} m${star}` : '\u2014' },
+                { label: 'Lane Pattern', value: rd.lane_pattern ? `${rd.lane_pattern} (${laneDesc})${star}` : '\u2014' },
+                { label: 'Orientation', value: rd.orientation || '\u2014' },
               ]} />
               <div className="flex gap-3 mt-2">
                 {rd.brt_present && (

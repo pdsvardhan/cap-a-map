@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react'
+import useMapStore from '../../stores/mapStore'
 import { ZONING_GROUPS, ZONING_HIERARCHY, AREA_HEATMAP_LEGEND } from '../../utils/colors'
 import { NAMED_ROAD_COLOR } from '../../utils/constants'
 
@@ -13,9 +14,16 @@ const QUICK_FILTERS = {
   mobility: { label: 'Mobility', groups: ['road-reserve', 'roads-infra'] },
 }
 
-// Single uniform color for all grid roads (category-based coloring removed per user request)
+export default function Legend() {
+  const activeZoningGroups = useMapStore((s) => s.activeZoningGroups)
+  const setActiveZoningGroups = useMapStore((s) => s.setActiveZoningGroups)
+  const plotCounts = useMapStore((s) => s.plotCounts)
+  const allocatedLandsVisible = useMapStore((s) => s.allocatedLandsVisible)
+  const toggleAllocatedLands = useMapStore((s) => s.toggleAllocatedLands)
+  const colorMode = useMapStore((s) => s.colorMode)
+  const setColorMode = useMapStore((s) => s.setColorMode)
+  const toggleLegend = useMapStore((s) => s.toggleLegend)
 
-export default function Legend({ onClose, activeZoningGroups, onActiveZoningGroupsChange, plotCounts, allocatedLandsVisible, onAllocatedLandsToggle, colorMode, onColorModeChange }) {
   const [collapsedCategories, setCollapsedCategories] = useState(new Set())
   const [activeQuickFilter, setActiveQuickFilter] = useState(null)
   const [roadsCollapsed, setRoadsCollapsed] = useState(false)
@@ -46,8 +54,8 @@ export default function Legend({ onClose, activeZoningGroups, onActiveZoningGrou
     } else {
       current.add(groupKey)
     }
-    onActiveZoningGroupsChange(current.size === ALL_GROUP_KEYS.length ? null : current)
-  }, [activeZoningGroups, onActiveZoningGroupsChange])
+    setActiveZoningGroups(current.size === ALL_GROUP_KEYS.length ? null : current)
+  }, [activeZoningGroups, setActiveZoningGroups])
 
   const toggleCategory = useCallback((categoryId) => {
     setActiveQuickFilter(null)
@@ -59,29 +67,29 @@ export default function Legend({ onClose, activeZoningGroups, onActiveZoningGrou
       if (allActive) current.delete(g)
       else current.add(g)
     }
-    onActiveZoningGroupsChange(current.size === ALL_GROUP_KEYS.length ? null : current)
-  }, [activeZoningGroups, onActiveZoningGroupsChange])
+    setActiveZoningGroups(current.size === ALL_GROUP_KEYS.length ? null : current)
+  }, [activeZoningGroups, setActiveZoningGroups])
 
   const handleSelectAll = useCallback(() => {
     setActiveQuickFilter(null)
-    onActiveZoningGroupsChange(null)
-  }, [onActiveZoningGroupsChange])
+    setActiveZoningGroups(null)
+  }, [setActiveZoningGroups])
 
   const handleClearAll = useCallback(() => {
     setActiveQuickFilter(null)
-    onActiveZoningGroupsChange(new Set())
-  }, [onActiveZoningGroupsChange])
+    setActiveZoningGroups(new Set())
+  }, [setActiveZoningGroups])
 
   const handleQuickFilter = useCallback((filterId) => {
     if (activeQuickFilter === filterId) {
       setActiveQuickFilter(null)
-      onActiveZoningGroupsChange(null)
+      setActiveZoningGroups(null)
       return
     }
     setActiveQuickFilter(filterId)
     const groups = QUICK_FILTERS[filterId]?.groups || []
-    onActiveZoningGroupsChange(new Set(groups))
-  }, [activeQuickFilter, onActiveZoningGroupsChange])
+    setActiveZoningGroups(new Set(groups))
+  }, [activeQuickFilter, setActiveZoningGroups])
 
   const toggleCollapse = useCallback((categoryId) => {
     setCollapsedCategories(prev => {
@@ -97,7 +105,7 @@ export default function Legend({ onClose, activeZoningGroups, onActiveZoningGrou
       {/* Header */}
       <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
         <h3 className="text-sm font-semibold text-gray-800">Map Explorer</h3>
-        <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded transition-colors">
+        <button onClick={toggleLegend} className="p-1 hover:bg-gray-100 rounded transition-colors">
           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -109,7 +117,7 @@ export default function Legend({ onClose, activeZoningGroups, onActiveZoningGrou
         <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Color Mode</p>
         <div className="flex gap-1">
           <button
-            onClick={() => onColorModeChange?.('zoning')}
+            onClick={() => setColorMode('zoning')}
             className={`flex-1 px-2 py-1.5 text-[11px] font-medium rounded transition-colors ${
               isZoning
                 ? 'bg-blue-600 text-white'
@@ -119,7 +127,7 @@ export default function Legend({ onClose, activeZoningGroups, onActiveZoningGrou
             Zoning
           </button>
           <button
-            onClick={() => onColorModeChange?.('area')}
+            onClick={() => setColorMode('area')}
             className={`flex-1 px-2 py-1.5 text-[11px] font-medium rounded transition-colors ${
               !isZoning
                 ? 'bg-emerald-600 text-white'
@@ -264,7 +272,7 @@ export default function Legend({ onClose, activeZoningGroups, onActiveZoningGrou
               <div className="pt-2 mt-1 border-t border-gray-100">
                 <div
                   className={`flex items-center gap-2 py-1.5 px-1.5 rounded cursor-pointer transition-colors hover:bg-gray-50 ${!allocatedLandsVisible ? 'opacity-40' : ''}`}
-                  onClick={() => onAllocatedLandsToggle?.()}
+                  onClick={() => toggleAllocatedLands()}
                 >
                   <button
                     className={`w-3.5 h-3.5 rounded-sm border flex-shrink-0 flex items-center justify-center transition-colors ${

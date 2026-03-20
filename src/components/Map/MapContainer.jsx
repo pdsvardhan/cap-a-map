@@ -1,43 +1,51 @@
-import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
+import React, { useEffect, useRef } from 'react'
 import maplibregl from 'maplibre-gl'
-import { MAP_CENTER, MAP_ZOOM, MAP_MIN_ZOOM, MAP_MAX_ZOOM, MAP_STYLE, DATA_PATHS, LAYERS, NAMED_ROAD_COLOR, NAMED_ROAD_OUTLINE } from '../../utils/constants'
+import useMapStore, { LoadingStage } from '../../stores/mapStore'
+import { MAP_CENTER, MAP_ZOOM, MAP_MIN_ZOOM, MAP_MAX_ZOOM, MAP_STYLE, DATA_PATHS, LAYERS } from '../../utils/constants'
+import { buildSymbologyColorExpression, buildFilteredColorExpression, buildAreaHeatmapExpression, ROAD_RESERVE_SYMBOLOGIES, SYMBOLOGY_GROUP_MAP } from '../../utils/colors'
 import { getRoadType, normalizeRoadName } from '../../utils/roadAttributes'
-import { buildSymbologyColorExpression, buildFilteredColorExpression, buildAreaHeatmapExpression, ROAD_RESERVE_SYMBOLOGIES, buildRoadReserveFilter, SYMBOLOGY_GROUP_MAP } from '../../utils/colors'
 import { buildJunctionMatrix } from '../../utils/junctionMatrix'
 import { SEGMENT_TO_ROAD } from '../../utils/roadSegmentMapping'
+import { buildRoadSegmentIndex, computeCentroid, getStableRoadKey } from './utils/roadSegmentIndex'
+import {
+  getPlotFillLayer, getPlotOutlineLayer, getPlotHighlightLayer, getRoadModeOverlayLayer,
+  getNamedRoadsFillLayer, getNamedRoadsOutlineLayer, getNamedRoadsHighlightLayer, getNamedRoadsLabelsLayer,
+  getAllocatedLandsFillLayer, getAllocatedLandsOutlineLayer, getAllocatedLandsLabelsLayer,
+} from './utils/layerDefinitions'
 
-const MapContainer = forwardRef(function MapContainer(
-  { onMapReady, onPlotClick, onLoadingStatus, selectedPlot, onNamedRoadsIndexReady, roadMode, activeZoningGroups, allocatedLandsVisible, onPlotCountsReady, colorMode, showNamedOnly },
-  ref
-) {
-  const mapContainerRef = useRef(null)
-  const mapInstanceRef = useRef(null)
-  const loadedSourcesRef = useRef(new Set())
-  const hoveredPlotRef = useRef(null)
+export default function MapContainer() {
+  const containerRef = useRef(null)
+  const mapRef = useRef(null)
   const plotsDataRef = useRef(null)
-  const roadModeRef = useRef(false)
   const roadSegmentIndexRef = useRef({ segments: [], keyToId: new Map() })
 
-  useImperativeHandle(ref, () => ({
-    getMap: () => mapInstanceRef.current,
-    refreshNamedRoads: () => {
-      const map = mapInstanceRef.current
-      const plotsData = plotsDataRef.current
-      if (!map || !map.getSource('namedRoads') || !plotsData?.features) return
-      const { segments, labels, index } = buildNamedRoadsData(plotsData.features)
-      map.getSource('namedRoads').setData(segments)
-      map.getSource('namedRoadLabels').setData(labels)
-      onNamedRoadsIndexReady?.(index)
-    },
-  }))
+  const setLoadingStage = useMapStore((s) => s.setLoadingStage)
+  const setLoadingError = useMapStore((s) => s.setLoadingError)
+  const setReady = useMapStore((s) => s.setReady)
+  const selectPlot = useMapStore((s) => s.selectPlot)
+  const setNamedRoadsIndex = useMapStore((s) => s.setNamedRoadsIndex)
+  const setPlotCounts = useMapStore((s) => s.setPlotCounts)
 
+  // Subscribe to reactive state for effects
+  const roadMode = useMapStore((s) => s.roadMode)
+  const activeZoningGroups = useMapStore((s) => s.activeZoningGroups)
+  const allocatedLandsVisible = useMapStore((s) => s.allocatedLandsVisible)
+  const colorMode = useMapStore((s) => s.colorMode)
+  const showNamedOnly = useMapStore((s) => s.showNamedOnly)
+  const selectedPlot = useMapStore((s) => s.selectedPlot)
+
+  // Keep a mutable ref for roadMode (used in click handlers)
+  const roadModeRef = useRef(false)
+  useEffect(() => { roadModeRef.current = roadMode }, [roadMode])
+
+  // --- Init map ---
   useEffect(() => {
-    if (mapInstanceRef.current) return
+    if (mapRef.current) return
 
-    onLoadingStatus?.('Initializing map...')
+    setLoadingStage(LoadingStage.INIT)
 
     const map = new maplibregl.Map({
-      container: mapContainerRef.current,
+      container: containerRef.current,
       style: MAP_STYLE,
       center: MAP_CENTER,
       zoom: MAP_ZOOM,
@@ -50,58 +58,43 @@ const MapContainer = forwardRef(function MapContainer(
     map.addControl(new maplibregl.NavigationControl(), 'bottom-right')
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 150 }), 'bottom-left')
 
-    mapInstanceRef.current = map
+    mapRef.current = map
 
     map.on('load', async () => {
       try {
-        // Hide all basemap noise — keep only background + water fills
         hideBasemapNoise(map)
 
-        onLoadingStatus?.('Loading plot data...')
+        setLoadingStage(LoadingStage.LOADING_PLOTS)
         await loadPlotData(map)
 
-        onLoadingStatus?.('Loading overlays...')
+        setLoadingStage(LoadingStage.LOADING_OVERLAYS)
         await loadOverlays(map)
 
         setupInteractions(map)
-        addNamedRoadsLayers(map)
+        buildAndAddNamedRoads(map)
 
-        onLoadingStatus?.('Ready!')
-        onMapReady?.()
+        setReady()
       } catch (err) {
         console.error('Error loading map data:', err)
-        onLoadingStatus?.(`Error: ${err.message}`)
+        setLoadingError(err.message)
       }
     })
 
     return () => {
       map.remove()
-      mapInstanceRef.current = null
+      mapRef.current = null
     }
   }, [])
 
+  // --- Helper functions ---
+
   function hideBasemapNoise(map) {
-    // Nuclear approach: hide ALL basemap layers except essentials.
-    // The CARTO Dark Matter basemap has ~80 layers (roads, boundaries,
-    // waterways, railways, buildings, labels, etc.) that create visual
-    // noise under our plot data. Instead of enumerating layers to hide
-    // (which breaks when naming changes), we hide everything and only
-    // keep the dark background and water body fills.
     const style = map.getStyle()
-    if (!style || !style.layers) return
-
-    const keepVisible = new Set([
-      'background',     // dark background color
-      'water',          // ocean/lake polygon fills
-    ])
-
+    if (!style?.layers) return
+    const keepVisible = new Set(['background', 'water'])
     for (const layer of style.layers) {
       if (!keepVisible.has(layer.id)) {
-        try {
-          map.setLayoutProperty(layer.id, 'visibility', 'none')
-        } catch (e) {
-          // Some layers may not support visibility changes
-        }
+        try { map.setLayoutProperty(layer.id, 'visibility', 'none') } catch (e) {}
       }
     }
   }
@@ -112,129 +105,33 @@ const MapContainer = forwardRef(function MapContainer(
       const sym = f.properties?.symbology
       if (!sym) continue
       const group = SYMBOLOGY_GROUP_MAP[sym]
-      if (group) {
-        counts[group] = (counts[group] || 0) + 1
-      }
+      if (group) counts[group] = (counts[group] || 0) + 1
     }
-    onPlotCountsReady?.(counts)
-  }
-
-  function buildRoadSegmentIndex(features) {
-    const roadSegs = []
-    for (let i = 0; i < features.length; i++) {
-      const f = features[i]
-      if (!ROAD_RESERVE_SYMBOLOGIES.has(f.properties?.symbology)) continue
-      const centroid = computeCentroid(f.geometry)
-      const stableKey = getStableRoadKey(f.geometry)
-      roadSegs.push({ featureIndex: i, stableKey, centroid })
-    }
-    // Sort south->north, then west->east for spatially stable IDs
-    roadSegs.sort((a, b) => {
-      if (!a.centroid || !b.centroid) return 0
-      const latDiff = a.centroid[1] - b.centroid[1]
-      if (Math.abs(latDiff) > 0.0001) return latDiff
-      return a.centroid[0] - b.centroid[0]
-    })
-    const keyToId = new Map()
-    roadSegs.forEach((seg, idx) => {
-      seg.segmentId = idx
-      if (seg.stableKey) keyToId.set(seg.stableKey, idx)
-    })
-    roadSegmentIndexRef.current = { segments: roadSegs, keyToId }
-    console.log(`Road segment index: ${roadSegs.length} segments indexed`)
+    setPlotCounts(counts)
   }
 
   async function loadPlotData(map) {
-    onLoadingStatus?.('Loading village index...')
-
     try {
-      onLoadingStatus?.('Loading all plots (this may take a moment)...')
-
+      setLoadingStage(LoadingStage.LOADING_PLOTS)
       const response = await fetch('/data/plots_wgs84.geojson')
       if (!response.ok) throw new Error('plots_wgs84.geojson not found')
 
       const data = await response.json()
-      onLoadingStatus?.(`Loaded ${data.features.length.toLocaleString()} plots, rendering...`)
+      setLoadingStage(LoadingStage.RENDERING_PLOTS)
       plotsDataRef.current = data
-      buildRoadSegmentIndex(data.features)
+
+      const segIndex = buildRoadSegmentIndex(data.features)
+      roadSegmentIndexRef.current = segIndex
       computePlotCounts(data.features)
 
-      map.addSource('plots', {
-        type: 'geojson',
-        data: data,
-        generateId: true,
-      })
-
-      map.addLayer({
-        id: LAYERS.PLOTS_FILL,
-        type: 'fill',
-        source: 'plots',
-        paint: {
-          'fill-color': buildSymbologyColorExpression(),
-          'fill-opacity': [
-            'interpolate', ['linear'], ['zoom'],
-            10, 0.6,
-            14, 0.75,
-            18, 0.85,
-          ],
-        },
-      })
-
-      map.addLayer({
-        id: LAYERS.PLOTS_OUTLINE,
-        type: 'line',
-        source: 'plots',
-        paint: {
-          'line-color': '#1A1A1A',
-          'line-width': [
-            'interpolate', ['linear'], ['zoom'],
-            10, 0,
-            13, 0.3,
-            15, 0.8,
-            17, 1.2,
-            19, 1.8,
-          ],
-          'line-opacity': [
-            'case',
-            // Road reserves get no outline — prevents dark outlines competing with named-roads layer
-            ['any',
-              ...Array.from(ROAD_RESERVE_SYMBOLOGIES).map(sym => ['==', ['get', 'symbology'], sym])
-            ],
-            0,
-            0.9,
-          ],
-        },
-      })
-
-      map.addLayer({
-        id: LAYERS.PLOTS_HIGHLIGHT,
-        type: 'line',
-        source: 'plots',
-        paint: {
-          'line-color': '#FFFFFF',
-          'line-width': 3,
-          'line-opacity': 1,
-        },
-        filter: ['==', ['id'], -1],
-      })
-
-      // Road Mode overlay — highlights all road reserves when Road Mode is active
-      map.addLayer({
-        id: LAYERS.ROAD_MODE_OVERLAY,
-        type: 'fill',
-        source: 'plots',
-        paint: {
-          'fill-color': '#FF8C00',
-          'fill-opacity': 0.35,
-        },
-        filter: buildRoadReserveFilter(),
-        layout: { visibility: 'none' },
-      })
-
-      loadedSourcesRef.current.add('plots')
+      map.addSource('plots', { type: 'geojson', data, generateId: true })
+      map.addLayer(getPlotFillLayer())
+      map.addLayer(getPlotOutlineLayer())
+      map.addLayer(getPlotHighlightLayer())
+      map.addLayer(getRoadModeOverlayLayer())
     } catch (err) {
       console.error('Failed to load plots GeoJSON:', err)
-      onLoadingStatus?.('Error loading plots data. Trying village-by-village...')
+      setLoadingStage(LoadingStage.LOADING_VILLAGES)
       await loadPlotsByVillage(map)
     }
   }
@@ -243,200 +140,61 @@ const MapContainer = forwardRef(function MapContainer(
     try {
       const indexRes = await fetch('/data/village_index.json')
       const villageIndex = await indexRes.json()
+      const villages = Object.entries(villageIndex).sort((a, b) => b[1].count - a[1].count)
 
-      const villages = Object.entries(villageIndex)
-        .sort((a, b) => b[1].count - a[1].count)
-
-      let totalLoaded = 0
       const allFeatures = []
-
       for (const [key, info] of villages) {
-        onLoadingStatus?.(`Loading ${info.name} (${info.count} plots)...`)
         try {
           const res = await fetch(`/data/${info.file}`)
           const data = await res.json()
           allFeatures.push(...data.features)
-          totalLoaded += data.features.length
         } catch (e) {
           console.warn(`Failed to load ${info.file}:`, e)
         }
       }
 
-      onLoadingStatus?.(`Rendering ${totalLoaded.toLocaleString()} plots...`)
+      setLoadingStage(LoadingStage.RENDERING)
       const plotsGeo = { type: 'FeatureCollection', features: allFeatures }
       plotsDataRef.current = plotsGeo
-      buildRoadSegmentIndex(allFeatures)
+
+      const segIndex = buildRoadSegmentIndex(allFeatures)
+      roadSegmentIndexRef.current = segIndex
       computePlotCounts(allFeatures)
 
-      map.addSource('plots', {
-        type: 'geojson',
-        data: plotsGeo,
-        generateId: true,
-      })
-
-      map.addLayer({
-        id: LAYERS.PLOTS_FILL,
-        type: 'fill',
-        source: 'plots',
-        paint: {
-          'fill-color': buildSymbologyColorExpression(),
-          'fill-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0.6, 14, 0.75, 18, 0.85],
-        },
-      })
-
-      map.addLayer({
-        id: LAYERS.PLOTS_OUTLINE,
-        type: 'line',
-        source: 'plots',
-        paint: {
-          'line-color': '#1A1A1A',
-          'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0, 13, 0.3, 15, 0.8, 17, 1.2, 19, 1.8],
-          'line-opacity': [
-            'case',
-            ['any', ...Array.from(ROAD_RESERVE_SYMBOLOGIES).map(sym => ['==', ['get', 'symbology'], sym])],
-            0,
-            0.9,
-          ],
-        },
-      })
-
-      map.addLayer({
-        id: LAYERS.PLOTS_HIGHLIGHT,
-        type: 'line',
-        source: 'plots',
-        paint: { 'line-color': '#FFFFFF', 'line-width': 3, 'line-opacity': 1 },
-        filter: ['==', ['id'], -1],
-      })
-
-      map.addLayer({
-        id: LAYERS.ROAD_MODE_OVERLAY,
-        type: 'fill',
-        source: 'plots',
-        paint: { 'fill-color': '#FF8C00', 'fill-opacity': 0.35 },
-        filter: buildRoadReserveFilter(),
-        layout: { visibility: 'none' },
-      })
-
-      loadedSourcesRef.current.add('plots')
+      map.addSource('plots', { type: 'geojson', data: plotsGeo, generateId: true })
+      map.addLayer(getPlotFillLayer())
+      map.addLayer(getPlotOutlineLayer())
+      map.addLayer(getPlotHighlightLayer())
+      map.addLayer(getRoadModeOverlayLayer())
     } catch (err) {
       console.error('Failed to load village data:', err)
+      throw err
     }
   }
 
   async function loadOverlays(map) {
-    // Only load allocated lands — legacy overlays (roads, burial grounds, boundaries) removed
     try {
       const res = await fetch(DATA_PATHS.allocatedLands)
       if (!res.ok) return
       const data = await res.json()
-
-      map.addSource('allocated_lands', {
-        type: 'geojson',
-        data: data,
-      })
-
-      map.addLayer({
-        id: LAYERS.ALLOCATED_LANDS,
-        type: 'fill',
-        source: 'allocated_lands',
-        paint: { 'fill-color': '#FF6F00', 'fill-opacity': 0.5 },
-      })
-      map.addLayer({
-        id: LAYERS.ALLOCATED_LANDS_OUTLINE,
-        type: 'line',
-        source: 'allocated_lands',
-        paint: { 'line-color': '#E65100', 'line-width': 2 },
-      })
-      map.addLayer({
-        id: LAYERS.ALLOCATED_LANDS_LABELS,
-        type: 'symbol',
-        source: 'allocated_lands',
-        layout: {
-          'text-field': ['get', 'label'],
-          'text-size': ['interpolate', ['linear'], ['zoom'], 12, 8, 16, 12, 18, 14],
-          'text-anchor': 'center',
-          'text-allow-overlap': false,
-          'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-        },
-        paint: {
-          'text-color': '#FFFFFF',
-          'text-halo-color': '#333333',
-          'text-halo-width': 1.5,
-        },
-      })
-
-      loadedSourcesRef.current.add('allocated_lands')
+      map.addSource('allocated_lands', { type: 'geojson', data })
+      map.addLayer(getAllocatedLandsFillLayer())
+      map.addLayer(getAllocatedLandsOutlineLayer())
+      map.addLayer(getAllocatedLandsLabelsLayer())
     } catch (err) {
-      console.warn('Failed to load allocated lands overlay:', err)
+      console.warn('Failed to load allocated lands:', err)
     }
   }
 
-  function computeCentroid(geometry) {
-    // Simple average of polygon exterior ring coordinates
-    if (!geometry || !geometry.coordinates) return null
-    const ring = geometry.type === 'Polygon'
-      ? geometry.coordinates[0]
-      : geometry.type === 'MultiPolygon'
-        ? geometry.coordinates[0][0]
-        : null
-    if (!ring || ring.length === 0) return null
-    let sumLon = 0, sumLat = 0
-    for (const coord of ring) {
-      sumLon += coord[0]
-      sumLat += coord[1]
-    }
-    return [
-      Math.round((sumLon / ring.length) * 1e6) / 1e6,
-      Math.round((sumLat / ring.length) * 1e6) / 1e6,
-    ]
-  }
-
-  /**
-   * Stable key for a road segment from its geometry (centroid + area).
-   * Same polygon always gets the same key, so names persist across reloads
-   * even if GeoJSON feature order or MapLibre ids change.
-   */
-  function getStableRoadKey(geometry) {
-    if (!geometry || !geometry.coordinates) return null
-    const ring = geometry.type === 'Polygon'
-      ? geometry.coordinates[0]
-      : geometry.type === 'MultiPolygon'
-        ? geometry.coordinates[0][0]
-        : null
-    if (!ring || ring.length < 3) return null
-    const centroid = computeCentroid(geometry)
-    if (!centroid) return null
-    let area = 0
-    for (let i = 0; i < ring.length - 1; i++) {
-      area += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1]
-    }
-    area = Math.abs(area) / 2
-    return `${centroid[0].toFixed(6)}_${centroid[1].toFixed(6)}_${area.toFixed(8)}`
-  }
-
-  /**
-   * Build Named Roads data from plots: segments with saved names (localStorage),
-   * one label point per unique name (centroid of segments), and search index.
-   * N3a and N3b stay separate (different names). Same name = one label, merged visually by style.
-   */
   function buildNamedRoadsData(plotFeatures) {
     let roadNames = {}
-    try {
-      roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}')
-    } catch (e) { /* ignore */ }
+    try { roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}') } catch (e) {}
 
-    // Load user-unnamed overrides: segments the user explicitly marked as NOT part of a named road
     let unnamedKeys = new Set()
-    try {
-      const raw = JSON.parse(localStorage.getItem('roadUnnamed') || '[]')
-      unnamedKeys = new Set(raw)
-    } catch (e) { /* ignore */ }
-
-    // No migration needed — localStorage was reset, all keys use current format
+    try { unnamedKeys = new Set(JSON.parse(localStorage.getItem('roadUnnamed') || '[]')) } catch (e) {}
 
     const segmentFeatures = []
-    const byName = {} // name -> { centroids: [], bbox: [minLon, minLat, maxLon, maxLat] }
-
+    const byName = {}
     const { keyToId } = roadSegmentIndexRef.current
 
     for (let i = 0; i < plotFeatures.length; i++) {
@@ -444,57 +202,35 @@ const MapContainer = forwardRef(function MapContainer(
       const props = f.properties || {}
       if (!ROAD_RESERVE_SYMBOLOGIES.has(props.symbology)) continue
       const stableKey = getStableRoadKey(f.geometry)
-      if (!stableKey) continue
+      if (!stableKey || unnamedKeys.has(stableKey)) continue
 
-      // Skip segments explicitly marked as unnamed by the user
-      if (unnamedKeys.has(stableKey)) continue
-
-      // Name priority: mapping file > localStorage
       const segId = keyToId.get(stableKey)
-      let name = (segId != null && SEGMENT_TO_ROAD[segId]) || null
-      if (!name) name = roadNames[stableKey] || null
-      if (!name || !name.trim()) continue
+      let name = (segId != null && SEGMENT_TO_ROAD[segId]) || roadNames[stableKey] || null
+      if (!name?.trim()) continue
       name = name.trim()
-      const roadName = name
-      const roadCategory = getRoadType(roadName) || 'other'
-
+      const roadCategory = getRoadType(name) || 'other'
       const centroid = computeCentroid(f.geometry)
+
       segmentFeatures.push({
-        type: 'Feature',
-        id: stableKey,
-        geometry: f.geometry,
-        properties: { roadName, roadCategory },
+        type: 'Feature', id: stableKey, geometry: f.geometry,
+        properties: { roadName: name, roadCategory },
       })
 
-      if (!byName[roadName]) {
-        byName[roadName] = { centroids: [], bbox: [Infinity, Infinity, -Infinity, -Infinity] }
-      }
+      if (!byName[name]) byName[name] = { centroids: [], bbox: [Infinity, Infinity, -Infinity, -Infinity] }
       if (centroid) {
-        byName[roadName].centroids.push(centroid)
+        byName[name].centroids.push(centroid)
         const [lon, lat] = centroid
-        const b = byName[roadName].bbox
-        byName[roadName].bbox = [
-          Math.min(b[0], lon),
-          Math.min(b[1], lat),
-          Math.max(b[2], lon),
-          Math.max(b[3], lat),
-        ]
+        const b = byName[name].bbox
+        byName[name].bbox = [Math.min(b[0], lon), Math.min(b[1], lat), Math.max(b[2], lon), Math.max(b[3], lat)]
       }
     }
 
-
-    // Gap-fill: chain-based expansion from known road segments.
-    // For each named road, iteratively add unmapped road reserves that are:
-    // 1. Aligned with the road's corridor (longitude for N-roads, latitude for E-roads)
-    // 2. Close to an existing segment in the chain (within MAX_GAP)
-    // 3. Large enough to be a grid road (not a small internal road)
-    //    Uses alloted_ex (Sq.Yards) — internal roads are typically <500 SqYd
+    // Gap-fill: chain-based expansion
     const mappedKeys = new Set(segmentFeatures.map(f => f.id))
-    const CORRIDOR_TOL = 0.002  // ~220m tolerance for corridor alignment
-    const MAX_GAP_DEG = 0.003   // ~330m max gap between chain segments
-    const MIN_AREA_SQYD = 500   // Minimum reserve area in Sq.Yards to qualify for gap-fill
+    const CORRIDOR_TOL = 0.002
+    const MAX_GAP_DEG = 0.003
+    const MIN_AREA_SQYD = 500
 
-    // Pre-compute all unmapped road reserve centroids + areas for efficiency
     const unmappedRoadFeats = []
     for (let i = 0; i < plotFeatures.length; i++) {
       const f = plotFeatures[i]
@@ -503,109 +239,69 @@ const MapContainer = forwardRef(function MapContainer(
       if (!sk || mappedKeys.has(sk) || unnamedKeys.has(sk)) continue
       const centroid = computeCentroid(f.geometry)
       if (!centroid) continue
-      // Use alloted_ex (Sq.Yards) to filter out small internal roads
       const areaSqYd = parseFloat(f.properties?.alloted_ex) || 0
       if (areaSqYd > 0 && areaSqYd < MIN_AREA_SQYD) continue
-      unmappedRoadFeats.push({ idx: i, sk, centroid, geometry: f.geometry, areaSqYd })
+      unmappedRoadFeats.push({ idx: i, sk, centroid, geometry: f.geometry })
     }
 
-    // For each named road, build corridor params and expand chain
     for (const [roadName, meta] of Object.entries(byName)) {
       const bb = meta.bbox
       if (bb[0] === Infinity) continue
       const isN = roadName.startsWith('N')
-
-      // Corridor center: median of the fixed coordinate
       const fixedCoord = isN ? (bb[0] + bb[2]) / 2 : (bb[1] + bb[3]) / 2
-
-      // Current chain centroids for this road
       const chainCentroids = [...meta.centroids]
 
-      // Iterative chain expansion
       let added = true
       while (added) {
         added = false
         for (const uf of unmappedRoadFeats) {
           if (mappedKeys.has(uf.sk)) continue
           const [cx, cy] = uf.centroid
-
-          // Check corridor alignment
-          const dist = isN
-            ? Math.abs(cx - fixedCoord)
-            : Math.abs(cy - fixedCoord)
+          const dist = isN ? Math.abs(cx - fixedCoord) : Math.abs(cy - fixedCoord)
           if (dist > CORRIDOR_TOL) continue
 
-          // Check proximity to any segment in the chain
           let closeEnough = false
           for (const cc of chainCentroids) {
-            const dx = cx - cc[0]
-            const dy = cy - cc[1]
-            if (Math.abs(dx) < MAX_GAP_DEG && Math.abs(dy) < MAX_GAP_DEG) {
+            if (Math.abs(cx - cc[0]) < MAX_GAP_DEG && Math.abs(cy - cc[1]) < MAX_GAP_DEG) {
               closeEnough = true
               break
             }
           }
           if (!closeEnough) continue
 
-          const roadCategory = getRoadType(roadName) || 'other'
           segmentFeatures.push({
-            type: 'Feature',
-            id: uf.sk,
-            geometry: uf.geometry,
-            properties: { roadName, roadCategory },
+            type: 'Feature', id: uf.sk, geometry: uf.geometry,
+            properties: { roadName, roadCategory: getRoadType(roadName) || 'other' },
           })
           mappedKeys.add(uf.sk)
           chainCentroids.push(uf.centroid)
           meta.centroids.push(uf.centroid)
-          meta.bbox = [
-            Math.min(bb[0], cx),
-            Math.min(bb[1], cy),
-            Math.max(bb[2], cx),
-            Math.max(bb[3], cy),
-          ]
           added = true
         }
       }
     }
 
     const junctionMatrix = buildJunctionMatrix(segmentFeatures)
-
     const labelFeatures = []
     const index = []
     for (const [roadName, meta] of Object.entries(byName)) {
       const cents = meta.centroids
       const center = cents.length
-        ? [
-            cents.reduce((s, c) => s + c[0], 0) / cents.length,
-            cents.reduce((s, c) => s + c[1], 0) / cents.length,
-          ]
+        ? [cents.reduce((s, c) => s + c[0], 0) / cents.length, cents.reduce((s, c) => s + c[1], 0) / cents.length]
         : [80.5, 16.505]
       const bbox = meta.bbox[0] === Infinity ? null : meta.bbox
-      labelFeatures.push({
-        type: 'Feature',
-        properties: { roadName },
-        geometry: { type: 'Point', coordinates: center },
-      })
-      index.push({
-        name: roadName,
-        center,
-        bbox,
-        meets: junctionMatrix[roadName] || [],
-      })
+      labelFeatures.push({ type: 'Feature', properties: { roadName }, geometry: { type: 'Point', coordinates: center } })
+      index.push({ name: roadName, center, bbox, meets: junctionMatrix[roadName] || [] })
     }
 
-    const segments = {
-      type: 'FeatureCollection',
-      features: segmentFeatures,
+    return {
+      segments: { type: 'FeatureCollection', features: segmentFeatures },
+      labels: { type: 'FeatureCollection', features: labelFeatures },
+      index,
     }
-    const labels = {
-      type: 'FeatureCollection',
-      features: labelFeatures,
-    }
-    return { segments, labels, index }
   }
 
-  function addNamedRoadsLayers(map) {
+  function buildAndAddNamedRoads(map) {
     const plotsData = plotsDataRef.current
     if (!plotsData?.features?.length) return
     const { segments, labels, index } = buildNamedRoadsData(plotsData.features)
@@ -619,60 +315,29 @@ const MapContainer = forwardRef(function MapContainer(
     }
 
     if (!map.getLayer(LAYERS.NAMED_ROADS_FILL)) {
-      map.addLayer({
-        id: LAYERS.NAMED_ROADS_FILL,
-        type: 'fill',
-        source: 'namedRoads',
-        paint: {
-          'fill-color': NAMED_ROAD_COLOR,
-          'fill-opacity': 1,
-        },
-      })
-      map.addLayer({
-        id: LAYERS.NAMED_ROADS_OUTLINE,
-        type: 'line',
-        source: 'namedRoads',
-        paint: {
-          'line-color': NAMED_ROAD_OUTLINE,
-          'line-width': ['interpolate', ['linear'], ['zoom'], 12, 1.5, 16, 2.5, 19, 4],
-          'line-opacity': 1,
-        },
-      })
-      map.addLayer({
-        id: LAYERS.NAMED_ROADS_HIGHLIGHT,
-        type: 'line',
-        source: 'namedRoads',
-        paint: {
-          'line-color': '#FFEB3B',
-          'line-width': 4,
-          'line-opacity': 1,
-        },
-        filter: ['==', ['get', 'roadName'], ''],
-      })
-      map.addLayer({
-        id: LAYERS.NAMED_ROADS_LABELS,
-        type: 'symbol',
-        source: 'namedRoadLabels',
-        layout: {
-          'text-field': ['get', 'roadName'],
-          'text-size': ['interpolate', ['linear'], ['zoom'], 11, 10, 14, 13, 17, 16],
-          'text-anchor': 'center',
-          'text-allow-overlap': false,
-          'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-          'text-letter-spacing': 0.05,
-        },
-        paint: {
-          'text-color': '#FFFFFF',
-          'text-halo-color': 'rgba(0,0,0,0.9)',
-          'text-halo-width': 2,
-        },
-      })
-      loadedSourcesRef.current.add('namedRoads')
-      loadedSourcesRef.current.add('namedRoadLabels')
+      map.addLayer(getNamedRoadsFillLayer())
+      map.addLayer(getNamedRoadsOutlineLayer())
+      map.addLayer(getNamedRoadsHighlightLayer())
+      map.addLayer(getNamedRoadsLabelsLayer())
     }
 
-    onNamedRoadsIndexReady?.(index)
+    setNamedRoadsIndex(index)
   }
+
+  function refreshNamedRoads() {
+    const map = mapRef.current
+    const plotsData = plotsDataRef.current
+    if (!map || !map.getSource('namedRoads') || !plotsData?.features) return
+    const { segments, labels, index } = buildNamedRoadsData(plotsData.features)
+    map.getSource('namedRoads').setData(segments)
+    map.getSource('namedRoadLabels').setData(labels)
+    setNamedRoadsIndex(index)
+  }
+
+  // Store refreshNamedRoads on the store for external access
+  useEffect(() => {
+    useMapStore.setState({ _refreshNamedRoads: refreshNamedRoads })
+  }, [])
 
   function processRoadClick(map, roadFeature) {
     map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['id'], roadFeature.id])
@@ -680,15 +345,10 @@ const MapContainer = forwardRef(function MapContainer(
 
     if (!props.lat || props.lat === 'N/A' || !props.lon || props.lon === 'N/A') {
       const centroid = computeCentroid(roadFeature.geometry)
-      if (centroid) {
-        props.lat = centroid[1]
-        props.lon = centroid[0]
-      }
+      if (centroid) { props.lat = centroid[1]; props.lon = centroid[0] }
     }
 
-    // Always use ORIGINAL geometry for stable key (rendered geometry varies by zoom/tile)
-    let locKey = null
-    let segmentId = null
+    let locKey = null, segmentId = null
     if (roadFeature.id != null) {
       const originalFeature = plotsDataRef.current?.features?.[roadFeature.id]
       if (originalFeature) {
@@ -696,35 +356,25 @@ const MapContainer = forwardRef(function MapContainer(
         segmentId = locKey ? (roadSegmentIndexRef.current.keyToId.get(locKey) ?? null) : null
       }
     }
-    // Fallback to rendered geometry if original not found
     if (!locKey) {
       locKey = getStableRoadKey(roadFeature.geometry)
       segmentId = locKey ? (roadSegmentIndexRef.current.keyToId.get(locKey) ?? null) : null
     }
 
-    // Name priority: mapping file > localStorage
-    let savedName = null
-    if (segmentId != null && SEGMENT_TO_ROAD[segmentId]) {
-      savedName = SEGMENT_TO_ROAD[segmentId]
-    }
+    let savedName = (segmentId != null && SEGMENT_TO_ROAD[segmentId]) || null
     if (!savedName && locKey) {
-      try {
-        const roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}')
-        savedName = roadNames[locKey] || null
-      } catch (err) { /* ignore */ }
+      try { savedName = JSON.parse(localStorage.getItem('roadNames') || '{}')[locKey] || null } catch (e) {}
     }
 
-    // If no saved name, try to infer from the named roads data source
     let inferredName = null
     if (!savedName) {
       const centroid = props.lat && props.lon ? [parseFloat(props.lon), parseFloat(props.lat)] : null
       if (centroid) {
-        const namedSrc = mapInstanceRef.current?.getSource('namedRoads')
+        const namedSrc = map.getSource('namedRoads')
         if (namedSrc) {
           try {
             const namedData = namedSrc._data || namedSrc.serialize?.()?.data
             if (namedData?.features) {
-              // Check which named road corridor this centroid falls in
               const roadBboxes = {}
               for (const nf of namedData.features) {
                 const rn = nf.properties?.roadName
@@ -739,32 +389,20 @@ const MapContainer = forwardRef(function MapContainer(
                 const isN = rn.startsWith('N')
                 const [cx, cy] = centroid
                 if (isN) {
-                  const roadLon = (bb[0] + bb[2]) / 2
-                  if (Math.abs(cx - roadLon) < 0.001 && cy >= bb[1] - 0.003 && cy <= bb[3] + 0.003) {
-                    inferredName = rn
-                    break
-                  }
+                  if (Math.abs(cx - (bb[0] + bb[2]) / 2) < 0.001 && cy >= bb[1] - 0.003 && cy <= bb[3] + 0.003) { inferredName = rn; break }
                 } else {
-                  const roadLat = (bb[1] + bb[3]) / 2
-                  if (Math.abs(cy - roadLat) < 0.001 && cx >= bb[0] - 0.003 && cx <= bb[2] + 0.003) {
-                    inferredName = rn
-                    break
-                  }
+                  if (Math.abs(cy - (bb[1] + bb[3]) / 2) < 0.001 && cx >= bb[0] - 0.003 && cx <= bb[2] + 0.003) { inferredName = rn; break }
                 }
               }
             }
-          } catch (e) { /* ignore */ }
+          } catch (e) {}
         }
       }
     }
 
-    // Check if user explicitly marked this as unnamed
     let isUnnamed = false
     if (locKey) {
-      try {
-        const raw = JSON.parse(localStorage.getItem('roadUnnamed') || '[]')
-        isUnnamed = raw.includes(locKey)
-      } catch (e) { /* ignore */ }
+      try { isUnnamed = JSON.parse(localStorage.getItem('roadUnnamed') || '[]').includes(locKey) } catch (e) {}
     }
 
     props._type = 'road'
@@ -773,42 +411,32 @@ const MapContainer = forwardRef(function MapContainer(
     props._roadName = isUnnamed ? null : savedName
     props._inferredRoadName = isUnnamed ? null : inferredName
     props._isUnnamed = isUnnamed
-    onPlotClick?.(props)
+    selectPlot(props)
   }
 
   function setupInteractions(map) {
-    // General click handler for map
+    let hoveredId = null
+
     map.on('click', (e) => {
       if (roadModeRef.current) {
-        // Road Mode: use expanded bounding box query on the ROAD_MODE_OVERLAY layer
-        // This fixes thin road polygons being unclickable at high zoom levels
-        const tolerance = 10 // pixels
-        const bbox = [
-          [e.point.x - tolerance, e.point.y - tolerance],
-          [e.point.x + tolerance, e.point.y + tolerance],
-        ]
-        // Query the road mode overlay first (visible orange fill)
+        const tolerance = 10
+        const bbox = [[e.point.x - tolerance, e.point.y - tolerance], [e.point.x + tolerance, e.point.y + tolerance]]
         let roadFeatures = map.queryRenderedFeatures(bbox, { layers: [LAYERS.ROAD_MODE_OVERLAY] })
-        // Fallback: also check the plots-fill layer for road reserves
         if (!roadFeatures.length) {
           const plotFeatures = map.queryRenderedFeatures(bbox, { layers: [LAYERS.PLOTS_FILL] })
           roadFeatures = plotFeatures.filter(f => ROAD_RESERVE_SYMBOLOGIES.has(f.properties?.symbology))
         }
-        if (roadFeatures.length > 0) {
-          processRoadClick(map, roadFeatures[0])
-        }
+        if (roadFeatures.length > 0) processRoadClick(map, roadFeatures[0])
         return
       }
 
-      // Normal mode: query the plots-fill layer at the click point
       const features = map.queryRenderedFeatures(e.point, { layers: [LAYERS.PLOTS_FILL] })
-      if (features && features.length > 0) {
+      if (features?.length > 0) {
         const plotFeature = features.find(f => !ROAD_RESERVE_SYMBOLOGIES.has(f.properties.symbology))
         const roadFeature = features.find(f => ROAD_RESERVE_SYMBOLOGIES.has(f.properties.symbology))
-
         if (plotFeature) {
           map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['id'], plotFeature.id])
-          onPlotClick?.(plotFeature.properties)
+          selectPlot(plotFeature.properties)
         } else if (roadFeature) {
           processRoadClick(map, roadFeature)
         }
@@ -816,109 +444,80 @@ const MapContainer = forwardRef(function MapContainer(
     })
 
     map.on('mousemove', (e) => {
-      // Check if hovering over any interactive layer
       const layers = [LAYERS.PLOTS_FILL]
       if (roadModeRef.current) layers.push(LAYERS.ROAD_MODE_OVERLAY)
       const features = map.queryRenderedFeatures(e.point, { layers })
-      if (features && features.length > 0) {
+      if (features?.length > 0) {
         map.getCanvas().style.cursor = 'pointer'
-        if (features[0].id !== hoveredPlotRef.current) {
-          hoveredPlotRef.current = features[0].id
-        }
+        hoveredId = features[0].id
       } else {
         map.getCanvas().style.cursor = ''
-        hoveredPlotRef.current = null
+        hoveredId = null
       }
     })
   }
 
-  // Handle color mode and zoning filter changes — update plot fill colors
+  // --- Effects ---
+
+  // Color mode + zoning filter
   useEffect(() => {
-    const map = mapInstanceRef.current
-    if (!map || !map.isStyleLoaded()) return
-    if (!map.getLayer(LAYERS.PLOTS_FILL)) return
+    const map = mapRef.current
+    if (!map?.isStyleLoaded() || !map.getLayer(LAYERS.PLOTS_FILL)) return
     if (colorMode === 'area') {
       map.setPaintProperty(LAYERS.PLOTS_FILL, 'fill-color', buildAreaHeatmapExpression())
     } else {
-      const expr = buildFilteredColorExpression(activeZoningGroups)
-      map.setPaintProperty(LAYERS.PLOTS_FILL, 'fill-color', expr)
+      map.setPaintProperty(LAYERS.PLOTS_FILL, 'fill-color', buildFilteredColorExpression(activeZoningGroups))
     }
   }, [activeZoningGroups, colorMode])
 
-  // Handle allocated lands visibility toggle
+  // Allocated lands visibility
   useEffect(() => {
-    const map = mapInstanceRef.current
-    if (!map || !map.isStyleLoaded()) return
+    const map = mapRef.current
+    if (!map?.isStyleLoaded()) return
     const visibility = allocatedLandsVisible ? 'visible' : 'none'
-    for (const layerId of [LAYERS.ALLOCATED_LANDS, LAYERS.ALLOCATED_LANDS_OUTLINE, LAYERS.ALLOCATED_LANDS_LABELS]) {
-      if (map.getLayer(layerId)) {
-        map.setLayoutProperty(layerId, 'visibility', visibility)
-      }
+    for (const id of [LAYERS.ALLOCATED_LANDS, LAYERS.ALLOCATED_LANDS_OUTLINE, LAYERS.ALLOCATED_LANDS_LABELS]) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', visibility)
     }
   }, [allocatedLandsVisible])
 
-  // Sync roadMode prop to ref (for click handler) and toggle overlay
+  // Road mode overlay
   useEffect(() => {
-    roadModeRef.current = !!roadMode
-    const map = mapInstanceRef.current
-    if (!map || !map.isStyleLoaded()) return
+    const map = mapRef.current
+    if (!map?.isStyleLoaded()) return
     if (map.getLayer(LAYERS.ROAD_MODE_OVERLAY)) {
       map.setLayoutProperty(LAYERS.ROAD_MODE_OVERLAY, 'visibility', roadMode ? 'visible' : 'none')
     }
-    // Dev helper: log segment index when road mode activates
-    if (roadMode && roadSegmentIndexRef.current.segments.length > 0) {
-      console.log(`Road Mode ON — ${roadSegmentIndexRef.current.segments.length} segments. Use console: roadSegmentIndexRef`)
-    }
   }, [roadMode])
 
-  // Show Named Roads Only mode: hide plots, show only named roads on dark background
+  // Named-only mode
   useEffect(() => {
-    const map = mapInstanceRef.current
-    if (!map || !map.isStyleLoaded()) return
+    const map = mapRef.current
+    if (!map?.isStyleLoaded()) return
     const plotLayers = [LAYERS.PLOTS_FILL, LAYERS.PLOTS_OUTLINE, LAYERS.ALLOCATED_LANDS, LAYERS.ALLOCATED_LANDS_OUTLINE, LAYERS.ALLOCATED_LANDS_LABELS]
-    for (const layerId of plotLayers) {
-      if (map.getLayer(layerId)) {
-        map.setLayoutProperty(layerId, 'visibility', showNamedOnly ? 'none' : 'visible')
-      }
-    }
-    // Make named roads more prominent when in this mode
-    if (map.getLayer(LAYERS.NAMED_ROADS_FILL)) {
-      map.setPaintProperty(LAYERS.NAMED_ROADS_FILL, 'fill-opacity', showNamedOnly ? 1 : 1)
-    }
-    if (map.getLayer(LAYERS.NAMED_ROADS_OUTLINE)) {
-      map.setPaintProperty(LAYERS.NAMED_ROADS_OUTLINE, 'line-width', showNamedOnly ? 2 : 1.5)
+    for (const id of plotLayers) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', showNamedOnly ? 'none' : 'visible')
     }
   }, [showNamedOnly])
 
-  // Handle selected plot / named road highlight
+  // Selected plot highlight
   useEffect(() => {
-    const map = mapInstanceRef.current
-    if (!map || !map.isStyleLoaded()) return
-
+    const map = mapRef.current
+    if (!map?.isStyleLoaded()) return
     if (selectedPlot?._type === 'namedRoad') {
       if (map.getLayer(LAYERS.PLOTS_HIGHLIGHT)) map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['id'], -1])
       if (map.getLayer(LAYERS.NAMED_ROADS_HIGHLIGHT)) {
         map.setFilter(LAYERS.NAMED_ROADS_HIGHLIGHT, ['==', ['get', 'roadName'], selectedPlot.name])
-        const bbox = selectedPlot.bbox
-        if (bbox && bbox.length === 4) {
-          try {
-            map.fitBounds(bbox, { padding: 80, duration: 1200, maxZoom: 17 })
-          } catch (e) { /* ignore */ }
+        if (selectedPlot.bbox?.length === 4) {
+          try { map.fitBounds(selectedPlot.bbox, { padding: 80, duration: 1200, maxZoom: 17 }) } catch (e) {}
         }
       }
     } else {
       if (map.getLayer(LAYERS.NAMED_ROADS_HIGHLIGHT)) map.setFilter(LAYERS.NAMED_ROADS_HIGHLIGHT, ['==', ['get', 'roadName'], ''])
-      if (selectedPlot && (selectedPlot.regcode || selectedPlot._type === 'road') && map.getLayer(LAYERS.PLOTS_HIGHLIGHT)) {
-        // Highlight is set on click in setupInteractions
-      } else if (map.getLayer(LAYERS.PLOTS_HIGHLIGHT)) {
+      if (!selectedPlot && map.getLayer(LAYERS.PLOTS_HIGHLIGHT)) {
         map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['id'], -1])
       }
     }
   }, [selectedPlot])
 
-  return (
-    <div ref={mapContainerRef} className="map-container" />
-  )
-})
-
-export default MapContainer
+  return <div ref={containerRef} className="map-container" />
+}
