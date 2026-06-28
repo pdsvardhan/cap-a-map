@@ -72,17 +72,15 @@ export default function PlotDetailPanel({ plot, onClose }) {
 
   // Regular plot
   const color = getColorForSymbology(plot.symbology)
-  const groupKey = getGroupForSymbology(plot.symbology)
+  const groupKey = plot.zoning_group || getGroupForSymbology(plot.symbology)
   const groupLabel = ZONING_GROUPS[groupKey]?.label || plot.symbology || 'Unknown'
 
-  const regcode = plot.regcode !== 'N/A' ? plot.regcode : null
-  const plotCode = plot.plot_code !== 'N/A' ? plot.plot_code : null
+  const regcode = plot.regcode && plot.regcode !== 'N/A' ? plot.regcode : null
+  const plotCode = plot.plot_code && plot.plot_code !== 'N/A' ? plot.plot_code : null
 
-  // Build Google Maps link
-  let googleMapsLink = plot.googlemaplink
-  if ((!googleMapsLink || googleMapsLink === 'N/A') && plot.lat && plot.lon) {
-    googleMapsLink = `https://www.google.com/maps?q=${plot.lat},${plot.lon}`
-  }
+  const googleMapsLink = (plot.lat && plot.lon)
+    ? `https://www.google.com/maps?q=${plot.lat},${plot.lon}`
+    : null
 
   return (
     <div className="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl z-20 flex flex-col animate-slide-in">
@@ -143,39 +141,23 @@ export default function PlotDetailPanel({ plot, onClose }) {
         {/* Location */}
         <Section title="Location">
           <InfoGrid items={[
-            { label: 'Village', value: plot.village },
+            { label: 'Village', value: plot.village_na ? 'N/A' : plot.village },
+            { label: 'Region (1km)', value: plot.grid_id },
             { label: 'Township', value: plot.township },
             { label: 'Sector', value: plot.sector },
-            { label: 'Colony', value: plot.colony },
             { label: 'Block', value: plot.block },
             { label: 'Plot No', value: plot.plot_no },
           ]} />
         </Section>
 
-        {/* Area & Dimensions */}
-        <Section title="Area & Dimensions">
+        {/* Area & Frontage */}
+        <Section title="Area & Frontage">
           <InfoGrid items={[
-            { label: 'Allotted Area', value: formatArea(plot.alloted_ex, plot.nbr || 'Sq.Yards') },
+            { label: 'Plot Area', value: formatArea(plot.area_sqyd, 'Sq.Yards') },
             { label: 'Dimensions', value: formatDimensions(plot.polylength, plot.polywidth) },
+            { label: 'Road Frontage', value: plot.max_frontage_m ? `${plot.max_frontage_m} m` : '—' },
             { label: 'Category', value: plot.plot_categ },
           ]} />
-        </Section>
-
-        {/* Neighbours */}
-        <Section title="Neighbours">
-          <div className="grid grid-cols-3 gap-1 text-center">
-            <div />
-            <NeighbourCell label="N" value={plot.regcode_n} />
-            <div />
-            <NeighbourCell label="W" value={plot.regcode_w} />
-            <div className="bg-orange-50 rounded p-1.5 text-xs font-medium text-orange-700">
-              This Plot
-            </div>
-            <NeighbourCell label="E" value={plot.regcode_e} />
-            <div />
-            <NeighbourCell label="S" value={plot.regcode_s} />
-            <div />
-          </div>
         </Section>
 
         {/* Google Maps Link */}

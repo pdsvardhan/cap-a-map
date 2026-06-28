@@ -18,6 +18,7 @@ public/data/villages/
 public/data/plots.clean.geojson
 public/data/plots.enriched.geojson
 public/data/*.pmtiles
+public/data/search.json
 
 # Environment
 .env

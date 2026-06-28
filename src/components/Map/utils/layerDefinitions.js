@@ -1,11 +1,12 @@
-import { LAYERS, NAMED_ROAD_COLOR, NAMED_ROAD_OUTLINE } from '../../../utils/constants'
+import { LAYERS, NAMED_ROAD_COLOR, NAMED_ROAD_OUTLINE, PLOTS_SOURCE, PLOTS_SOURCE_LAYER } from '../../../utils/constants'
 import { buildSymbologyColorExpression, ROAD_RESERVE_SYMBOLOGIES, buildRoadReserveFilter } from '../../../utils/colors'
 
 export function getPlotFillLayer() {
   return {
     id: LAYERS.PLOTS_FILL,
     type: 'fill',
-    source: 'plots',
+    source: PLOTS_SOURCE,
+    'source-layer': PLOTS_SOURCE_LAYER,
     paint: {
       'fill-color': buildSymbologyColorExpression(),
       'fill-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0.6, 14, 0.75, 18, 0.85],
@@ -17,7 +18,8 @@ export function getPlotOutlineLayer() {
   return {
     id: LAYERS.PLOTS_OUTLINE,
     type: 'line',
-    source: 'plots',
+    source: PLOTS_SOURCE,
+    'source-layer': PLOTS_SOURCE_LAYER,
     paint: {
       'line-color': '#1A1A1A',
       'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0, 13, 0.3, 15, 0.8, 17, 1.2, 19, 1.8],
@@ -35,9 +37,10 @@ export function getPlotHighlightLayer() {
   return {
     id: LAYERS.PLOTS_HIGHLIGHT,
     type: 'line',
-    source: 'plots',
+    source: PLOTS_SOURCE,
+    'source-layer': PLOTS_SOURCE_LAYER,
     paint: { 'line-color': '#FFFFFF', 'line-width': 3, 'line-opacity': 1 },
-    filter: ['==', ['id'], -1],
+    filter: ['==', ['get', 'pid'], -1],
   }
 }
 
@@ -45,7 +48,8 @@ export function getRoadModeOverlayLayer() {
   return {
     id: LAYERS.ROAD_MODE_OVERLAY,
     type: 'fill',
-    source: 'plots',
+    source: PLOTS_SOURCE,
+    'source-layer': PLOTS_SOURCE_LAYER,
     paint: { 'fill-color': '#FF8C00', 'fill-opacity': 0.35 },
     filter: buildRoadReserveFilter(),
     layout: { visibility: 'none' },

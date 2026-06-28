@@ -112,7 +112,7 @@ const DIRS = ['n', 's', 'e', 'w']
 const outFeatures = []
 const areas = []
 
-for (const f of feats) {
+for (const [pid, f] of feats.entries()) {
   const p = f.properties || {}
 
   // -- village --
@@ -176,6 +176,7 @@ for (const f of feats) {
 
   // -- slimmed, cleaned properties --
   const props = {
+    pid, // stable unique id (raw feature index) — selection / joins / scoring
     regcode: isBlank(p.regcode) ? null : p.regcode,
     plot_code: isBlank(p.plot_code) ? null : p.plot_code,
     plot_no: p.plot_no ?? null,
