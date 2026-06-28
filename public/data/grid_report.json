@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-06-28T20:17:41.711Z",
+  "cell_size_m": 1000,
+  "reference": {
+    "lon0": 80.408998,
+    "lat0": 16.41561,
+    "latRef": 16.496038310553416,
+    "m_per_deg_lon": 106737.99874433989,
+    "m_per_deg_lat": 110574
+  },
+  "plots_assigned": 95291,
+  "plots_unassigned": 0,
+  "occupied_cells": 222,
+  "plots_per_cell": {
+    "min": 1,
+    "median": 377,
+    "max": 1593
+  }
+}
