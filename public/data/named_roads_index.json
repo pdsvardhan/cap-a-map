@@ -15,12 +15,12 @@
     "seedCount": 6,
     "category": "arterial",
     "orientation": "E-W",
-    "row_m": 60,
-    "lane_pattern": "3+3+3",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
-    "remarks": "Typical arterial",
+    "remarks": "Arterial, 50m ROW (WB EIA); IRR connection",
     "meets": [
       "E2",
       "N11"
@@ -46,8 +46,8 @@
     "lane_pattern": "2+2+2",
     "brt_present": false,
     "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Penumaka-Inavolu",
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane, ~7.81km; Inavolu/Mandadam/Venkatapalem/Kuragallu/Krishnayapalem/Nowluru/Penumaka",
     "meets": [
       "N10"
     ]
@@ -68,12 +68,12 @@
     "seedCount": 1,
     "category": "arterial",
     "orientation": "E-W",
-    "row_m": 60,
-    "lane_pattern": "3+3+3",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": true,
     "confidence": "B",
-    "remarks": "NH16 extension planned",
+    "remarks": "Arterial, 50m ROW (WB EIA); directly linked to NH-16 (front of AIIMS)",
     "meets": [
       "N10"
     ]
@@ -98,8 +98,8 @@
     "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Typical sub-arterial",
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane + 2 BRT, ~6.79km; Kuragallu/Nowluru",
     "meets": [
       "N10"
     ]
@@ -125,7 +125,7 @@
     "brt_present": true,
     "connects_nh16": true,
     "confidence": "B",
-    "remarks": "Govt Complex to NH16",
+    "remarks": "Major arterial; Govt Complex → NH-16 (behind AIIMS)",
     "meets": [
       "N10"
     ]
@@ -150,8 +150,8 @@
     "lane_pattern": "2+2+2",
     "brt_present": false,
     "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Typical sub-arterial",
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane, ~7.36km; Kuragallu/Nowluru/Nidamarru",
     "meets": [
       "N10"
     ]
@@ -170,14 +170,14 @@
     ],
     "segCount": 1,
     "seedCount": 1,
-    "category": "sub-arterial",
+    "category": "arterial",
     "orientation": "E-W",
     "row_m": 50,
     "lane_pattern": "3+3+0",
     "brt_present": false,
     "connects_nh16": true,
     "confidence": "A",
-    "remarks": "DPR cross-section available",
+    "remarks": "DPR cross-section available; extended to NH-16",
     "meets": []
   },
   {
@@ -201,7 +201,7 @@
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
-    "remarks": "Typical sub-arterial",
+    "remarks": "Arterial section",
     "meets": []
   },
   {
@@ -220,12 +220,12 @@
     "seedCount": 5,
     "category": "sub-arterial",
     "orientation": "E-W",
-    "row_m": 60,
-    "lane_pattern": "3+3+3",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
-    "remarks": "Typical arterial",
+    "remarks": "Sub-arterial, 50m ROW (WB EIA)",
     "meets": [
       "E1"
     ]
@@ -247,11 +247,11 @@
     "category": "seed access",
     "orientation": "E-W",
     "row_m": 60,
-    "lane_pattern": "4+0+4",
-    "brt_present": false,
+    "lane_pattern": "4+2+4",
+    "brt_present": true,
     "connects_nh16": true,
-    "confidence": "B",
-    "remarks": "Seed access road, connects NH-16 to core",
+    "confidence": "A",
+    "remarks": "Seed Capital Road: 8–9 lane with dedicated BRT, ~21km; NH-16 via Kanakadurga Varadhi cable bridge",
     "meets": []
   },
   {
@@ -270,12 +270,12 @@
     "seedCount": 3,
     "category": "sub-arterial",
     "orientation": "E-W",
-    "row_m": 60,
-    "lane_pattern": "3+3+3",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
-    "remarks": "Typical arterial",
+    "remarks": "Sub-arterial, 50m ROW (WB EIA)",
     "meets": [
       "N11"
     ]
@@ -301,7 +301,7 @@
     "brt_present": true,
     "connects_nh16": true,
     "confidence": "B",
-    "remarks": "NH16 to IRR trunk connection",
+    "remarks": "Major arterial; elevated corridor; connects NH-16",
     "meets": [
       "N10",
       "N11"
@@ -327,8 +327,8 @@
     "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Typical sub-arterial, 9.844 km length reported",
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane + 2 BRT, ~9.84km; Ananthavaram/Nelapadu/Thullur/Velagapudi",
     "meets": [
       "N11"
     ]
@@ -352,9 +352,9 @@
     "row_m": 50,
     "lane_pattern": "2+2+2",
     "brt_present": true,
-    "connects_nh16": false,
+    "connects_nh16": true,
     "confidence": "B",
-    "remarks": "Mandadam area (west)",
+    "remarks": "Arterial; connects NH-16 (no land acq.)",
     "meets": [
       "N10",
       "N11"
@@ -380,8 +380,8 @@
     "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Typical sub-arterial, 14.955 km length reported",
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane + 2 BRT, ~14.96km; Nekkallu/Thullur/Sakhamuru/Velagapudi/Malkapuram/Mandadam/Venkatapalem/Krishnayapalem",
     "meets": [
       "N10",
       "N11",
@@ -405,12 +405,12 @@
     "seedCount": 3,
     "category": "arterial",
     "orientation": "E-W",
-    "row_m": 60,
-    "lane_pattern": "3+3+3",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
     "brt_present": true,
-    "connects_nh16": false,
+    "connects_nh16": true,
     "confidence": "B",
-    "remarks": "Typical arterial",
+    "remarks": "Arterial, 50m ROW (WB EIA); connects NH-16 (no land acq.)",
     "meets": [
       "N1"
     ]
@@ -464,7 +464,7 @@
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
-    "remarks": "Typical sub-arterial section",
+    "remarks": "Arterial; IRR connection",
     "meets": [
       "E10",
       "E11",
@@ -504,11 +504,11 @@
     "category": "sub-arterial",
     "orientation": "N-S",
     "row_m": 50,
-    "lane_pattern": "3+2+3",
+    "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "A",
-    "remarks": "4 lane + 2 lane BRT confirmed",
+    "remarks": "WB EIA: 4-lane + 2 BRT, ~8.66km; Ayinavolu/Nelapadu/Sakhamuru/Rayapudi/Velagapudi/Lingayapalem",
     "meets": [
       "E1",
       "E4",
@@ -545,12 +545,12 @@
     "seedCount": 3,
     "category": "arterial",
     "orientation": "N-S",
-    "row_m": 60,
-    "lane_pattern": "3+3+3",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
-    "confidence": "A",
-    "remarks": "6 lane arterial confirmed",
+    "confidence": "B",
+    "remarks": "Arterial, 50m ROW (WB EIA)",
     "meets": [
       "N10",
       "N11",
@@ -580,7 +580,7 @@
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
-    "remarks": "Connects N1 via bund road",
+    "remarks": "Major arterial; elevated corridor (with E5, E13)",
     "meets": [
       "N10",
       "N11",
@@ -607,10 +607,10 @@
     "orientation": "N-S",
     "row_m": 50,
     "lane_pattern": "2+2+2",
-    "brt_present": true,
+    "brt_present": false,
     "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Typical sub-arterial section",
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane, ~8.27km; Borupalem/Abbarajupalem/Thullur/Sakhamuru",
     "meets": [
       "N10",
       "N11",
@@ -635,12 +635,12 @@
     "seedCount": 1,
     "category": "arterial",
     "orientation": "N-S",
-    "row_m": 60,
-    "lane_pattern": "3+3+3",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
-    "confidence": "A",
-    "remarks": "6 lane arterial confirmed",
+    "confidence": "B",
+    "remarks": "Arterial, 50m ROW (WB EIA)",
     "meets": [
       "N10"
     ]
@@ -663,10 +663,10 @@
     "orientation": "N-S",
     "row_m": 50,
     "lane_pattern": "2+2+2",
-    "brt_present": true,
+    "brt_present": false,
     "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Typical sub-arterial section",
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane, ~7.36km; Borupalem/Pichakalapalem/Thullur/Ananthavaram/Nekkallu",
     "meets": [
       "N10"
     ]
@@ -692,7 +692,7 @@
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
-    "remarks": "Typical sub-arterial section",
+    "remarks": "Arterial section",
     "meets": [
       "N11"
     ]
@@ -714,11 +714,11 @@
     "category": "sub-arterial",
     "orientation": "N-S",
     "row_m": 50,
-    "lane_pattern": "3+2+3",
+    "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "A",
-    "remarks": "4 lane + 2 lane BRT confirmed",
+    "remarks": "4-lane + 2 BRT confirmed",
     "meets": [
       "N10",
       "N11",
@@ -771,12 +771,12 @@
     "seedCount": 5,
     "category": "arterial",
     "orientation": "N-S",
-    "row_m": 60,
-    "lane_pattern": "3+3+3",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
-    "remarks": "Typical arterial section",
+    "remarks": "Arterial, 50m ROW (WB EIA); Venkatapalem–Krishnayapalem",
     "meets": [
       "E8",
       "N10",
@@ -799,12 +799,12 @@
     "seedCount": 1,
     "category": "arterial",
     "orientation": "N-S",
-    "row_m": 60,
-    "lane_pattern": "3+3+3",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
-    "remarks": "Typical arterial section",
+    "remarks": "Arterial, 50m ROW (WB EIA)",
     "meets": []
   },
   {
@@ -825,10 +825,10 @@
     "orientation": "N-S",
     "row_m": 50,
     "lane_pattern": "2+2+2",
-    "brt_present": true,
+    "brt_present": false,
     "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Typical sub-arterial section",
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane, ~7.17km; Penumaka/Nowluru/Krishnayapalem/Venkatapalem",
     "meets": [
       "N11"
     ]
@@ -852,9 +852,9 @@
     "row_m": 60,
     "lane_pattern": "3+3+3",
     "brt_present": true,
-    "connects_nh16": false,
+    "connects_nh16": true,
     "confidence": "B",
-    "remarks": "Major arterial, multiple references",
+    "remarks": "Major arterial; proposed NH-16 bypass",
     "meets": []
   },
   {
@@ -902,7 +902,7 @@
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
-    "remarks": "Typical sub-arterial section",
+    "remarks": "Arterial; in trunk tender package",
     "meets": []
   },
   {
@@ -922,11 +922,11 @@
     "category": "sub-arterial",
     "orientation": "N-S",
     "row_m": 50,
-    "lane_pattern": "3+2+3",
+    "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "A",
-    "remarks": "4 lane + 2 lane BRT confirmed",
+    "remarks": "WB EIA: 4-lane + 2 BRT, ~12.5km; Nidamarru/Kuragallu/Mandadam/Malkapuram/Velagapudi",
     "meets": [
       "N10",
       "N11"
