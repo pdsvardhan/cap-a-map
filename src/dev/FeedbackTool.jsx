@@ -29,23 +29,30 @@ function mapView() {
   return { center: [r6(c.lng), r6(c.lat)], zoom: +m.getZoom().toFixed(2), bearing: +m.getBearing().toFixed(1) }
 }
 
+// Persistent tab-capture stream — prompt once per session, reuse for every grab.
+let _stream = null, _video = null
+function streamLive() { return _stream && _stream.getTracks().some((t) => t.readyState === 'live') }
+async function ensureStream(setStatus) {
+  if (streamLive()) return _video
+  setStatus('Pick "This tab"…')
+  _stream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 4 }, preferCurrentTab: true, audio: false })
+  _stream.getVideoTracks()[0].addEventListener('ended', () => { _stream = null; _video = null })
+  _video = document.createElement('video'); _video.srcObject = _stream; _video.muted = true
+  await _video.play()
+  await new Promise((r) => setTimeout(r, 220))
+  return _video
+}
+export function stopFeedbackStream() { if (_stream) { _stream.getTracks().forEach((t) => t.stop()); _stream = null; _video = null } }
+
 async function captureFrame(setStatus) {
-  // 1) tab capture (pixel-perfect, no taint)
   try {
-    setStatus('Pick "This tab" to capture…')
-    const stream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 4 }, preferCurrentTab: true, audio: false })
-    const video = document.createElement('video')
-    video.srcObject = stream; video.muted = true
-    await video.play()
-    await new Promise((r) => setTimeout(r, 180))
+    const video = await ensureStream(setStatus) // 1) tab capture (pixel-perfect, no taint)
     const cv = document.createElement('canvas')
     cv.width = video.videoWidth; cv.height = video.videoHeight
     cv.getContext('2d').drawImage(video, 0, 0)
-    stream.getTracks().forEach((t) => t.stop())
     return cv.toDataURL('image/jpeg', 0.92)
   } catch (e) {
-    // 2) html-to-image fallback
-    try {
+    try { // 2) html-to-image fallback
       setStatus('Capturing…')
       return await toJpeg(document.body, { quality: 0.85, cacheBust: true, filter: (n) => !(n.dataset && n.dataset.feedbackUi) })
     } catch (e2) { return null }
@@ -79,6 +86,8 @@ export default function FeedbackTool() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [editor, busy, start])
+
+  useEffect(() => () => stopFeedbackStream(), [])
 
   const onSaved = (id) => { setCount((n) => n + 1); setToast(`saved ${id || ''}`); setTimeout(() => setToast(null), 1800); setEditor(null) }
 
