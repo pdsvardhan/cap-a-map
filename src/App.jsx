@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import useMapStore from './stores/mapStore'
 import MapContainer from './components/Map/MapContainer'
 import SearchBar from './components/Search/SearchBar'
@@ -9,6 +9,8 @@ import ErrorBoundary from './components/ErrorBoundary'
 
 // Internal road-naming tooling is gated behind ?dev — not part of the public app.
 const DEV_TOOLS = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('dev')
+// In-app comment tool — dev builds only (excluded from production bundle).
+const FeedbackTool = import.meta.env.DEV ? lazy(() => import('./dev/FeedbackTool.jsx')) : null
 
 export default function App() {
   const isLoading = useMapStore((s) => s.isLoading)
@@ -29,11 +31,11 @@ export default function App() {
         <MapContainer />
 
         {!isLoading && (
-          <div className="absolute top-3 left-3 right-3 z-10 flex flex-col gap-3 sm:top-4 sm:left-4 sm:right-4 sm:flex-row sm:items-start">
-            <div className="flex-1 sm:max-w-lg">
+          <div data-component="TopBar" className="absolute top-3 left-3 right-3 z-10 flex flex-col gap-3 sm:top-4 sm:left-4 sm:right-4 sm:flex-row sm:items-start">
+            <div data-component="SearchBar" className="flex-1 sm:max-w-lg">
               <SearchBar />
             </div>
-            <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+            <div data-component="MapControls" className="flex flex-wrap gap-2 sm:flex-nowrap">
               <TopButton onClick={toggleLegend} active={showLegend} label="Legend" />
               {DEV_TOOLS && (
                 <TopButton onClick={toggleRoadMode} active={roadMode} activeClass="bg-orange-500 text-white hover:bg-orange-600" label="Roads (dev)" />
@@ -42,9 +44,11 @@ export default function App() {
           </div>
         )}
 
-        {showLegend && !isLoading && <Legend />}
+        {showLegend && !isLoading && <div data-component="Legend" className="contents"><Legend /></div>}
 
-        {showPanel && <PlotDetailPanel plot={selectedPlot} onClose={clearPlot} />}
+        {showPanel && <div data-component="PlotDetailPanel" className="contents"><PlotDetailPanel plot={selectedPlot} onClose={clearPlot} /></div>}
+
+        {FeedbackTool && <Suspense fallback={null}><FeedbackTool /></Suspense>}
       </div>
     </ErrorBoundary>
   )

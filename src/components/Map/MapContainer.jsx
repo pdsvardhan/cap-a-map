@@ -47,6 +47,8 @@ export default function MapContainer() {
       minZoom: MAP_MIN_ZOOM,
       maxZoom: MAP_MAX_ZOOM,
       attributionControl: false,
+      // dev-only: lets the comment tool capture the WebGL canvas via toDataURL
+      preserveDrawingBuffer: import.meta.env.DEV,
     })
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right')
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')

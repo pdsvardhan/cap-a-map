@@ -20,6 +20,9 @@ public/data/plots.enriched.geojson
 public/data/*.pmtiles
 public/data/search.json
 
+# In-app review comments (dev comment tool → vite /__feedback)
+feedback/
+
 # Environment
 .env
 .env.local
