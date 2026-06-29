@@ -135,8 +135,8 @@ export default function SearchBar() {
   return (
     <div ref={boxRef} className="relative">
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+          <svg className="w-[18px] h-[18px] text-[var(--text-3)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
@@ -149,12 +149,12 @@ export default function SearchBar() {
           onFocus={() => query.length >= 2 && results.length > 0 && setIsOpen(true)}
           placeholder={isLoading ? 'Loading search…' : `Search ${total.toLocaleString()} plots, landmarks, roads…`}
           disabled={isLoading}
-          className="w-full pl-10 pr-10 py-2.5 bg-white rounded-lg shadow-md border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 outline-none text-sm text-gray-800 placeholder-gray-400 disabled:bg-gray-100 transition-all"
+          className="glass w-full pl-11 pr-10 py-3 rounded-2xl outline-none text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] transition-all focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-weak),var(--shadow)]"
         />
         {query && (
           <button
             onClick={() => { setQuery(''); setResults([]); setIsOpen(false) }}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -164,27 +164,27 @@ export default function SearchBar() {
       </div>
 
       {isOpen && (
-        <div className="absolute top-full mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-80 overflow-y-auto panel-scroll z-50">
-          <div className="px-3 py-1.5 text-xs text-gray-500 border-b border-gray-100">
+        <div className="glass absolute top-full mt-2 w-full rounded-2xl max-h-80 overflow-y-auto panel-scroll z-50 animate-[fade-up_.18s_ease]">
+          <div className="px-3.5 py-2 text-[11px] uppercase tracking-wider text-[var(--text-3)] border-b border-[var(--border)] mono">
             {results.length} result{results.length !== 1 ? 's' : ''}
           </div>
           {results.map((result, idx) => {
             const item = result.item
             const sel = idx === selectedIndex
-            const base = `w-full text-left px-3 py-2 hover:bg-orange-50 border-b border-gray-50 last:border-0 transition-colors ${sel ? 'bg-orange-50' : ''}`
+            const base = `w-full text-left px-3.5 py-2.5 hover:bg-white/[0.06] border-b border-[var(--border)] last:border-0 transition-colors ${sel ? 'bg-white/[0.06]' : ''}`
             if (item.t === 'road') return (
               <button key={`r-${item.n}`} onClick={() => handleSelect(item)} className={base}>
-                <Row dot="#8B5A2B" title={item.n} badge="Road" badgeClass="bg-amber-100 text-amber-800" />
+                <Row dot="#FFA64D" title={item.n} mono badge="Road" badgeClass="bg-amber-400/15 text-amber-300" />
               </button>
             )
             if (item.t === 'landmark') return (
               <button key={`l-${item.n}-${idx}`} onClick={() => handleSelect(item)} className={base}>
-                <Row dot="#FF6F00" title={truncate(item.n, 40)} badge="Landmark" badgeClass="bg-orange-100 text-orange-700" sub={item.cat} />
+                <Row dot="#FF8C42" title={truncate(item.n, 40)} badge="Landmark" badgeClass="bg-orange-400/15 text-orange-300" sub={item.cat} />
               </button>
             )
             return (
               <button key={`p-${item.i}`} onClick={() => handleSelect(item)} className={base}>
-                <Row dot="#5FA8D3" title={item.r || item.c || item.v || 'Plot'} sub={item.v} />
+                <Row dot="#5FA8D3" title={item.r || item.c || item.v || 'Plot'} mono sub={item.v} />
               </button>
             )
           })}
@@ -194,16 +194,16 @@ export default function SearchBar() {
   )
 }
 
-function Row({ dot, title, badge, badgeClass, sub }) {
+function Row({ dot, title, badge, badgeClass, sub, mono }) {
   return (
-    <div className="flex items-center gap-2">
-      <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: dot }} />
+    <div className="flex items-center gap-2.5">
+      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 ring-2 ring-white/10" style={{ backgroundColor: dot }} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-800 truncate">{title}</span>
-          {badge && <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${badgeClass}`}>{badge}</span>}
+          <span className={`text-sm font-medium text-[var(--text-1)] truncate ${mono ? 'mono' : ''}`}>{title}</span>
+          {badge && <span className={`text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded-md font-semibold ${badgeClass}`}>{badge}</span>}
         </div>
-        {sub && <div className="text-xs text-gray-500 truncate">{sub}</div>}
+        {sub && <div className="text-xs text-[var(--text-3)] truncate">{sub}</div>}
       </div>
     </div>
   )

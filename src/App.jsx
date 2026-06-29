@@ -29,6 +29,7 @@ export default function App() {
         {isLoading && <LoadingScreen />}
 
         <MapContainer />
+        <div className="map-vignette" />
 
         {!isLoading && (
           <div data-component="TopBar" className="absolute top-3 left-3 right-3 z-10 flex flex-col gap-3 sm:top-4 sm:left-4 sm:right-4 sm:flex-row sm:items-start">
@@ -38,7 +39,7 @@ export default function App() {
             <div data-component="MapControls" className="flex flex-wrap gap-2 sm:flex-nowrap">
               <TopButton onClick={toggleLegend} active={showLegend} label="Legend" />
               {DEV_TOOLS && (
-                <TopButton onClick={toggleRoadMode} active={roadMode} activeClass="bg-orange-500 text-white hover:bg-orange-600" label="Roads (dev)" />
+                <TopButton onClick={toggleRoadMode} active={roadMode} label="Roads · dev" />
               )}
             </div>
           </div>
@@ -54,12 +55,14 @@ export default function App() {
   )
 }
 
-function TopButton({ onClick, active, label, activeClass = 'bg-gray-800 text-white hover:bg-gray-700' }) {
+function TopButton({ onClick, active, label }) {
   return (
     <button
       onClick={onClick}
-      className={`flex-1 px-3 py-2.5 rounded-lg shadow-md text-sm font-medium transition-colors sm:flex-none ${
-        active ? activeClass : 'bg-white text-gray-700 hover:bg-gray-50'
+      className={`flex-1 px-4 py-3 rounded-2xl text-sm font-medium transition-all sm:flex-none border ${
+        active
+          ? 'bg-[var(--accent)] text-[var(--accent-ink)] border-transparent shadow-[var(--shadow)]'
+          : 'glass text-[var(--text-2)] hover:text-[var(--text-1)] hover:border-[var(--border-strong)]'
       }`}
     >
       {label}

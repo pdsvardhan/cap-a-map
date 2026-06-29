@@ -46,23 +46,25 @@ export default function LoadingScreen() {
   }, [stage.label])
 
   return (
-    <div className="absolute inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center">
-      <div className="text-center">
-        <div className="mb-6">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 shadow-lg shadow-orange-500/30">
-            <span className="text-4xl font-bold text-white">A</span>
+    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center"
+         style={{ background: 'radial-gradient(120% 90% at 50% 38%, #0e151d 0%, var(--bg) 70%)' }}>
+      <div className="text-center px-6">
+        <div className="mb-7">
+          <div className="inline-flex items-center justify-center w-[68px] h-[68px] rounded-2xl glass-2"
+               style={{ boxShadow: '0 0 0 1px var(--border), 0 0 40px -8px var(--accent-weak)' }}>
+            <span className="text-4xl leading-none" style={{ color: 'var(--accent)' }}>అ</span>
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-white mb-1">Cap A</h1>
-        <p className="text-slate-400 text-sm mb-10">Amaravati Capital City Interactive Map</p>
+        <h1 className="text-[26px] font-bold tracking-tight text-[var(--text-1)] mb-1">Amaravati</h1>
+        <p className="text-[var(--text-3)] text-[13px] tracking-wide mb-10 mono uppercase">Land Explorer · 95,291 plots</p>
 
         {error ? (
           <div className="mb-8">
             <p className="text-red-400 text-sm mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-2.5 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
+              className="px-6 py-2.5 rounded-xl font-medium transition-colors bg-[var(--accent)] text-[var(--accent-ink)] hover:brightness-110"
             >
               Retry
             </button>
@@ -72,7 +74,7 @@ export default function LoadingScreen() {
             <p className="text-yellow-400 text-sm mb-4">Loading is taking longer than expected...</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-2.5 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
+              className="px-6 py-2.5 rounded-xl font-medium transition-colors bg-[var(--accent)] text-[var(--accent-ink)] hover:brightness-110"
             >
               Reload
             </button>

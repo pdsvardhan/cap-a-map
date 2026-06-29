@@ -101,27 +101,27 @@ export default function Legend() {
   }, [])
 
   return (
-    <div className="absolute z-30 bg-white shadow-lg border border-gray-200 flex flex-col inset-x-3 bottom-3 top-auto max-h-[55vh] rounded-xl sm:inset-auto sm:top-16 sm:right-4 sm:w-80 sm:max-h-[calc(100vh-120px)] sm:rounded-lg">
+    <div className="glass absolute z-30 flex flex-col inset-x-3 bottom-3 top-auto max-h-[55vh] rounded-2xl sm:inset-auto sm:top-[4.75rem] sm:right-4 sm:w-80 sm:max-h-[calc(100vh-120px)]">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
-        <h3 className="text-sm font-semibold text-gray-800">Map Explorer</h3>
+      <div className="px-4 py-3 border-b border-[var(--border)] flex items-center justify-between flex-shrink-0">
+        <h3 className="text-sm font-semibold text-[var(--text-1)]">Map Explorer</h3>
         <button onClick={toggleLegend} className="p-1 hover:bg-gray-100 rounded transition-colors">
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-[var(--text-3)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
       {/* Color Mode Toggle */}
-      <div className="px-4 py-2 border-b border-gray-100 flex-shrink-0">
-        <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Color Mode</p>
+      <div className="px-4 py-2 border-b border-[var(--border)] flex-shrink-0">
+        <p className="text-[9px] font-semibold text-[var(--text-3)] uppercase tracking-wider mb-1.5">Color Mode</p>
         <div className="flex gap-1">
           <button
             onClick={() => setColorMode('zoning')}
             className={`flex-1 px-2 py-1.5 text-[11px] font-medium rounded transition-colors ${
               isZoning
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-white/[0.06] text-[var(--text-2)] hover:bg-white/[0.12]'
             }`}
           >
             Zoning
@@ -131,7 +131,7 @@ export default function Legend() {
             className={`flex-1 px-2 py-1.5 text-[11px] font-medium rounded transition-colors ${
               !isZoning
                 ? 'bg-emerald-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-white/[0.06] text-[var(--text-2)] hover:bg-white/[0.12]'
             }`}
           >
             Plot Size
@@ -146,24 +146,24 @@ export default function Legend() {
         {isZoning && (
           <>
             {/* Action buttons */}
-            <div className="px-4 py-2 border-b border-gray-100 flex gap-2 flex-shrink-0">
+            <div className="px-4 py-2 border-b border-[var(--border)] flex gap-2 flex-shrink-0">
               <button
                 onClick={handleSelectAll}
-                className={`px-2.5 py-1 text-[10px] font-medium rounded transition-colors ${isAllActive ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`px-2.5 py-1 text-[10px] font-medium rounded transition-colors ${isAllActive ? 'bg-gray-800 text-white' : 'bg-white/[0.06] text-[var(--text-2)] hover:bg-white/[0.12]'}`}
               >
                 Select All
               </button>
               <button
                 onClick={handleClearAll}
-                className="px-2.5 py-1 text-[10px] font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 rounded transition-colors"
+                className="px-2.5 py-1 text-[10px] font-medium bg-white/[0.06] text-[var(--text-2)] hover:bg-white/[0.12] rounded transition-colors"
               >
                 Clear
               </button>
             </div>
 
             {/* Quick filters */}
-            <div className="px-4 py-2 border-b border-gray-100 flex-shrink-0">
-              <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Quick Filters</p>
+            <div className="px-4 py-2 border-b border-[var(--border)] flex-shrink-0">
+              <p className="text-[9px] font-semibold text-[var(--text-3)] uppercase tracking-wider mb-1.5">Quick Filters</p>
               <div className="flex flex-wrap gap-1.5">
                 {Object.entries(QUICK_FILTERS).map(([filterId, filter]) => (
                   <button
@@ -172,7 +172,7 @@ export default function Legend() {
                     className={`px-2 py-0.5 text-[10px] font-medium rounded-full transition-colors ${
                       activeQuickFilter === filterId
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        : 'bg-white/[0.06] text-[var(--text-2)] hover:bg-white/[0.12]'
                     }`}
                   >
                     {filter.label}
@@ -195,7 +195,7 @@ export default function Legend() {
                     {/* Category header */}
                     <div className="flex items-center gap-1.5 py-1.5 cursor-pointer group" onClick={() => toggleCollapse(category.id)}>
                       <svg
-                        className={`w-3 h-3 text-gray-400 transition-transform ${isCollapsed ? '' : 'rotate-90'}`}
+                        className={`w-3 h-3 text-[var(--text-3)] transition-transform ${isCollapsed ? '' : 'rotate-90'}`}
                         fill="none" stroke="currentColor" viewBox="0 0 24 24"
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -203,7 +203,7 @@ export default function Legend() {
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleCategory(category.id) }}
                         className={`w-3.5 h-3.5 rounded-sm border flex-shrink-0 flex items-center justify-center transition-colors ${
-                          allCatActive ? 'bg-blue-600 border-blue-600' : someCatActive ? 'bg-blue-200 border-blue-400' : 'border-gray-300 hover:border-gray-400'
+                          allCatActive ? 'bg-blue-600 border-blue-600' : someCatActive ? 'bg-blue-200 border-blue-400' : 'border-white/25 hover:border-white/40'
                         }`}
                       >
                         {allCatActive && (
@@ -215,8 +215,8 @@ export default function Legend() {
                           <div className="w-1.5 h-1.5 bg-blue-600 rounded-sm" />
                         )}
                       </button>
-                      <span className="text-xs font-semibold text-gray-700 group-hover:text-gray-900">{category.label}</span>
-                      <span className="text-[9px] text-gray-400 ml-auto">{catGroupsActive}/{catGroupsTotal}</span>
+                      <span className="text-xs font-semibold text-[var(--text-2)] group-hover:text-[var(--text-1)]">{category.label}</span>
+                      <span className="text-[9px] text-[var(--text-3)] ml-auto">{catGroupsActive}/{catGroupsTotal}</span>
                     </div>
 
                     {/* Individual groups */}
@@ -232,12 +232,12 @@ export default function Legend() {
                           return (
                             <div
                               key={groupKey}
-                              className={`flex items-center gap-2 py-1 px-1.5 rounded cursor-pointer transition-colors hover:bg-gray-50 ${!active ? 'opacity-40' : ''}`}
+                              className={`flex items-center gap-2 py-1 px-1.5 rounded cursor-pointer transition-colors hover:bg-white/[0.06] ${!active ? 'opacity-40' : ''}`}
                               onClick={() => toggleGroup(groupKey)}
                             >
                               <button
                                 className={`w-3.5 h-3.5 rounded-sm border flex-shrink-0 flex items-center justify-center transition-colors ${
-                                  active ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
+                                  active ? 'bg-blue-600 border-blue-600' : 'border-white/25'
                                 }`}
                               >
                                 {active && (
@@ -257,8 +257,8 @@ export default function Legend() {
                                   border: '1px solid ' + (group.outlineColor || '#ddd'),
                                 }}
                               />
-                              <span className="text-[11px] text-gray-700 flex-1">{group.label}</span>
-                              <span className="text-[9px] text-gray-400 tabular-nums">{count.toLocaleString()}</span>
+                              <span className="text-[11px] text-[var(--text-2)] flex-1">{group.label}</span>
+                              <span className="text-[9px] text-[var(--text-3)] tabular-nums">{count.toLocaleString()}</span>
                             </div>
                           )
                         })}
@@ -269,14 +269,14 @@ export default function Legend() {
               })}
 
               {/* Allocated Lands toggle */}
-              <div className="pt-2 mt-1 border-t border-gray-100">
+              <div className="pt-2 mt-1 border-t border-[var(--border)]">
                 <div
-                  className={`flex items-center gap-2 py-1.5 px-1.5 rounded cursor-pointer transition-colors hover:bg-gray-50 ${!allocatedLandsVisible ? 'opacity-40' : ''}`}
+                  className={`flex items-center gap-2 py-1.5 px-1.5 rounded cursor-pointer transition-colors hover:bg-white/[0.06] ${!allocatedLandsVisible ? 'opacity-40' : ''}`}
                   onClick={() => toggleAllocatedLands()}
                 >
                   <button
                     className={`w-3.5 h-3.5 rounded-sm border flex-shrink-0 flex items-center justify-center transition-colors ${
-                      allocatedLandsVisible ? 'bg-orange-500 border-orange-500' : 'border-gray-300'
+                      allocatedLandsVisible ? 'bg-orange-500 border-orange-500' : 'border-white/25'
                     }`}
                   >
                     {allocatedLandsVisible && (
@@ -286,7 +286,7 @@ export default function Legend() {
                     )}
                   </button>
                   <div className="w-4 h-3 rounded-sm flex-shrink-0 bg-[#FF6F00] border border-[#CC5800]" />
-                  <span className="text-[11px] text-gray-700">Allocated Lands</span>
+                  <span className="text-[11px] text-[var(--text-2)]">Allocated Lands</span>
                 </div>
               </div>
             </div>
@@ -296,7 +296,7 @@ export default function Legend() {
         {/* === AREA HEATMAP MODE CONTENT === */}
         {!isZoning && (
           <div className="px-4 py-3">
-            <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Plot Size (Sq. Yards)</p>
+            <p className="text-[9px] font-semibold text-[var(--text-3)] uppercase tracking-wider mb-2">Plot Size (Sq. Yards)</p>
             <div className="space-y-1">
               {AREA_HEATMAP_LEGEND.map((item, i) => (
                 <div key={i} className="flex items-center gap-2.5">
@@ -304,7 +304,7 @@ export default function Legend() {
                     className="w-5 h-3 rounded-sm flex-shrink-0"
                     style={{ backgroundColor: item.color }}
                   />
-                  <span className="text-[11px] text-gray-700">{item.label}</span>
+                  <span className="text-[11px] text-[var(--text-2)]">{item.label}</span>
                 </div>
               ))}
             </div>
@@ -313,7 +313,7 @@ export default function Legend() {
                 className="w-5 h-3 rounded-sm flex-shrink-0"
                 style={{ backgroundColor: 'rgba(120,120,120,0.3)', border: '1px solid #888' }}
               />
-              <span className="text-[11px] text-gray-500 italic">No area data / Road reserve</span>
+              <span className="text-[11px] text-[var(--text-3)] italic">No area data / Road reserve</span>
             </div>
 
             {/* Gradient bar visualization */}
@@ -325,29 +325,29 @@ export default function Legend() {
                 }}
               />
               <div className="flex justify-between mt-0.5">
-                <span className="text-[9px] text-gray-400">Small</span>
-                <span className="text-[9px] text-gray-400">Large</span>
+                <span className="text-[9px] text-[var(--text-3)]">Small</span>
+                <span className="text-[9px] text-[var(--text-3)]">Large</span>
               </div>
             </div>
           </div>
         )}
 
         {/* === ROAD HIERARCHY (always shown) === */}
-        <div className="px-3 py-2 border-t border-gray-100">
+        <div className="px-3 py-2 border-t border-[var(--border)]">
           <div
             className="flex items-center gap-1.5 py-1.5 cursor-pointer group"
             onClick={() => setRoadsCollapsed(!roadsCollapsed)}
           >
             <svg
-              className={`w-3 h-3 text-gray-400 transition-transform ${roadsCollapsed ? '' : 'rotate-90'}`}
+              className={`w-3 h-3 text-[var(--text-3)] transition-transform ${roadsCollapsed ? '' : 'rotate-90'}`}
               fill="none" stroke="currentColor" viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-            <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-[var(--text-3)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
             </svg>
-            <span className="text-xs font-semibold text-gray-700 group-hover:text-gray-900">Named Roads</span>
+            <span className="text-xs font-semibold text-[var(--text-2)] group-hover:text-[var(--text-1)]">Named Roads</span>
           </div>
           {!roadsCollapsed && (
             <div className="ml-5 space-y-0.5">
@@ -359,18 +359,18 @@ export default function Legend() {
               ].map(([key, label]) => (
                 <div key={key} className="flex items-center gap-2.5 py-1 px-1.5">
                   <div className="w-5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: NAMED_ROAD_CATEGORY_COLORS[key] }} />
-                  <span className="text-[11px] text-gray-700">{label}</span>
+                  <span className="text-[11px] text-[var(--text-2)]">{label}</span>
                 </div>
               ))}
-              <p className="text-[9px] text-gray-400 px-1.5 pt-0.5">E1–E16 (E-W), N1–N18 (N-S)</p>
+              <p className="text-[9px] text-[var(--text-3)] px-1.5 pt-0.5">E1–E16 (E-W), N1–N18 (N-S)</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Footer: visible count */}
-      <div className="px-4 py-2 border-t border-gray-100 flex-shrink-0">
-        <span className="text-[10px] text-gray-500">
+      <div className="px-4 py-2 border-t border-[var(--border)] flex-shrink-0">
+        <span className="text-[10px] text-[var(--text-3)]">
           {isZoning
             ? `${totalVisible.toLocaleString()} plots visible`
             : 'Showing plot sizes (Sq. Yards)'

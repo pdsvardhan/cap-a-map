@@ -16,15 +16,15 @@ export default function PlotDetailPanel({ plot, onClose }) {
       ? `https://www.google.com/maps?q=${plot.lat},${plot.lon}`
       : null
     return (
-      <div className="absolute z-20 bg-white shadow-2xl flex flex-col animate-slide-in inset-x-0 bottom-0 h-[70%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-96 sm:h-full sm:rounded-t-none">
-        <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
+      <div className="glass absolute z-20 flex flex-col animate-slide-in inset-x-0 bottom-0 h-[72%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-[380px] sm:h-full sm:rounded-t-none sm:border-l">
+        <div className="px-5 py-4 border-b border-[var(--border)] flex-shrink-0">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-4 h-4 rounded" style={{ backgroundColor: '#FF6F00' }} />
-                <span className="text-xs font-medium text-gray-600">Allocated Land</span>
+                <span className="text-xs font-medium text-[var(--text-2)]">Allocated Land</span>
               </div>
-              <h2 className="text-lg font-bold text-gray-900">{plot.name}</h2>
+              <h2 className="text-lg font-bold text-[var(--text-1)]">{plot.name}</h2>
             </div>
             <CloseButton onClick={onClose} />
           </div>
@@ -41,7 +41,7 @@ export default function PlotDetailPanel({ plot, onClose }) {
                 href={googleMapsLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                className="inline-flex items-center gap-2 text-sm text-[var(--accent)] hover:brightness-125 hover:underline"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -52,8 +52,8 @@ export default function PlotDetailPanel({ plot, onClose }) {
             </Section>
           )}
         </div>
-        <div className="px-5 py-3 border-t border-gray-100 flex-shrink-0">
-          <p className="text-[10px] text-gray-400">Data source: APCRDA Land Allotments</p>
+        <div className="px-5 py-3 border-t border-[var(--border)] flex-shrink-0">
+          <p className="text-[10px] text-[var(--text-3)]">Data source: APCRDA Land Allotments</p>
         </div>
       </div>
     )
@@ -77,9 +77,9 @@ export default function PlotDetailPanel({ plot, onClose }) {
     : null
 
   return (
-    <div className="absolute z-20 bg-white shadow-2xl flex flex-col animate-slide-in inset-x-0 bottom-0 h-[70%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-96 sm:h-full sm:rounded-t-none">
+    <div className="glass absolute z-20 flex flex-col animate-slide-in inset-x-0 bottom-0 h-[72%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-[380px] sm:h-full sm:rounded-t-none sm:border-l">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
+      <div className="px-5 py-4 border-b border-[var(--border)] flex-shrink-0">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             {/* Zoning badge */}
@@ -88,19 +88,19 @@ export default function PlotDetailPanel({ plot, onClose }) {
                 className="w-4 h-4 rounded"
                 style={{ backgroundColor: color }}
               />
-              <span className="text-xs font-medium text-gray-600 truncate">
+              <span className="text-xs font-medium text-[var(--text-2)] truncate">
                 {groupLabel}
               </span>
             </div>
             {/* Regcode */}
             {regcode && (
-              <h2 className="text-lg font-bold text-gray-900 leading-tight truncate" title={regcode}>
+              <h2 className="text-base font-semibold text-[var(--text-1)] leading-tight truncate mono" title={regcode}>
                 {regcode}
               </h2>
             )}
             {/* Plot code */}
             {plotCode && plotCode !== regcode && (
-              <p className="text-sm text-gray-500 truncate" title={plotCode}>
+              <p className="text-sm text-[var(--text-3)] truncate" title={plotCode}>
                 Plot: {plotCode}
               </p>
             )}
@@ -116,17 +116,17 @@ export default function PlotDetailPanel({ plot, onClose }) {
         <Section title="Zoning">
           <div className="flex items-center gap-2">
             <div
-              className="w-5 h-5 rounded border border-gray-200"
+              className="w-5 h-5 rounded border border-[var(--border)]"
               style={{ backgroundColor: color }}
             />
-            <span className="text-sm text-gray-800">{plot.symbology || 'N/A'}</span>
+            <span className="text-sm text-[var(--text-1)]">{plot.symbology || 'N/A'}</span>
           </div>
         </Section>
 
         {/* Owner */}
         {plot.farmer_n && plot.farmer_n !== 'N/A' && (
           <Section title="Owner / Farmer">
-            <p className="text-sm text-gray-800">
+            <p className="text-sm text-[var(--text-1)]">
               {formatFarmerName(plot.farmer_n)}
             </p>
           </Section>
@@ -161,7 +161,7 @@ export default function PlotDetailPanel({ plot, onClose }) {
               href={googleMapsLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+              className="inline-flex items-center gap-2 text-sm text-[var(--accent)] hover:brightness-125 hover:underline"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -174,8 +174,8 @@ export default function PlotDetailPanel({ plot, onClose }) {
       </div>
 
       {/* Footer */}
-      <div className="px-5 py-3 border-t border-gray-100 flex-shrink-0">
-        <p className="text-[10px] text-gray-400">
+      <div className="px-5 py-3 border-t border-[var(--border)] flex-shrink-0">
+        <p className="text-[10px] text-[var(--text-3)]">
           Data source: APCRDA Land Pooling Scheme
         </p>
       </div>
@@ -188,9 +188,9 @@ function CloseButton({ onClick }) {
   return (
     <button
       onClick={onClick}
-      className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0 ml-2"
+      className="p-1.5 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0 ml-2"
     >
-      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-5 h-5 text-[var(--text-3)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
@@ -200,7 +200,7 @@ function CloseButton({ onClick }) {
 function Section({ title, children }) {
   return (
     <div>
-      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+      <h3 className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wider mb-2">
         {title}
       </h3>
       {children}
@@ -213,9 +213,9 @@ function InfoGrid({ items }) {
     <div className="grid grid-cols-2 gap-x-4 gap-y-2">
       {items.map(({ label, value }) => (
         <div key={label}>
-          <span className="text-xs text-gray-500">{label}</span>
-          <p className="text-sm text-gray-800 font-medium">
-            {value || 'N/A'}
+          <span className="text-[11px] uppercase tracking-wide text-[var(--text-3)]">{label}</span>
+          <p className="text-sm text-[var(--text-1)] font-medium mono mt-0.5">
+            {value || '—'}
           </p>
         </div>
       ))}
@@ -227,21 +227,21 @@ function RoadInfoPanel({ plot, onClose }) {
   const color = NAMED_ROAD_CATEGORY_COLORS[plot.category] || NAMED_ROAD_CATEGORY_COLORS.other
   const meets = plot.meets || []
   return (
-    <div className="absolute z-20 bg-white shadow-2xl flex flex-col animate-slide-in inset-x-0 bottom-0 h-[70%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-96 sm:h-full sm:rounded-t-none">
-      <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
+    <div className="glass absolute z-20 flex flex-col animate-slide-in inset-x-0 bottom-0 h-[72%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-[380px] sm:h-full sm:rounded-t-none sm:border-l">
+      <div className="px-5 py-4 border-b border-[var(--border)] flex-shrink-0">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-4 h-4 rounded" style={{ backgroundColor: color }} />
-              <span className="text-xs font-medium text-gray-600 capitalize">Named Road · {plot.category || 'road'}</span>
+              <span className="text-xs font-medium text-[var(--text-2)] capitalize">Named Road · {plot.category || 'road'}</span>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">{plot.name}</h2>
+            <h2 className="text-2xl font-bold text-[var(--text-1)]">{plot.name}</h2>
           </div>
           <CloseButton onClick={onClose} />
         </div>
         <div className="flex gap-2 mt-2">
-          {plot.brt_present && <span className="text-[10px] px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">BRT corridor</span>}
-          {plot.connects_nh16 && <span className="text-[10px] px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">Connects NH-16</span>}
+          {plot.brt_present && <span className="text-[10px] px-2 py-0.5 bg-sky-400/15 text-sky-300 rounded-full font-medium">BRT corridor</span>}
+          {plot.connects_nh16 && <span className="text-[10px] px-2 py-0.5 bg-emerald-400/15 text-emerald-300 rounded-full font-medium">Connects NH-16</span>}
         </div>
       </div>
       <div className="flex-1 overflow-y-auto panel-scroll px-5 py-4 space-y-5">
@@ -256,7 +256,7 @@ function RoadInfoPanel({ plot, onClose }) {
         {meets.length > 0 && (
           <Section title="Connects to">
             <div className="flex flex-wrap gap-1.5">
-              {meets.map((m) => <span key={m} className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded font-medium">{m}</span>)}
+              {meets.map((m) => <span key={m} className="text-xs px-2 py-0.5 bg-white/[0.07] text-[var(--text-2)] rounded font-medium">{m}</span>)}
             </div>
           </Section>
         )}
@@ -268,11 +268,11 @@ function RoadInfoPanel({ plot, onClose }) {
           ]} />
         </Section>
         {plot.remarks && (
-          <Section title="Notes"><p className="text-sm text-gray-700">{plot.remarks}</p></Section>
+          <Section title="Notes"><p className="text-sm text-[var(--text-2)]">{plot.remarks}</p></Section>
         )}
       </div>
-      <div className="px-5 py-3 border-t border-gray-100 flex-shrink-0">
-        <p className="text-[10px] text-gray-400">Source: APCRDA transport plan + project road mapping</p>
+      <div className="px-5 py-3 border-t border-[var(--border)] flex-shrink-0">
+        <p className="text-[10px] text-[var(--text-3)]">Source: APCRDA transport plan + project road mapping</p>
       </div>
     </div>
   )
@@ -286,13 +286,13 @@ function NeighbourCell({ label, value }) {
   return (
     <div
       className={`rounded p-1.5 text-[10px] leading-tight ${
-        isRoad ? 'bg-gray-100 text-gray-600' :
+        isRoad ? 'bg-white/[0.07] text-[var(--text-2)]' :
         isVacant ? 'bg-yellow-50 text-yellow-700' :
         'bg-slate-50 text-slate-600'
       }`}
       title={displayValue}
     >
-      <div className="font-semibold text-[9px] text-gray-400 mb-0.5">{label}</div>
+      <div className="font-semibold text-[9px] text-[var(--text-3)] mb-0.5">{label}</div>
       <div className="truncate">{displayValue === 'N/A' ? '\u2014' : displayValue}</div>
     </div>
   )
@@ -375,24 +375,24 @@ function RoadDetailPanel({ plot, onClose, namedRoadsIndex = [] }) {
   }
 
   return (
-    <div className="absolute z-20 bg-white shadow-2xl flex flex-col animate-slide-in inset-x-0 bottom-0 h-[70%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-96 sm:h-full sm:rounded-t-none">
+    <div className="glass absolute z-20 flex flex-col animate-slide-in inset-x-0 bottom-0 h-[72%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-[380px] sm:h-full sm:rounded-t-none sm:border-l">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
+      <div className="px-5 py-4 border-b border-[var(--border)] flex-shrink-0">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-4 h-4 rounded bg-gray-800 border border-gray-600" />
-              <span className="text-xs font-medium text-gray-600">Road Reserve</span>
+              <span className="text-xs font-medium text-[var(--text-2)]">Road Reserve</span>
               {plot._segmentId != null && (
                 <span className="text-3xl font-mono font-bold text-orange-500 ml-auto">
                   #{String(plot._segmentId).padStart(4, '0')}
                 </span>
               )}
             </div>
-            <h2 className="text-lg font-bold text-gray-900">
+            <h2 className="text-lg font-bold text-[var(--text-1)]">
               {isUnnamed ? 'Marked as Unnamed' : (plot._roadName || 'Unnamed Road')}
             </h2>
-            <p className="text-sm text-gray-500">{plot.symbology}</p>
+            <p className="text-sm text-[var(--text-3)]">{plot.symbology}</p>
           </div>
           <CloseButton onClick={onClose} />
         </div>
@@ -405,7 +405,7 @@ function RoadDetailPanel({ plot, onClose, namedRoadsIndex = [] }) {
         <Section title="Road Status">
           <div className="flex gap-4">
             <label className={`flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border transition-colors ${
-              !isUnnamed ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'
+              !isUnnamed ? 'border-blue-500 bg-blue-50' : 'border-[var(--border)] hover:bg-gray-50'
             }`}>
               <input
                 type="radio"
@@ -414,10 +414,10 @@ function RoadDetailPanel({ plot, onClose, namedRoadsIndex = [] }) {
                 onChange={handleMarkNamed}
                 className="accent-blue-600"
               />
-              <span className="text-sm font-medium text-gray-700">Named</span>
+              <span className="text-sm font-medium text-[var(--text-2)]">Named</span>
             </label>
             <label className={`flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border transition-colors ${
-              isUnnamed ? 'border-red-500 bg-red-50' : 'border-gray-200 hover:bg-gray-50'
+              isUnnamed ? 'border-red-500 bg-red-50' : 'border-[var(--border)] hover:bg-gray-50'
             }`}>
               <input
                 type="radio"
@@ -426,7 +426,7 @@ function RoadDetailPanel({ plot, onClose, namedRoadsIndex = [] }) {
                 onChange={handleMarkUnnamed}
                 className="accent-red-600"
               />
-              <span className="text-sm font-medium text-gray-700">Unnamed</span>
+              <span className="text-sm font-medium text-[var(--text-2)]">Unnamed</span>
             </label>
           </div>
           {isUnnamed && (
@@ -492,7 +492,7 @@ function RoadDetailPanel({ plot, onClose, namedRoadsIndex = [] }) {
                 )}
               </div>
               {star && (
-                <p className="text-[9px] text-gray-400 mt-1">* high confidence | ** indicative</p>
+                <p className="text-[9px] text-[var(--text-3)] mt-1">* high confidence | ** indicative</p>
               )}
             </Section>
           )
@@ -501,7 +501,7 @@ function RoadDetailPanel({ plot, onClose, namedRoadsIndex = [] }) {
         {/* Junctions: which roads this one meets (for directions) */}
         {meets.length > 0 && (
           <Section title="Connects to">
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-[var(--text-2)]">
               {meets.sort((a, b) => a.localeCompare(b)).join(', ')}
             </p>
           </Section>
@@ -541,7 +541,7 @@ function RoadDetailPanel({ plot, onClose, namedRoadsIndex = [] }) {
               href={googleMapsLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+              className="inline-flex items-center gap-2 text-sm text-[var(--accent)] hover:brightness-125 hover:underline"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -554,8 +554,8 @@ function RoadDetailPanel({ plot, onClose, namedRoadsIndex = [] }) {
       </div>
 
       {/* Footer */}
-      <div className="px-5 py-3 border-t border-gray-100 flex-shrink-0">
-        <p className="text-[10px] text-gray-400">Click road segments to name them. Names saved in browser.</p>
+      <div className="px-5 py-3 border-t border-[var(--border)] flex-shrink-0">
+        <p className="text-[10px] text-[var(--text-3)]">Click road segments to name them. Names saved in browser.</p>
       </div>
     </div>
   )
