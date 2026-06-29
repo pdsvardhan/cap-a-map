@@ -16,7 +16,7 @@ export default function PlotDetailPanel({ plot, onClose }) {
       ? `https://www.google.com/maps?q=${plot.lat},${plot.lon}`
       : null
     return (
-      <div className="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl z-20 flex flex-col animate-slide-in">
+      <div className="absolute z-20 bg-white shadow-2xl flex flex-col animate-slide-in inset-x-0 bottom-0 h-[70%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-96 sm:h-full sm:rounded-t-none">
         <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
@@ -77,7 +77,7 @@ export default function PlotDetailPanel({ plot, onClose }) {
     : null
 
   return (
-    <div className="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl z-20 flex flex-col animate-slide-in">
+    <div className="absolute z-20 bg-white shadow-2xl flex flex-col animate-slide-in inset-x-0 bottom-0 h-[70%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-96 sm:h-full sm:rounded-t-none">
       {/* Header */}
       <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
         <div className="flex items-start justify-between">
@@ -227,7 +227,7 @@ function RoadInfoPanel({ plot, onClose }) {
   const color = NAMED_ROAD_CATEGORY_COLORS[plot.category] || NAMED_ROAD_CATEGORY_COLORS.other
   const meets = plot.meets || []
   return (
-    <div className="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl z-20 flex flex-col animate-slide-in">
+    <div className="absolute z-20 bg-white shadow-2xl flex flex-col animate-slide-in inset-x-0 bottom-0 h-[70%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-96 sm:h-full sm:rounded-t-none">
       <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
@@ -375,7 +375,7 @@ function RoadDetailPanel({ plot, onClose, namedRoadsIndex = [] }) {
   }
 
   return (
-    <div className="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl z-20 flex flex-col animate-slide-in">
+    <div className="absolute z-20 bg-white shadow-2xl flex flex-col animate-slide-in inset-x-0 bottom-0 h-[70%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-96 sm:h-full sm:rounded-t-none">
       {/* Header */}
       <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
         <div className="flex items-start justify-between">

@@ -101,7 +101,7 @@ export default function Legend() {
   }, [])
 
   return (
-    <div className="absolute top-16 right-4 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-30 max-h-[calc(100vh-120px)] flex flex-col">
+    <div className="absolute z-30 bg-white shadow-lg border border-gray-200 flex flex-col inset-x-3 bottom-3 top-auto max-h-[55vh] rounded-xl sm:inset-auto sm:top-16 sm:right-4 sm:w-80 sm:max-h-[calc(100vh-120px)] sm:rounded-lg">
       {/* Header */}
       <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
         <h3 className="text-sm font-semibold text-gray-800">Map Explorer</h3>
