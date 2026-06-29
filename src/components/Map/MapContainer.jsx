@@ -8,6 +8,7 @@ import {
 } from '../../utils/colors'
 import {
   getPlotFillLayer, getPlotOutlineLayer, getPlotHighlightLayer, getRoadModeOverlayLayer,
+  getWaterFillLayer,
   getAllocatedLandsFillLayer, getAllocatedLandsOutlineLayer, getAllocatedLandsLabelsLayer,
   getNamedRoadsFillLayer, getNamedRoadsOutlineLayer, getNamedRoadsHighlightLayer, getNamedRoadsLabelsLayer,
 } from './utils/layerDefinitions'
@@ -82,6 +83,7 @@ export default function MapContainer() {
         map.addLayer(getPlotHighlightLayer())
 
         store.setLoadingStage(LoadingStage.LOADING_OVERLAYS)
+        await loadWater(map)
         await loadAllocated(map)
         await loadNamedRoads(map)
 
@@ -121,6 +123,16 @@ export default function MapContainer() {
         try { map.setLayoutProperty(layer.id, 'visibility', 'none') } catch (e) { /* ignore */ }
       }
     }
+  }
+
+  async function loadWater(map) {
+    try {
+      const data = await fetch(DATA_PATHS.water).then((r) => (r.ok ? r.json() : null))
+      if (!data) return
+      map.addSource('water', { type: 'geojson', data })
+      const before = map.getLayer(LAYERS.PLOTS_HIGHLIGHT) ? LAYERS.PLOTS_HIGHLIGHT : undefined
+      map.addLayer(getWaterFillLayer(), before)
+    } catch (e) { /* non-fatal */ }
   }
 
   async function loadAllocated(map) {

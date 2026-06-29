@@ -111,6 +111,15 @@ export function getNamedRoadsLabelsLayer() {
   }
 }
 
+export function getWaterFillLayer() {
+  return {
+    id: LAYERS.WATER,
+    type: 'fill',
+    source: 'water',
+    paint: { 'fill-color': '#15405f', 'fill-opacity': 0.9 },
+  }
+}
+
 export function getAllocatedLandsFillLayer() {
   return {
     id: LAYERS.ALLOCATED_LANDS,

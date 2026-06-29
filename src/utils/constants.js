@@ -29,6 +29,7 @@ export const DATA_PATHS = {
   grid: '/data/grid.geojson',
   namedRoads: '/data/named_roads.geojson',
   namedRoadsIndex: '/data/named_roads_index.json',
+  water: '/data/waterbodies.geojson',
 }
 
 // Vector-tile source + source-layer name (set by tippecanoe `-l plots`)
@@ -37,6 +38,7 @@ export const PLOTS_SOURCE_LAYER = 'plots'
 
 // Layer IDs
 export const LAYERS = {
+  WATER: 'water-fill',
   PLOTS_FILL: 'plots-fill',
   PLOTS_OUTLINE: 'plots-outline',
   PLOTS_HIGHLIGHT: 'plots-highlight',
