@@ -3,6 +3,7 @@ import useMapStore from '../../stores/mapStore'
 import { getColorForSymbology, getGroupForSymbology, ZONING_GROUPS } from '../../utils/colors'
 import { formatArea, formatDimensions, formatFarmerName, formatNeighbour } from '../../utils/formatters'
 import { getRoadType, getROW, getRoadData, getLanePattern } from '../../utils/roadAttributes'
+import { NAMED_ROAD_CATEGORY_COLORS } from '../../utils/constants'
 
 export default function PlotDetailPanel({ plot, onClose }) {
   const namedRoadsIndex = useMapStore((s) => s.namedRoadsIndex)
@@ -58,16 +59,9 @@ export default function PlotDetailPanel({ plot, onClose }) {
     )
   }
 
-  // Handle road reserve type
+  // Named road (public read-only info)
   if (plot._type === 'road') {
-    return (
-      <RoadDetailPanel
-        key={plot._locKey}
-        plot={plot}
-        onClose={onClose}
-        namedRoadsIndex={namedRoadsIndex}
-      />
-    )
+    return <RoadInfoPanel plot={plot} onClose={onClose} />
   }
 
   // Regular plot
@@ -225,6 +219,61 @@ function InfoGrid({ items }) {
           </p>
         </div>
       ))}
+    </div>
+  )
+}
+
+function RoadInfoPanel({ plot, onClose }) {
+  const color = NAMED_ROAD_CATEGORY_COLORS[plot.category] || NAMED_ROAD_CATEGORY_COLORS.other
+  const meets = plot.meets || []
+  return (
+    <div className="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl z-20 flex flex-col animate-slide-in">
+      <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: color }} />
+              <span className="text-xs font-medium text-gray-600 capitalize">Named Road · {plot.category || 'road'}</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">{plot.name}</h2>
+          </div>
+          <CloseButton onClick={onClose} />
+        </div>
+        <div className="flex gap-2 mt-2">
+          {plot.brt_present && <span className="text-[10px] px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">BRT corridor</span>}
+          {plot.connects_nh16 && <span className="text-[10px] px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">Connects NH-16</span>}
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto panel-scroll px-5 py-4 space-y-5">
+        <Section title="Classification">
+          <InfoGrid items={[
+            { label: 'Category', value: plot.category },
+            { label: 'Orientation', value: plot.orientation },
+            { label: 'Right of Way', value: plot.row_m ? `${plot.row_m} m` : undefined },
+            { label: 'Lane Pattern', value: plot.lane_pattern },
+          ]} />
+        </Section>
+        {meets.length > 0 && (
+          <Section title="Connects to">
+            <div className="flex flex-wrap gap-1.5">
+              {meets.map((m) => <span key={m} className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded font-medium">{m}</span>)}
+            </div>
+          </Section>
+        )}
+        <Section title="Mapping coverage">
+          <InfoGrid items={[
+            { label: 'Mapped segments', value: plot.segCount },
+            { label: 'Verified seeds', value: plot.seedCount },
+            { label: 'Confidence', value: plot.confidence },
+          ]} />
+        </Section>
+        {plot.remarks && (
+          <Section title="Notes"><p className="text-sm text-gray-700">{plot.remarks}</p></Section>
+        )}
+      </div>
+      <div className="px-5 py-3 border-t border-gray-100 flex-shrink-0">
+        <p className="text-[10px] text-gray-400">Source: APCRDA transport plan + project road mapping</p>
+      </div>
     </div>
   )
 }

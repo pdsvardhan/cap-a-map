@@ -1,4 +1,6 @@
-import { LAYERS, NAMED_ROAD_COLOR, NAMED_ROAD_OUTLINE, PLOTS_SOURCE, PLOTS_SOURCE_LAYER } from '../../../utils/constants'
+import { LAYERS, NAMED_ROAD_COLOR_MATCH, NAMED_ROAD_FALLBACK, PLOTS_SOURCE, PLOTS_SOURCE_LAYER } from '../../../utils/constants'
+
+const roadCategoryColor = ['match', ['get', 'roadCategory'], ...NAMED_ROAD_COLOR_MATCH, NAMED_ROAD_FALLBACK]
 import { buildSymbologyColorExpression, ROAD_RESERVE_SYMBOLOGIES, buildRoadReserveFilter } from '../../../utils/colors'
 
 export function getPlotFillLayer() {
@@ -61,7 +63,7 @@ export function getNamedRoadsFillLayer() {
     id: LAYERS.NAMED_ROADS_FILL,
     type: 'fill',
     source: 'namedRoads',
-    paint: { 'fill-color': NAMED_ROAD_COLOR, 'fill-opacity': 1 },
+    paint: { 'fill-color': roadCategoryColor, 'fill-opacity': 0.85 },
   }
 }
 
@@ -71,8 +73,8 @@ export function getNamedRoadsOutlineLayer() {
     type: 'line',
     source: 'namedRoads',
     paint: {
-      'line-color': NAMED_ROAD_OUTLINE,
-      'line-width': ['interpolate', ['linear'], ['zoom'], 12, 1.5, 16, 2.5, 19, 4],
+      'line-color': roadCategoryColor,
+      'line-width': ['interpolate', ['linear'], ['zoom'], 12, 1, 16, 2, 19, 3.5],
       'line-opacity': 1,
     },
   }
@@ -83,7 +85,7 @@ export function getNamedRoadsHighlightLayer() {
     id: LAYERS.NAMED_ROADS_HIGHLIGHT,
     type: 'line',
     source: 'namedRoads',
-    paint: { 'line-color': '#FFEB3B', 'line-width': 4, 'line-opacity': 1 },
+    paint: { 'line-color': '#FFFFFF', 'line-width': 3, 'line-opacity': 1 },
     filter: ['==', ['get', 'roadName'], ''],
   }
 }

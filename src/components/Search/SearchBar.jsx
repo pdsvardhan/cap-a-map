@@ -83,8 +83,12 @@ export default function SearchBar() {
     const map = useMapStore.getState()._mapInstance
 
     if (item.t === 'road') {
-      // Named-road geometry lands in P5; just echo the name for now.
       setQuery(item.n)
+      const meta = useMapStore.getState().namedRoadsIndex.find((r) => r.name === item.n)
+      if (meta) {
+        if (map && meta.bbox?.length === 4) { try { map.fitBounds(meta.bbox, { padding: 90, duration: 1000, maxZoom: 16 }) } catch (e) { /* */ } }
+        selectPlot({ _type: 'road', ...meta })
+      }
       return
     }
 

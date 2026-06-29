@@ -1,9 +1,87 @@
 /**
- * Amaravati Capital City - Road Segment to Road Name Mapping
+ * Amaravati Capital City - shared road segment seed mapping.
  *
- * Empty — all road naming is done by the user via Road Mode UI.
- * Names are persisted in localStorage ('roadNames' key).
- * The gap-fill algorithm chains corridor segments from user-named anchors.
+ * This restores a committed baseline so named roads are visible to every user,
+ * not just in a single browser's localStorage. Local overrides still win.
+ *
+ * Source: validated snapshot from the project's earlier mapping pass.
+ * Total: 110 seed segments across 34 named roads.
  */
 
-export const SEGMENT_TO_ROAD = {}
+export const SEGMENT_TO_ROAD = {
+  // E1 (6 segments)
+  3403: 'E1', 3719: 'E1', 3735: 'E1', 3741: 'E1', 3743: 'E1', 3745: 'E1',
+  // E2 (5 segments)
+  3630: 'E2', 3631: 'E2', 3654: 'E2', 3655: 'E2', 3661: 'E2',
+  // E3 (1 segment)
+  2524: 'E3',
+  // E4 (3 segments)
+  3098: 'E4', 3099: 'E4', 3130: 'E4',
+  // E5 (3 segments)
+  2439: 'E5', 2458: 'E5', 2472: 'E5',
+  // E6 (1 segment)
+  2702: 'E6',
+  // E7 (6 segments)
+  2279: 'E7', 2282: 'E7', 2300: 'E7', 2303: 'E7', 2304: 'E7', 2309: 'E7',
+  // E8 (3 segments)
+  1717: 'E8', 1729: 'E8', 1733: 'E8',
+  // E9 (3 segments)
+  1188: 'E9', 1193: 'E9', 1194: 'E9',
+  // E10 (1 segment)
+  856: 'E10',
+  // E11 (1 segment)
+  620: 'E11',
+  // E12 (1 segment)
+  503: 'E12',
+  // E13 (3 segments)
+  362: 'E13', 365: 'E13', 366: 'E13',
+  // E14 (1 segment)
+  208: 'E14',
+  // E15 (1 segment)
+  90: 'E15',
+  // E16 (1 segment)
+  16: 'E16',
+  // N1 (7 segments)
+  1067: 'N1', 1072: 'N1', 1073: 'N1', 1101: 'N1', 1162: 'N1', 1163: 'N1',
+  1164: 'N1',
+  // N2 (3 segments)
+  1641: 'N2', 1666: 'N2', 1701: 'N2',
+  // N3A (5 segments)
+  1744: 'N3A', 1764: 'N3A', 1778: 'N3A', 1795: 'N3A', 1807: 'N3A',
+  // N3B (1 segment)
+  608: 'N3B',
+  // N4 (1 segment)
+  1233: 'N4',
+  // N6 (1 segment)
+  72: 'N6',
+  // N7 (1 segment)
+  95: 'N7',
+  // N8 (1 segment)
+  91: 'N8',
+  // N9 (7 segments)
+  2612: 'N9', 2614: 'N9', 2635: 'N9', 2641: 'N9', 2663: 'N9', 2664: 'N9',
+  2674: 'N9',
+  // N10 (12 segments)
+  107: 'N10', 270: 'N10', 410: 'N10', 741: 'N10', 754: 'N10', 772: 'N10',
+  1436: 'N10', 2057: 'N10', 2537: 'N10', 2851: 'N10', 3135: 'N10',
+  3300: 'N10',
+  // N11 (8 segments)
+  1029: 'N11', 1336: 'N11', 2084: 'N11', 2563: 'N11', 2867: 'N11',
+  3183: 'N11', 3410: 'N11', 3606: 'N11',
+  // N12 (3 segments)
+  1472: 'N12', 1477: 'N12', 1488: 'N12',
+  // N13 (2 segments)
+  1365: 'N13', 1420: 'N13',
+  // N14 (2 segments)
+  1460: 'N14', 1479: 'N14',
+  // N15 (1 segment)
+  2705: 'N15',
+  // N16 (1 segment)
+  2701: 'N16',
+  // N17 (7 segments)
+  3316: 'N17', 3317: 'N17', 3318: 'N17', 3326: 'N17', 3330: 'N17',
+  3334: 'N17', 3339: 'N17',
+  // N18 (7 segments)
+  1425: 'N18', 1469: 'N18', 1470: 'N18', 1471: 'N18', 1485: 'N18',
+  1487: 'N18', 1497: 'N18',
+}

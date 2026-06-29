@@ -9,6 +9,7 @@ import {
 import {
   getPlotFillLayer, getPlotOutlineLayer, getPlotHighlightLayer, getRoadModeOverlayLayer,
   getAllocatedLandsFillLayer, getAllocatedLandsOutlineLayer, getAllocatedLandsLabelsLayer,
+  getNamedRoadsFillLayer, getNamedRoadsOutlineLayer, getNamedRoadsHighlightLayer, getNamedRoadsLabelsLayer,
 } from './utils/layerDefinitions'
 
 // PMTiles protocol is global; register once across mounts.
@@ -82,6 +83,7 @@ export default function MapContainer() {
 
         store.setLoadingStage(LoadingStage.LOADING_OVERLAYS)
         await loadAllocated(map)
+        await loadNamedRoads(map)
 
         setupInteractions(map)
         store.setLoadingStage(LoadingStage.RENDERING)
@@ -132,6 +134,29 @@ export default function MapContainer() {
     } catch (e) { /* non-fatal */ }
   }
 
+  async function loadNamedRoads(map) {
+    try {
+      const [roads, index] = await Promise.all([
+        fetch(DATA_PATHS.namedRoads).then((r) => (r.ok ? r.json() : null)),
+        fetch(DATA_PATHS.namedRoadsIndex).then((r) => (r.ok ? r.json() : [])),
+      ])
+      if (!roads) return
+      useMapStore.getState().setNamedRoadsIndex(index || [])
+      const labels = {
+        type: 'FeatureCollection',
+        features: (index || []).map((r) => ({
+          type: 'Feature', properties: { roadName: r.name }, geometry: { type: 'Point', coordinates: r.center },
+        })),
+      }
+      map.addSource('namedRoads', { type: 'geojson', data: roads })
+      map.addSource('namedRoadLabels', { type: 'geojson', data: labels })
+      map.addLayer(getNamedRoadsFillLayer())
+      map.addLayer(getNamedRoadsOutlineLayer())
+      map.addLayer(getNamedRoadsHighlightLayer())
+      map.addLayer(getNamedRoadsLabelsLayer())
+    } catch (e) { /* non-fatal */ }
+  }
+
   function setupInteractions(map) {
     // only query layers that currently exist (avoids errors during load races)
     const existing = (ids) => ids.filter((id) => map.getLayer(id))
@@ -155,6 +180,19 @@ export default function MapContainer() {
         }
       }
 
+      // named roads (overlay) take precedence over the plot beneath
+      if (map.getLayer(LAYERS.NAMED_ROADS_FILL)) {
+        const rd = map.queryRenderedFeatures(e.point, { layers: [LAYERS.NAMED_ROADS_FILL] })[0]
+        if (rd) {
+          const name = rd.properties.roadName
+          const meta = useMapStore.getState().namedRoadsIndex.find((r) => r.name === name) || {}
+          store.selectPlot({ _type: 'road', name, ...meta })
+          if (map.getLayer(LAYERS.PLOTS_HIGHLIGHT)) map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['get', 'pid'], -1])
+          if (meta.bbox?.length === 4) { try { map.fitBounds(meta.bbox, { padding: 90, duration: 900, maxZoom: 16 }) } catch (e2) { /* */ } }
+          return
+        }
+      }
+
       if (!map.getLayer(LAYERS.PLOTS_FILL)) return
       const feats = map.queryRenderedFeatures(e.point, { layers: [LAYERS.PLOTS_FILL] })
       if (!feats.length) return
@@ -164,7 +202,9 @@ export default function MapContainer() {
     })
 
     map.on('mousemove', (e) => {
-      const layers = existing(allocatedRef.current ? [LAYERS.ALLOCATED_LANDS, LAYERS.PLOTS_FILL] : [LAYERS.PLOTS_FILL])
+      const ids = [LAYERS.NAMED_ROADS_FILL, LAYERS.PLOTS_FILL]
+      if (allocatedRef.current) ids.unshift(LAYERS.ALLOCATED_LANDS)
+      const layers = existing(ids)
       if (!layers.length) { map.getCanvas().style.cursor = ''; return }
       const feats = map.queryRenderedFeatures(e.point, { layers })
       map.getCanvas().style.cursor = feats.length ? 'pointer' : ''
@@ -200,12 +240,18 @@ export default function MapContainer() {
     map.setLayoutProperty(LAYERS.ROAD_MODE_OVERLAY, 'visibility', roadMode ? 'visible' : 'none')
   }, [roadMode])
 
-  // selected-plot highlight
+  // selected highlight (plot or named road)
   useEffect(() => {
     const map = mapRef.current
-    if (!map?.getLayer?.(LAYERS.PLOTS_HIGHLIGHT)) return
-    const pid = (selectedPlot && selectedPlot.pid != null) ? selectedPlot.pid : -1
-    map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['get', 'pid'], pid])
+    if (!map) return
+    if (map.getLayer(LAYERS.PLOTS_HIGHLIGHT)) {
+      const pid = (selectedPlot && selectedPlot.pid != null) ? selectedPlot.pid : -1
+      map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['get', 'pid'], pid])
+    }
+    if (map.getLayer(LAYERS.NAMED_ROADS_HIGHLIGHT)) {
+      const roadName = selectedPlot?._type === 'road' ? selectedPlot.name : ' '
+      map.setFilter(LAYERS.NAMED_ROADS_HIGHLIGHT, ['==', ['get', 'roadName'], roadName])
+    }
   }, [selectedPlot])
 
   return <div ref={containerRef} className="map-container" />

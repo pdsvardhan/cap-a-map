@@ -27,6 +27,8 @@ export const DATA_PATHS = {
   meta: '/data/meta.json',
   allocatedLands: '/data/allocated_lands.geojson',
   grid: '/data/grid.geojson',
+  namedRoads: '/data/named_roads.geojson',
+  namedRoadsIndex: '/data/named_roads_index.json',
 }
 
 // Vector-tile source + source-layer name (set by tippecanoe `-l plots`)
@@ -49,6 +51,14 @@ export const LAYERS = {
   NAMED_ROADS_HIGHLIGHT: 'named-roads-highlight',
 }
 
-// Named roads: uniform light grey (category coloring added in P5)
-export const NAMED_ROAD_COLOR = '#D0D0D0'
-export const NAMED_ROAD_OUTLINE = '#A0A0A0'
+// Named roads colored by classification (visible on the dark canvas)
+export const NAMED_ROAD_CATEGORY_COLORS = {
+  'major arterial': '#FF4D4D', // red
+  'arterial': '#FFA64D',       // orange
+  'sub-arterial': '#5BC0EB',   // blue
+  'seed access': '#7CD992',    // green
+  'other': '#CBD5E1',          // grey
+}
+export const NAMED_ROAD_FALLBACK = '#CBD5E1'
+// MapLibre ['match', ['get','roadCategory'], ...] color pairs
+export const NAMED_ROAD_COLOR_MATCH = Object.entries(NAMED_ROAD_CATEGORY_COLORS).flat()

@@ -1,0 +1,935 @@
+[
+  {
+    "name": "E1",
+    "center": [
+      80.474957,
+      16.55818
+    ],
+    "bbox": [
+      80.462649,
+      16.539451,
+      80.500152,
+      16.560603
+    ],
+    "segCount": 12,
+    "seedCount": 6,
+    "category": "arterial",
+    "orientation": "E-W",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical arterial",
+    "meets": [
+      "E2",
+      "N11"
+    ]
+  },
+  {
+    "name": "E10",
+    "center": [
+      80.531832,
+      16.479177
+    ],
+    "bbox": [
+      80.531298,
+      16.479006,
+      80.532339,
+      16.479272
+    ],
+    "segCount": 3,
+    "seedCount": 1,
+    "category": "sub-arterial",
+    "orientation": "E-W",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": false,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Penumaka-Inavolu",
+    "meets": [
+      "N10"
+    ]
+  },
+  {
+    "name": "E11",
+    "center": [
+      80.537312,
+      16.4691
+    ],
+    "bbox": [
+      80.537312,
+      16.4691,
+      80.537312,
+      16.4691
+    ],
+    "segCount": 1,
+    "seedCount": 1,
+    "category": "arterial",
+    "orientation": "E-W",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": true,
+    "confidence": "B",
+    "remarks": "NH16 extension planned",
+    "meets": [
+      "N10"
+    ]
+  },
+  {
+    "name": "E12",
+    "center": [
+      80.523897,
+      16.459239
+    ],
+    "bbox": [
+      80.523897,
+      16.459239,
+      80.523897,
+      16.459239
+    ],
+    "segCount": 1,
+    "seedCount": 1,
+    "category": "sub-arterial",
+    "orientation": "E-W",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial",
+    "meets": [
+      "N10"
+    ]
+  },
+  {
+    "name": "E13",
+    "center": [
+      80.540438,
+      16.450565
+    ],
+    "bbox": [
+      80.540023,
+      16.45022,
+      80.540791,
+      16.450739
+    ],
+    "segCount": 3,
+    "seedCount": 3,
+    "category": "major arterial",
+    "orientation": "E-W",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": true,
+    "confidence": "B",
+    "remarks": "Govt Complex to NH16",
+    "meets": [
+      "N10"
+    ]
+  },
+  {
+    "name": "E14",
+    "center": [
+      80.535087,
+      16.441913
+    ],
+    "bbox": [
+      80.535087,
+      16.441913,
+      80.535087,
+      16.441913
+    ],
+    "segCount": 1,
+    "seedCount": 1,
+    "category": "sub-arterial",
+    "orientation": "E-W",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": false,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial",
+    "meets": [
+      "N10"
+    ]
+  },
+  {
+    "name": "E15",
+    "center": [
+      80.514706,
+      16.431064
+    ],
+    "bbox": [
+      80.514706,
+      16.431064,
+      80.514706,
+      16.431064
+    ],
+    "segCount": 1,
+    "seedCount": 1,
+    "category": "sub-arterial",
+    "orientation": "E-W",
+    "row_m": 50,
+    "lane_pattern": "3+3+0",
+    "brt_present": false,
+    "connects_nh16": true,
+    "confidence": "A",
+    "remarks": "DPR cross-section available",
+    "meets": []
+  },
+  {
+    "name": "E16",
+    "center": [
+      80.52095,
+      16.421625
+    ],
+    "bbox": [
+      80.52095,
+      16.421625,
+      80.52095,
+      16.421625
+    ],
+    "segCount": 1,
+    "seedCount": 1,
+    "category": "arterial",
+    "orientation": "E-W",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial",
+    "meets": []
+  },
+  {
+    "name": "E2",
+    "center": [
+      80.48482,
+      16.553226
+    ],
+    "bbox": [
+      80.477311,
+      16.552797,
+      80.493372,
+      16.554615
+    ],
+    "segCount": 13,
+    "seedCount": 5,
+    "category": "sub-arterial",
+    "orientation": "E-W",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical arterial",
+    "meets": [
+      "E1"
+    ]
+  },
+  {
+    "name": "E3",
+    "center": [
+      80.55832,
+      16.511165
+    ],
+    "bbox": [
+      80.5569,
+      16.510707,
+      80.559911,
+      16.511639
+    ],
+    "segCount": 6,
+    "seedCount": 1,
+    "category": "seed access",
+    "orientation": "E-W",
+    "row_m": 60,
+    "lane_pattern": "4+0+4",
+    "brt_present": false,
+    "connects_nh16": true,
+    "confidence": "B",
+    "remarks": "Seed access road, connects NH-16 to core",
+    "meets": []
+  },
+  {
+    "name": "E4",
+    "center": [
+      80.452552,
+      16.527716
+    ],
+    "bbox": [
+      80.445963,
+      16.527151,
+      80.461807,
+      16.52836
+    ],
+    "segCount": 20,
+    "seedCount": 3,
+    "category": "sub-arterial",
+    "orientation": "E-W",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical arterial",
+    "meets": [
+      "N11"
+    ]
+  },
+  {
+    "name": "E5",
+    "center": [
+      80.460355,
+      16.509838
+    ],
+    "bbox": [
+      80.450892,
+      16.509297,
+      80.472278,
+      16.51017
+    ],
+    "segCount": 10,
+    "seedCount": 3,
+    "category": "major arterial",
+    "orientation": "E-W",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": true,
+    "confidence": "B",
+    "remarks": "NH16 to IRR trunk connection",
+    "meets": [
+      "N10",
+      "N11"
+    ]
+  },
+  {
+    "name": "E6",
+    "center": [
+      80.444618,
+      16.516279
+    ],
+    "bbox": [
+      80.444618,
+      16.516279,
+      80.444618,
+      16.516279
+    ],
+    "segCount": 1,
+    "seedCount": 1,
+    "category": "sub-arterial",
+    "orientation": "E-W",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial, 9.844 km length reported",
+    "meets": [
+      "N11"
+    ]
+  },
+  {
+    "name": "E7",
+    "center": [
+      80.541288,
+      16.506514
+    ],
+    "bbox": [
+      80.476191,
+      16.505682,
+      80.56634,
+      16.506992
+    ],
+    "segCount": 13,
+    "seedCount": 6,
+    "category": "arterial",
+    "orientation": "E-W",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Mandadam area (west)",
+    "meets": [
+      "N10",
+      "N11"
+    ]
+  },
+  {
+    "name": "E8",
+    "center": [
+      80.551784,
+      16.496962
+    ],
+    "bbox": [
+      80.517212,
+      16.496408,
+      80.567089,
+      16.497525
+    ],
+    "segCount": 14,
+    "seedCount": 3,
+    "category": "sub-arterial",
+    "orientation": "E-W",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial, 14.955 km length reported",
+    "meets": [
+      "N10",
+      "N11",
+      "N2",
+      "N3A"
+    ]
+  },
+  {
+    "name": "E9",
+    "center": [
+      80.554142,
+      16.485665
+    ],
+    "bbox": [
+      80.553791,
+      16.485356,
+      80.554353,
+      16.485838
+    ],
+    "segCount": 3,
+    "seedCount": 3,
+    "category": "arterial",
+    "orientation": "E-W",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical arterial",
+    "meets": [
+      "N1"
+    ]
+  },
+  {
+    "name": "N1",
+    "center": [
+      80.549708,
+      16.483915
+    ],
+    "bbox": [
+      80.535638,
+      16.483131,
+      80.572156,
+      16.484784
+    ],
+    "segCount": 10,
+    "seedCount": 7,
+    "category": "sub-arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": [
+      "E9",
+      "N10",
+      "N11"
+    ]
+  },
+  {
+    "name": "N10",
+    "center": [
+      80.509084,
+      16.487531
+    ],
+    "bbox": [
+      80.471156,
+      16.433902,
+      80.551771,
+      16.535053
+    ],
+    "segCount": 12,
+    "seedCount": 12,
+    "category": "arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": [
+      "E10",
+      "E11",
+      "E12",
+      "E13",
+      "E14",
+      "E5",
+      "E7",
+      "E8",
+      "N1",
+      "N11",
+      "N12",
+      "N13",
+      "N14",
+      "N15",
+      "N16",
+      "N18",
+      "N2",
+      "N3A",
+      "N9"
+    ]
+  },
+  {
+    "name": "N11",
+    "center": [
+      80.480796,
+      16.511863
+    ],
+    "bbox": [
+      80.438169,
+      16.482883,
+      80.538974,
+      16.551537
+    ],
+    "segCount": 13,
+    "seedCount": 8,
+    "category": "sub-arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "3+2+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "4 lane + 2 lane BRT confirmed",
+    "meets": [
+      "E1",
+      "E4",
+      "E5",
+      "E6",
+      "E7",
+      "E8",
+      "N1",
+      "N10",
+      "N12",
+      "N13",
+      "N14",
+      "N17",
+      "N18",
+      "N2",
+      "N3A",
+      "N4",
+      "N9"
+    ]
+  },
+  {
+    "name": "N12",
+    "center": [
+      80.552685,
+      16.491855
+    ],
+    "bbox": [
+      80.470541,
+      16.49091,
+      80.590807,
+      16.492862
+    ],
+    "segCount": 7,
+    "seedCount": 3,
+    "category": "arterial",
+    "orientation": "N-S",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "6 lane arterial confirmed",
+    "meets": [
+      "N10",
+      "N11",
+      "N13",
+      "N14",
+      "N18"
+    ]
+  },
+  {
+    "name": "N13",
+    "center": [
+      80.512606,
+      16.490905
+    ],
+    "bbox": [
+      80.461296,
+      16.490086,
+      80.525749,
+      16.491608
+    ],
+    "segCount": 5,
+    "seedCount": 2,
+    "category": "major arterial",
+    "orientation": "N-S",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Connects N1 via bund road",
+    "meets": [
+      "N10",
+      "N11",
+      "N12",
+      "N14",
+      "N18"
+    ]
+  },
+  {
+    "name": "N14",
+    "center": [
+      80.555213,
+      16.49146
+    ],
+    "bbox": [
+      80.518666,
+      16.490615,
+      80.560784,
+      16.492454
+    ],
+    "segCount": 8,
+    "seedCount": 2,
+    "category": "sub-arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": [
+      "N10",
+      "N11",
+      "N12",
+      "N13",
+      "N18"
+    ]
+  },
+  {
+    "name": "N15",
+    "center": [
+      80.551588,
+      16.516639
+    ],
+    "bbox": [
+      80.551586,
+      16.516537,
+      80.551589,
+      16.51674
+    ],
+    "segCount": 2,
+    "seedCount": 1,
+    "category": "arterial",
+    "orientation": "N-S",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "6 lane arterial confirmed",
+    "meets": [
+      "N10"
+    ]
+  },
+  {
+    "name": "N16",
+    "center": [
+      80.545378,
+      16.516128
+    ],
+    "bbox": [
+      80.545378,
+      16.516128,
+      80.545378,
+      16.516128
+    ],
+    "segCount": 1,
+    "seedCount": 1,
+    "category": "sub-arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": [
+      "N10"
+    ]
+  },
+  {
+    "name": "N17",
+    "center": [
+      80.46147,
+      16.536757
+    ],
+    "bbox": [
+      80.440844,
+      16.536228,
+      80.471517,
+      16.53763
+    ],
+    "segCount": 10,
+    "seedCount": 7,
+    "category": "arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": [
+      "N11"
+    ]
+  },
+  {
+    "name": "N18",
+    "center": [
+      80.516798,
+      16.492089
+    ],
+    "bbox": [
+      80.42724,
+      16.491324,
+      80.575831,
+      16.492591
+    ],
+    "segCount": 11,
+    "seedCount": 7,
+    "category": "sub-arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "3+2+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "4 lane + 2 lane BRT confirmed",
+    "meets": [
+      "N10",
+      "N11",
+      "N12",
+      "N13",
+      "N14"
+    ]
+  },
+  {
+    "name": "N2",
+    "center": [
+      80.519187,
+      16.495713
+    ],
+    "bbox": [
+      80.47907,
+      16.495141,
+      80.540595,
+      16.496162
+    ],
+    "segCount": 3,
+    "seedCount": 3,
+    "category": "sub-arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": [
+      "E8",
+      "N10",
+      "N11"
+    ]
+  },
+  {
+    "name": "N3A",
+    "center": [
+      80.508743,
+      16.4987
+    ],
+    "bbox": [
+      80.428873,
+      16.498041,
+      80.590149,
+      16.49994
+    ],
+    "segCount": 7,
+    "seedCount": 5,
+    "category": "arterial",
+    "orientation": "N-S",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical arterial section",
+    "meets": [
+      "E8",
+      "N10",
+      "N11"
+    ]
+  },
+  {
+    "name": "N3B",
+    "center": [
+      80.562885,
+      16.467663
+    ],
+    "bbox": [
+      80.562885,
+      16.467663,
+      80.562885,
+      16.467663
+    ],
+    "segCount": 1,
+    "seedCount": 1,
+    "category": "arterial",
+    "orientation": "N-S",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical arterial section",
+    "meets": []
+  },
+  {
+    "name": "N4",
+    "center": [
+      80.437485,
+      16.48865
+    ],
+    "bbox": [
+      80.437206,
+      16.48789,
+      80.437835,
+      16.48942
+    ],
+    "segCount": 5,
+    "seedCount": 1,
+    "category": "sub-arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": [
+      "N11"
+    ]
+  },
+  {
+    "name": "N6",
+    "center": [
+      80.544379,
+      16.426909
+    ],
+    "bbox": [
+      80.544379,
+      16.426909,
+      80.544379,
+      16.426909
+    ],
+    "segCount": 1,
+    "seedCount": 1,
+    "category": "major arterial",
+    "orientation": "N-S",
+    "row_m": 60,
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Major arterial, multiple references",
+    "meets": []
+  },
+  {
+    "name": "N7",
+    "center": [
+      80.533435,
+      16.432383
+    ],
+    "bbox": [
+      80.533435,
+      16.432383,
+      80.533435,
+      16.432383
+    ],
+    "segCount": 1,
+    "seedCount": 1,
+    "category": "sub-arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": []
+  },
+  {
+    "name": "N8",
+    "center": [
+      80.523597,
+      16.431461
+    ],
+    "bbox": [
+      80.523597,
+      16.431461,
+      80.523597,
+      16.431461
+    ],
+    "segCount": 1,
+    "seedCount": 1,
+    "category": "arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": []
+  },
+  {
+    "name": "N9",
+    "center": [
+      80.500295,
+      16.514031
+    ],
+    "bbox": [
+      80.440264,
+      16.513153,
+      80.536792,
+      16.514831
+    ],
+    "segCount": 10,
+    "seedCount": 7,
+    "category": "sub-arterial",
+    "orientation": "N-S",
+    "row_m": 50,
+    "lane_pattern": "3+2+3",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "4 lane + 2 lane BRT confirmed",
+    "meets": [
+      "N10",
+      "N11"
+    ]
+  }
+]

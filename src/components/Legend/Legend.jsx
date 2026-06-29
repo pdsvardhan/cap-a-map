@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import useMapStore from '../../stores/mapStore'
 import { ZONING_GROUPS, ZONING_HIERARCHY, AREA_HEATMAP_LEGEND } from '../../utils/colors'
-import { NAMED_ROAD_COLOR } from '../../utils/constants'
+import { NAMED_ROAD_CATEGORY_COLORS } from '../../utils/constants'
 
 const ALL_GROUP_KEYS = Object.keys(ZONING_GROUPS)
 
@@ -351,13 +351,18 @@ export default function Legend() {
           </div>
           {!roadsCollapsed && (
             <div className="ml-5 space-y-0.5">
-              <div className="flex items-center gap-2.5 py-1 px-1.5">
-                <div
-                  className="w-5 h-2.5 rounded-sm flex-shrink-0"
-                  style={{ backgroundColor: NAMED_ROAD_COLOR, border: `1px solid ${NAMED_ROAD_COLOR}` }}
-                />
-                <span className="text-[11px] text-gray-700">Grid Roads (E1-E16, N1-N18)</span>
-              </div>
+              {[
+                ['major arterial', 'Major Arterial'],
+                ['arterial', 'Arterial'],
+                ['sub-arterial', 'Sub-Arterial'],
+                ['seed access', 'Seed Access'],
+              ].map(([key, label]) => (
+                <div key={key} className="flex items-center gap-2.5 py-1 px-1.5">
+                  <div className="w-5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: NAMED_ROAD_CATEGORY_COLORS[key] }} />
+                  <span className="text-[11px] text-gray-700">{label}</span>
+                </div>
+              ))}
+              <p className="text-[9px] text-gray-400 px-1.5 pt-0.5">E1–E16 (E-W), N1–N18 (N-S)</p>
             </div>
           )}
         </div>
