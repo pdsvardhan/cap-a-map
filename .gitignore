@@ -20,6 +20,14 @@ public/data/plots.enriched.geojson
 public/data/*.pmtiles
 public/data/search.json
 
+# Authoritative APCRDA scrape (regenerable via scripts/scrape_apcrda.mjs).
+# The big raw layers are ignored; only the small inputs our pipelines read are kept.
+public/data/sources/apcrda/*
+!public/data/sources/apcrda/manifest.json
+!public/data/sources/apcrda/trunk_roads.geojson
+!public/data/sources/apcrda/land_allotments.geojson
+!public/data/sources/apcrda/available_lands.geojson
+
 # In-app review comments (dev comment tool → vite /__feedback)
 feedback/
 

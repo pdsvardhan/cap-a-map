@@ -1,4 +1,10 @@
 /**
+ * ⚠️ DEPRECATED 2026-06-30 — superseded by pipeline/07_roads_authoritative.mjs (adr-002).
+ * This stage RECONSTRUCTED the grid (OSM anchors + calibrated 1km model) because we
+ * believed no authentic road geometry existed. It does: the APCRDA ArcGIS server has
+ * AmaravatiTrunkRoadNetwork (35 named road polygons with widths). We now pull that
+ * directly. Kept for reference only; not part of the build.
+ *
  * Pipeline stage 06 — NAMED ROADS via GRID-MODEL FUSION (offline)
  *
  * Supersedes 05_roads.mjs (derive-from-plot-polygons + drifted segId seeds).

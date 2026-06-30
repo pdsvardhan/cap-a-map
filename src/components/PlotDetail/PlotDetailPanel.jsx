@@ -264,19 +264,14 @@ function RoadInfoPanel({ plot, onClose }) {
         <Section title="Geometry">
           <InfoGrid items={[
             { label: 'Length', value: plot.length_km != null ? `${plot.length_km} km` : undefined },
-            { label: 'Source', value: plot.surveyed ? 'Surveyed (OSM)' : 'Planned (grid model)' },
-            { label: 'Confidence', value: plot.confidence },
           ]} />
-          {!plot.surveyed && (
-            <p className="text-[10px] text-[var(--text-3)] mt-1.5">Centre-line modelled on the calibrated 1 km grid; not yet field-surveyed.</p>
-          )}
         </Section>
         {plot.remarks && (
           <Section title="Notes"><p className="text-sm text-[var(--text-2)]">{plot.remarks}</p></Section>
         )}
       </div>
       <div className="px-5 py-3 border-t border-[var(--border)] flex-shrink-0">
-        <p className="text-[10px] text-[var(--text-3)]">Source: APCRDA transport plan + project road mapping</p>
+        <p className="text-[10px] text-[var(--text-3)]">Source: APCRDA Trunk Road Network (official)</p>
       </div>
     </div>
   )

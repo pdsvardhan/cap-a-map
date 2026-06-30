@@ -46,19 +46,16 @@ export const LAYERS = {
   ALLOCATED_LANDS: 'allocated-lands-fill',
   ALLOCATED_LANDS_OUTLINE: 'allocated-lands-outline',
   ALLOCATED_LANDS_LABELS: 'allocated-lands-labels',
-  // Named roads — rendered as cased lines from OSM-anchored grid-model geometry
-  // (pipeline/06_roads_grid.mjs). Casing (bed) under line (fill) under dashed marking.
-  NAMED_ROADS_CASING: 'named-roads-casing',
-  NAMED_ROADS_LINE: 'named-roads-line',
-  NAMED_ROADS_MARKING: 'named-roads-marking',
+  // Named roads — authentic APCRDA trunk-road POLYGONS (pipeline/07). Filled
+  // corridor + subtle outline; "roads are huge polygons" (owner 2026-06-30).
+  NAMED_ROADS_FILL: 'named-roads-fill',
+  NAMED_ROADS_OUTLINE: 'named-roads-outline',
   NAMED_ROADS_LABELS: 'named-roads-labels',
   NAMED_ROADS_HIGHLIGHT: 'named-roads-highlight',
 }
 
 // Named roads use ONE colour for all classes (owner feedback 2026-06-30 #6) —
-// distinguished from plots by being cased lines with a dashed centre marking, not
-// per-class colours. A bright warm gold reads as "road" and sits apart from the
-// muted residential orange / commercial blue plot fills.
-export const NAMED_ROAD_COLOR = '#F6B73C'   // line (carriageway)
-export const NAMED_ROAD_CASING = '#23262E'  // dark bed beneath the line
-export const NAMED_ROAD_MARKING = '#FFF1CC' // dashed centre-line marking
+// a warm gold corridor that reads as "road" and sits apart from the muted
+// residential orange / commercial blue plot fills, with a subtle darker outline.
+export const NAMED_ROAD_COLOR = '#F6B73C'    // corridor fill
+export const NAMED_ROAD_OUTLINE = '#7A5A1E'  // subtle outline

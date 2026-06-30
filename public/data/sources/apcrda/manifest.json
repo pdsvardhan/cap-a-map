@@ -1,0 +1,12 @@
+{
+  "root": "https://gis.apcrda.org/server/rest/services/AmaravatiCapitalCityLayers/MapServer",
+  "scraped": "2026-06-30T14:09:49.089Z",
+  "layers": [
+    {
+      "id": 34,
+      "name": "plots_mosaic",
+      "count": 86918,
+      "kb": 199459
+    }
+  ]
+}

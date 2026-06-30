@@ -2,257 +2,32 @@
   {
     "name": "E1",
     "center": [
-      80.46073,
-      16.563536
+      80.508444,
+      16.537857
     ],
     "bbox": [
-      80.425099,
-      16.563536,
-      80.496361,
-      16.563536
+      80.455253,
+      16.51007,
+      80.561635,
+      16.565645
     ],
-    "length_km": 7.48,
+    "length_km": 11.17,
     "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.563536,
-    "category": "arterial",
     "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
     "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
     "remarks": "Arterial, 50m ROW (WB EIA); IRR connection",
     "meets": [
-      "N12"
-    ]
-  },
-  {
-    "name": "E10",
-    "center": [
-      80.555904,
-      16.478002
-    ],
-    "bbox": [
-      80.518713,
-      16.478002,
-      80.593094,
-      16.478002
-    ],
-    "length_km": 7.81,
-    "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.478002,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": false,
-    "connects_nh16": false,
-    "confidence": "A",
-    "remarks": "WB EIA: 4-lane, ~7.81km; Inavolu/Mandadam/Venkatapalem/Kuragallu/Krishnayapalem/Nowluru/Penumaka",
-    "meets": [
-      "N2",
-      "N3A",
-      "N3B",
       "N4",
-      "N5",
-      "N6",
-      "N7"
-    ]
-  },
-  {
-    "name": "E11",
-    "center": [
-      80.549806,
-      16.468499
-    ],
-    "bbox": [
-      80.511711,
-      16.468499,
-      80.587901,
-      16.468499
-    ],
-    "length_km": 8,
-    "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.468499,
-    "category": "arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": true,
-    "confidence": "B",
-    "remarks": "Arterial, 50m ROW (WB EIA); directly linked to NH-16 (front of AIIMS)",
-    "meets": [
-      "N2",
-      "N3A",
-      "N3B",
-      "N4",
-      "N5",
       "N6",
       "N7",
-      "N9"
-    ]
-  },
-  {
-    "name": "E12",
-    "center": [
-      80.550654,
-      16.459552
-    ],
-    "bbox": [
-      80.51832,
-      16.459552,
-      80.582987,
-      16.459552
-    ],
-    "length_km": 6.79,
-    "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.459552,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "A",
-    "remarks": "WB EIA: 4-lane + 2 BRT, ~6.79km; Kuragallu/Nowluru",
-    "meets": [
-      "N3B",
-      "N4",
-      "N5",
-      "N6"
-    ]
-  },
-  {
-    "name": "E13",
-    "center": [
-      80.532868,
-      16.449491
-    ],
-    "bbox": [
-      80.494773,
-      16.449491,
-      80.570963,
-      16.449491
-    ],
-    "length_km": 8,
-    "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.449491,
-    "category": "major arterial",
-    "row_m": 60,
-    "lane_pattern": "3+3+3",
-    "brt_present": true,
-    "connects_nh16": true,
-    "confidence": "B",
-    "remarks": "Major arterial; Govt Complex → NH-16 (behind AIIMS)",
-    "meets": [
-      "N3B",
-      "N5",
-      "N6"
-    ]
-  },
-  {
-    "name": "E14",
-    "center": [
-      80.529078,
-      16.439988
-    ],
-    "bbox": [
-      80.49403,
-      16.439988,
-      80.564125,
-      16.439988
-    ],
-    "length_km": 7.36,
-    "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.439988,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": false,
-    "connects_nh16": false,
-    "confidence": "A",
-    "remarks": "WB EIA: 4-lane, ~7.36km; Kuragallu/Nowluru/Nidamarru",
-    "meets": [
-      "N6"
-    ]
-  },
-  {
-    "name": "E15",
-    "center": [
-      80.514671,
-      16.430484
-    ],
-    "bbox": [
-      80.476576,
-      16.430484,
-      80.552767,
-      16.430484
-    ],
-    "length_km": 8,
-    "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.430484,
-    "category": "arterial",
-    "row_m": 50,
-    "lane_pattern": "3+3+0",
-    "brt_present": false,
-    "connects_nh16": true,
-    "confidence": "A",
-    "remarks": "DPR cross-section available; extended to NH-16",
-    "meets": []
-  },
-  {
-    "name": "E16",
-    "center": [
-      80.514671,
-      16.42098
-    ],
-    "bbox": [
-      80.476576,
-      16.42098,
-      80.552767,
-      16.42098
-    ],
-    "length_km": 8,
-    "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.42098,
-    "category": "arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Arterial section",
-    "meets": []
-  },
-  {
-    "name": "E2",
-    "center": [
-      80.470764,
-      16.554032
-    ],
-    "bbox": [
-      80.432669,
-      16.554032,
-      80.508859,
-      16.554032
-    ],
-    "length_km": 8,
-    "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.554032,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Sub-arterial, 50m ROW (WB EIA)",
-    "meets": [
+      "N8",
+      "N9",
+      "N10",
       "N11",
       "N12",
       "N13",
@@ -261,30 +36,28 @@
     ]
   },
   {
-    "name": "E3",
+    "name": "E2",
     "center": [
-      80.498687,
-      16.527456
+      80.473369,
+      16.555039
     ],
     "bbox": [
-      80.4363263,
-      16.5098271,
-      80.5610469,
-      16.545084
+      80.452761,
+      16.554397,
+      80.493978,
+      16.555682
     ],
-    "length_km": 23.38,
+    "length_km": 4.33,
     "orientation": "E-W",
-    "surveyed": true,
-    "axis": 16.537139,
-    "category": "seed access",
-    "row_m": 60,
-    "lane_pattern": "4+2+4",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
     "brt_present": true,
-    "connects_nh16": true,
-    "confidence": "A",
-    "remarks": "Seed Capital Road: 8–9 lane with dedicated BRT, ~21km; NH-16 via Kanakadurga Varadhi cable bridge",
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Sub-arterial, 50m ROW (WB EIA)",
     "meets": [
-      "N9",
       "N11",
       "N12",
       "N13",
@@ -294,122 +67,32 @@
     ]
   },
   {
-    "name": "E4",
+    "name": "E3",
     "center": [
-      80.481901,
-      16.535025
+      80.5189,
+      16.518996
     ],
     "bbox": [
-      80.443806,
-      16.535025,
-      80.519996,
-      16.535025
+      80.436106,
+      16.49232,
+      80.601694,
+      16.545672
     ],
-    "length_km": 8,
+    "length_km": 17.39,
     "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.535025,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Sub-arterial, 50m ROW (WB EIA)",
-    "meets": [
-      "N9",
-      "N11",
-      "N12",
-      "N13",
-      "N14",
-      "N15"
-    ]
-  },
-  {
-    "name": "E5",
-    "center": [
-      80.522341,
-      16.525521
-    ],
-    "bbox": [
-      80.484246,
-      16.525521,
-      80.560436,
-      16.525521
-    ],
-    "length_km": 8,
-    "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.525521,
-    "category": "major arterial",
     "row_m": 60,
-    "lane_pattern": "3+3+3",
+    "source": "APCRDA trunk road network",
+    "category": "seed access",
+    "lane_pattern": "4+2+4",
     "brt_present": true,
     "connects_nh16": true,
-    "confidence": "B",
-    "remarks": "Major arterial; elevated corridor; connects NH-16",
-    "meets": [
-      "N9",
-      "N11",
-      "N12"
-    ]
-  },
-  {
-    "name": "E6",
-    "center": [
-      80.490185,
-      16.516388
-    ],
-    "bbox": [
-      80.4667211,
-      16.5162771,
-      80.5136498,
-      16.5164998
-    ],
-    "length_km": 4.93,
-    "orientation": "E-W",
-    "surveyed": true,
-    "axis": 16.51641,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
     "confidence": "A",
-    "remarks": "WB EIA: 4-lane + 2 BRT, ~9.84km; Ananthavaram/Nelapadu/Thullur/Velagapudi",
+    "remarks": "Seed Capital Road: 8–9 lane with dedicated BRT, ~21km; NH-16 via Kanakadurga Varadhi cable bridge",
     "meets": [
-      "N9",
-      "N11",
-      "N12",
-      "N13"
-    ]
-  },
-  {
-    "name": "E7",
-    "center": [
-      80.497919,
-      16.506514
-    ],
-    "bbox": [
-      80.430444,
-      16.506514,
-      80.565393,
-      16.506514
-    ],
-    "length_km": 14.17,
-    "orientation": "E-W",
-    "surveyed": false,
-    "axis": 16.506514,
-    "category": "arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": true,
-    "confidence": "B",
-    "remarks": "Arterial; connects NH-16 (no land acq.)",
-    "meets": [
+      "N1",
+      "N2",
+      "N3A",
       "N4",
-      "N5",
       "N6",
       "N7",
       "N8",
@@ -425,145 +108,847 @@
     ]
   },
   {
-    "name": "E8",
+    "name": "E4",
     "center": [
-      80.518739,
-      16.49777
+      80.504582,
+      16.518239
     ],
     "bbox": [
-      80.4944874,
-      16.4974337,
-      80.5429912,
-      16.4981059
+      80.43704,
+      16.500389,
+      80.572124,
+      16.53609
     ],
-    "length_km": 5.17,
+    "length_km": 14.18,
     "orientation": "E-W",
-    "surveyed": true,
-    "axis": 16.497503,
-    "category": "sub-arterial",
     "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Sub-arterial, 50m ROW (WB EIA)",
+    "meets": [
+      "N2",
+      "N3A",
+      "N4",
+      "N6",
+      "N7",
+      "N8",
+      "N9",
+      "N10",
+      "N11",
+      "N12",
+      "N13",
+      "N14",
+      "N15",
+      "N16",
+      "N17"
+    ]
+  },
+  {
+    "name": "E5",
+    "center": [
+      80.511394,
+      16.499105
+    ],
+    "bbox": [
+      80.429722,
+      16.468606,
+      80.593067,
+      16.529604
+    ],
+    "length_km": 17.15,
+    "orientation": "E-W",
+    "row_m": 60,
+    "source": "APCRDA trunk road network",
+    "category": "major arterial",
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": true,
+    "confidence": "B",
+    "remarks": "Major arterial; elevated corridor; connects NH-16",
+    "meets": [
+      "N1",
+      "N2",
+      "N3A",
+      "N3B",
+      "N4",
+      "N6",
+      "N7",
+      "N8",
+      "N9",
+      "N10",
+      "N11",
+      "N12",
+      "N13",
+      "N14",
+      "N15",
+      "N16",
+      "N17"
+    ]
+  },
+  {
+    "name": "E6",
+    "center": [
+      80.471483,
+      16.512199
+    ],
+    "bbox": [
+      80.429986,
+      16.507359,
+      80.512979,
+      16.517038
+    ],
+    "length_km": 8.71,
+    "orientation": "E-W",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane + 2 BRT, ~9.84km; Ananthavaram/Nelapadu/Thullur/Velagapudi",
+    "meets": [
+      "N9",
+      "N10",
+      "N11",
+      "N12",
+      "N13",
+      "N14",
+      "N15",
+      "N16",
+      "N17"
+    ]
+  },
+  {
+    "name": "E7",
+    "center": [
+      80.468823,
+      16.506863
+    ],
+    "bbox": [
+      80.413708,
+      16.506132,
+      80.523938,
+      16.507593
+    ],
+    "length_km": 11.57,
+    "orientation": "E-W",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": true,
+    "confidence": "B",
+    "remarks": "Arterial; connects NH-16 (no land acq.)",
+    "meets": [
+      "N8",
+      "N9",
+      "N10",
+      "N11",
+      "N12",
+      "N13",
+      "N14",
+      "N15",
+      "N16",
+      "N17",
+      "N18"
+    ]
+  },
+  {
+    "name": "E8",
+    "center": [
+      80.483945,
+      16.492489
+    ],
+    "bbox": [
+      80.419323,
+      16.486855,
+      80.548567,
+      16.498123
+    ],
+    "length_km": 13.57,
+    "orientation": "E-W",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
     "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "A",
     "remarks": "WB EIA: 4-lane + 2 BRT, ~14.96km; Nekkallu/Thullur/Sakhamuru/Velagapudi/Malkapuram/Mandadam/Venkatapalem/Krishnayapalem",
     "meets": [
+      "N6",
       "N7",
       "N8",
       "N9",
       "N10",
-      "N11"
+      "N11",
+      "N12",
+      "N13",
+      "N14",
+      "N15",
+      "N16",
+      "N17",
+      "N18"
     ]
   },
   {
     "name": "E9",
     "center": [
-      80.497548,
-      16.485997
+      80.486653,
+      16.486114
     ],
     "bbox": [
-      80.4616639,
-      16.4856828,
-      80.5334322,
-      16.4863114
+      80.420826,
+      16.485373,
+      80.55248,
+      16.486856
     ],
-    "length_km": 5.59,
+    "length_km": 13.82,
     "orientation": "E-W",
-    "surveyed": true,
-    "axis": 16.486064,
-    "category": "arterial",
     "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
     "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": true,
     "confidence": "B",
     "remarks": "Arterial, 50m ROW (WB EIA); connects NH-16 (no land acq.)",
     "meets": [
+      "N4",
+      "N6",
+      "N7",
       "N8",
       "N9",
       "N10",
       "N11",
-      "N13"
+      "N12",
+      "N13",
+      "N14",
+      "N15",
+      "N16",
+      "N17",
+      "N18"
+    ]
+  },
+  {
+    "name": "E10",
+    "center": [
+      80.538512,
+      16.479727
+    ],
+    "bbox": [
+      80.504472,
+      16.477883,
+      80.572553,
+      16.481572
+    ],
+    "length_km": 7.15,
+    "orientation": "E-W",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": false,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane, ~7.81km; Inavolu/Mandadam/Venkatapalem/Kuragallu/Krishnayapalem/Nowluru/Penumaka",
+    "meets": [
+      "N2",
+      "N3B",
+      "N4",
+      "N6",
+      "N7",
+      "N8",
+      "N9",
+      "N10"
+    ]
+  },
+  {
+    "name": "E11",
+    "center": [
+      80.533427,
+      16.469041
+    ],
+    "bbox": [
+      80.504496,
+      16.468391,
+      80.562357,
+      16.469691
+    ],
+    "length_km": 6.08,
+    "orientation": "E-W",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": true,
+    "confidence": "B",
+    "remarks": "Arterial, 50m ROW (WB EIA); directly linked to NH-16 (front of AIIMS)",
+    "meets": [
+      "N3B",
+      "N4",
+      "N6",
+      "N7",
+      "N8",
+      "N9",
+      "N10"
+    ]
+  },
+  {
+    "name": "E12",
+    "center": [
+      80.529326,
+      16.458754
+    ],
+    "bbox": [
+      80.496272,
+      16.457309,
+      80.562381,
+      16.460199
+    ],
+    "length_km": 6.94,
+    "orientation": "E-W",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane + 2 BRT, ~6.79km; Kuragallu/Nowluru",
+    "meets": [
+      "N3B",
+      "N4",
+      "N6",
+      "N7",
+      "N8",
+      "N9",
+      "N10"
+    ]
+  },
+  {
+    "name": "E13",
+    "center": [
+      80.538168,
+      16.449973
+    ],
+    "bbox": [
+      80.504545,
+      16.44706,
+      80.571791,
+      16.452886
+    ],
+    "length_km": 7.06,
+    "orientation": "E-W",
+    "row_m": 60,
+    "source": "APCRDA trunk road network",
+    "category": "major arterial",
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": true,
+    "confidence": "B",
+    "remarks": "Major arterial; Govt Complex → NH-16 (behind AIIMS)",
+    "meets": [
+      "N3B",
+      "N4",
+      "N5",
+      "N6",
+      "N7",
+      "N8",
+      "N9",
+      "N10"
+    ]
+  },
+  {
+    "name": "E14",
+    "center": [
+      80.529897,
+      16.439723
+    ],
+    "bbox": [
+      80.496576,
+      16.436658,
+      80.563219,
+      16.442788
+    ],
+    "length_km": 7,
+    "orientation": "E-W",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": false,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane, ~7.36km; Kuragallu/Nowluru/Nidamarru",
+    "meets": [
+      "N5",
+      "N6",
+      "N7",
+      "N8",
+      "N9",
+      "N10"
+    ]
+  },
+  {
+    "name": "E15",
+    "center": [
+      80.519236,
+      16.430875
+    ],
+    "bbox": [
+      80.495349,
+      16.430113,
+      80.543122,
+      16.431637
+    ],
+    "length_km": 5.02,
+    "orientation": "E-W",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
+    "lane_pattern": "3+3+0",
+    "brt_present": false,
+    "connects_nh16": true,
+    "confidence": "A",
+    "remarks": "DPR cross-section available; extended to NH-16",
+    "meets": [
+      "N6",
+      "N7",
+      "N8",
+      "N9",
+      "N10"
+    ]
+  },
+  {
+    "name": "E16",
+    "center": [
+      80.522764,
+      16.421546
+    ],
+    "bbox": [
+      80.50074,
+      16.420902,
+      80.544789,
+      16.42219
+    ],
+    "length_km": 4.63,
+    "orientation": "E-W",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Arterial section",
+    "meets": [
+      "N6",
+      "N7",
+      "N8",
+      "N10"
     ]
   },
   {
     "name": "N1",
     "center": [
-      80.595968,
-      16.499767
+      80.592123,
+      16.484932
     ],
     "bbox": [
-      80.595968,
-      16.463731,
-      80.595968,
-      16.535803
+      80.58713,
+      16.472806,
+      80.597116,
+      16.497058
     ],
-    "length_km": 8,
+    "length_km": 2.69,
     "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.595968,
-    "category": "sub-arterial",
     "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
     "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
     "remarks": "Typical sub-arterial section",
-    "meets": []
+    "meets": [
+      "E3",
+      "E5"
+    ]
+  },
+  {
+    "name": "N2",
+    "center": [
+      80.572542,
+      16.49254
+    ],
+    "bbox": [
+      80.57193,
+      16.48157,
+      80.573153,
+      16.503511
+    ],
+    "length_km": 2.44,
+    "orientation": "N-S",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": [
+      "E3",
+      "E4",
+      "E5",
+      "E10"
+    ]
+  },
+  {
+    "name": "N3A",
+    "center": [
+      80.563561,
+      16.501209
+    ],
+    "bbox": [
+      80.562673,
+      16.495194,
+      80.564449,
+      16.507224
+    ],
+    "length_km": 1.34,
+    "orientation": "N-S",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Arterial, 50m ROW (WB EIA); Venkatapalem–Krishnayapalem",
+    "meets": [
+      "E3",
+      "E4",
+      "E5"
+    ]
+  },
+  {
+    "name": "N3B",
+    "center": [
+      80.562867,
+      16.463853
+    ],
+    "bbox": [
+      80.562356,
+      16.449714,
+      80.563378,
+      16.477992
+    ],
+    "length_km": 3.14,
+    "orientation": "N-S",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Arterial, 50m ROW (WB EIA)",
+    "meets": [
+      "E5",
+      "E10",
+      "E11",
+      "E12",
+      "E13"
+    ]
+  },
+  {
+    "name": "N4",
+    "center": [
+      80.55478,
+      16.482533
+    ],
+    "bbox": [
+      80.552479,
+      16.45219,
+      80.557082,
+      16.512876
+    ],
+    "length_km": 6.74,
+    "orientation": "N-S",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": false,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane, ~7.17km; Penumaka/Nowluru/Krishnayapalem/Venkatapalem",
+    "meets": [
+      "E1",
+      "E3",
+      "E4",
+      "E5",
+      "E9",
+      "E10",
+      "E11",
+      "E12",
+      "E13"
+    ]
+  },
+  {
+    "name": "N5",
+    "center": [
+      80.548773,
+      16.44049
+    ],
+    "bbox": [
+      80.548379,
+      16.431486,
+      80.549167,
+      16.449493
+    ],
+    "length_km": 2,
+    "orientation": "N-S",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": [
+      "E13",
+      "E14"
+    ]
+  },
+  {
+    "name": "N6",
+    "center": [
+      80.550187,
+      16.477173
+    ],
+    "bbox": [
+      80.542536,
+      16.419953,
+      80.557837,
+      16.534393
+    ],
+    "length_km": 12.7,
+    "orientation": "N-S",
+    "row_m": 60,
+    "source": "APCRDA trunk road network",
+    "category": "major arterial",
+    "lane_pattern": "3+3+3",
+    "brt_present": true,
+    "connects_nh16": true,
+    "confidence": "B",
+    "remarks": "Major arterial; proposed NH-16 bypass",
+    "meets": [
+      "E1",
+      "E3",
+      "E4",
+      "E5",
+      "E8",
+      "E9",
+      "E10",
+      "E11",
+      "E12",
+      "E13",
+      "E14",
+      "E15",
+      "E16"
+    ]
+  },
+  {
+    "name": "N7",
+    "center": [
+      80.537752,
+      16.473219
+    ],
+    "bbox": [
+      80.532895,
+      16.416513,
+      80.54261,
+      16.529925
+    ],
+    "length_km": 12.59,
+    "orientation": "N-S",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Typical sub-arterial section",
+    "meets": [
+      "E1",
+      "E3",
+      "E4",
+      "E5",
+      "E8",
+      "E9",
+      "E10",
+      "E11",
+      "E12",
+      "E13",
+      "E14",
+      "E15",
+      "E16"
+    ]
+  },
+  {
+    "name": "N8",
+    "center": [
+      80.528742,
+      16.476745
+    ],
+    "bbox": [
+      80.52298,
+      16.415552,
+      80.534505,
+      16.537938
+    ],
+    "length_km": 13.58,
+    "orientation": "N-S",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Arterial; in trunk tender package",
+    "meets": [
+      "E1",
+      "E3",
+      "E4",
+      "E5",
+      "E7",
+      "E8",
+      "E9",
+      "E10",
+      "E11",
+      "E12",
+      "E13",
+      "E14",
+      "E15",
+      "E16"
+    ]
+  },
+  {
+    "name": "N9",
+    "center": [
+      80.520529,
+      16.489259
+    ],
+    "bbox": [
+      80.512978,
+      16.431636,
+      80.528079,
+      16.546882
+    ],
+    "length_km": 12.79,
+    "orientation": "N-S",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "WB EIA: 4-lane + 2 BRT, ~12.5km; Nidamarru/Kuragallu/Mandadam/Malkapuram/Velagapudi",
+    "meets": [
+      "E1",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
+      "E7",
+      "E8",
+      "E9",
+      "E10",
+      "E11",
+      "E12",
+      "E13",
+      "E14",
+      "E15"
+    ]
   },
   {
     "name": "N10",
     "center": [
-      80.504278,
-      16.483286
+      80.515854,
+      16.487618
     ],
     "bbox": [
-      80.5037237,
-      16.459553,
-      80.504833,
-      16.5070181
+      80.503338,
+      16.422121,
+      80.528371,
+      16.553115
     ],
-    "length_km": 3.05,
+    "length_km": 14.54,
     "orientation": "N-S",
-    "surveyed": true,
-    "axis": 80.503882,
-    "category": "arterial",
     "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
     "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
     "remarks": "Arterial; IRR connection",
     "meets": [
+      "E1",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
       "E7",
       "E8",
-      "E9"
+      "E9",
+      "E10",
+      "E11",
+      "E12",
+      "E13",
+      "E14",
+      "E15",
+      "E16"
     ]
   },
   {
     "name": "N11",
     "center": [
-      80.494486,
-      16.519417
+      80.494522,
+      16.52058
     ],
     "bbox": [
-      80.494486,
-      16.480408,
-      80.494486,
-      16.558426
+      80.493977,
+      16.481757,
+      80.495068,
+      16.559403
     ],
-    "length_km": 8.66,
+    "length_km": 8.62,
     "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.494486,
-    "category": "sub-arterial",
     "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
     "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "A",
     "remarks": "WB EIA: 4-lane + 2 BRT, ~8.66km; Ayinavolu/Nelapadu/Sakhamuru/Rayapudi/Velagapudi/Lingayapalem",
     "meets": [
+      "E1",
       "E2",
       "E3",
       "E4",
@@ -577,21 +962,20 @@
   {
     "name": "N12",
     "center": [
-      80.4837,
-      16.526648
+      80.484543,
+      16.521009
     ],
     "bbox": [
-      80.4837,
-      16.490612,
-      80.4837,
-      16.562684
+      80.484128,
+      16.482209,
+      80.484957,
+      16.559809
     ],
-    "length_km": 8,
+    "length_km": 8.61,
     "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.4837,
-    "category": "arterial",
     "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
     "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
@@ -604,442 +988,168 @@
       "E4",
       "E5",
       "E6",
-      "E7"
+      "E7",
+      "E8",
+      "E9"
     ]
   },
   {
     "name": "N13",
     "center": [
-      80.473494,
-      16.524005
+      80.475084,
+      16.534608
     ],
     "bbox": [
-      80.473494,
-      16.486529,
-      80.473494,
-      16.56148
+      80.474594,
+      16.481042,
+      80.475574,
+      16.588175
     ],
-    "length_km": 8.32,
+    "length_km": 11.89,
     "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.473494,
-    "category": "major arterial",
     "row_m": 60,
+    "source": "APCRDA trunk road network",
+    "category": "major arterial",
     "lane_pattern": "3+3+3",
     "brt_present": true,
     "connects_nh16": false,
     "confidence": "B",
     "remarks": "Major arterial; elevated corridor (with E5, E13)",
     "meets": [
+      "E1",
       "E2",
       "E3",
       "E4",
+      "E5",
       "E6",
       "E7",
+      "E8",
       "E9"
     ]
   },
   {
     "name": "N14",
     "center": [
-      80.463288,
-      16.524954
+      80.464274,
+      16.523352
     ],
     "bbox": [
-      80.463288,
-      16.487702,
-      80.463288,
-      16.562206
+      80.463791,
+      16.486657,
+      80.464757,
+      16.560047
     ],
-    "length_km": 8.27,
+    "length_km": 8.15,
     "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.463288,
-    "category": "sub-arterial",
     "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
     "lane_pattern": "2+2+2",
     "brt_present": false,
     "connects_nh16": false,
     "confidence": "A",
     "remarks": "WB EIA: 4-lane, ~8.27km; Borupalem/Abbarajupalem/Thullur/Sakhamuru",
     "meets": [
+      "E1",
       "E2",
       "E3",
       "E4",
-      "E7"
-    ]
-  },
-  {
-    "name": "N15",
-    "center": [
-      80.453081,
-      16.522328
-    ],
-    "bbox": [
-      80.453081,
-      16.486292,
-      80.453081,
-      16.558364
-    ],
-    "length_km": 8,
-    "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.453081,
-    "category": "arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Arterial, 50m ROW (WB EIA)",
-    "meets": [
-      "E2",
-      "E3",
-      "E4",
-      "E7"
-    ]
-  },
-  {
-    "name": "N16",
-    "center": [
-      80.442875,
-      16.505876
-    ],
-    "bbox": [
-      80.442875,
-      16.472723,
-      80.442875,
-      16.539029
-    ],
-    "length_km": 7.36,
-    "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.442875,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": false,
-    "connects_nh16": false,
-    "confidence": "A",
-    "remarks": "WB EIA: 4-lane, ~7.36km; Borupalem/Pichakalapalem/Thullur/Ananthavaram/Nekkallu",
-    "meets": [
-      "E3",
-      "E7"
-    ]
-  },
-  {
-    "name": "N17",
-    "center": [
-      80.432669,
-      16.509884
-    ],
-    "bbox": [
-      80.432669,
-      16.473848,
-      80.432669,
-      16.54592
-    ],
-    "length_km": 8,
-    "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.432669,
-    "category": "arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Arterial section",
-    "meets": [
-      "E7"
-    ]
-  },
-  {
-    "name": "N18",
-    "center": [
-      80.422463,
-      16.499767
-    ],
-    "bbox": [
-      80.422463,
-      16.463731,
-      80.422463,
-      16.535803
-    ],
-    "length_km": 8,
-    "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.422463,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "A",
-    "remarks": "4-lane + 2 BRT confirmed",
-    "meets": []
-  },
-  {
-    "name": "N2",
-    "center": [
-      80.585762,
-      16.502138
-    ],
-    "bbox": [
-      80.585762,
-      16.466102,
-      80.585762,
-      16.538174
-    ],
-    "length_km": 8,
-    "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.585762,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Typical sub-arterial section",
-    "meets": [
-      "E10",
-      "E11"
-    ]
-  },
-  {
-    "name": "N3A",
-    "center": [
-      80.575556,
-      16.497407
-    ],
-    "bbox": [
-      80.575556,
-      16.461371,
-      80.575556,
-      16.533443
-    ],
-    "length_km": 8,
-    "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.575556,
-    "category": "arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Arterial, 50m ROW (WB EIA); Venkatapalem–Krishnayapalem",
-    "meets": [
-      "E10",
-      "E11"
-    ]
-  },
-  {
-    "name": "N3B",
-    "center": [
-      80.570453,
-      16.481071
-    ],
-    "bbox": [
-      80.570453,
-      16.445035,
-      80.570453,
-      16.517107
-    ],
-    "length_km": 8,
-    "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.570453,
-    "category": "arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Arterial, 50m ROW (WB EIA)",
-    "meets": [
-      "E10",
-      "E11",
-      "E12",
-      "E13"
-    ]
-  },
-  {
-    "name": "N4",
-    "center": [
-      80.56535,
-      16.486188
-    ],
-    "bbox": [
-      80.56535,
-      16.453891,
-      80.56535,
-      16.518486
-    ],
-    "length_km": 7.17,
-    "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.56535,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": false,
-    "connects_nh16": false,
-    "confidence": "A",
-    "remarks": "WB EIA: 4-lane, ~7.17km; Penumaka/Nowluru/Krishnayapalem/Venkatapalem",
-    "meets": [
-      "E7",
-      "E10",
-      "E11",
-      "E12"
-    ]
-  },
-  {
-    "name": "N5",
-    "center": [
-      80.555144,
-      16.480913
-    ],
-    "bbox": [
-      80.555144,
-      16.444877,
-      80.555144,
-      16.516949
-    ],
-    "length_km": 8,
-    "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.555144,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Typical sub-arterial section",
-    "meets": [
-      "E7",
-      "E10",
-      "E11",
-      "E12",
-      "E13"
-    ]
-  },
-  {
-    "name": "N6",
-    "center": [
-      80.544937,
-      16.477449
-    ],
-    "bbox": [
-      80.544937,
-      16.435289,
-      80.544937,
-      16.51961
-    ],
-    "length_km": 9.36,
-    "orientation": "N-S",
-    "surveyed": false,
-    "axis": 80.544937,
-    "category": "major arterial",
-    "row_m": 60,
-    "lane_pattern": "3+3+3",
-    "brt_present": true,
-    "connects_nh16": true,
-    "confidence": "B",
-    "remarks": "Major arterial; proposed NH-16 bypass",
-    "meets": [
-      "E7",
-      "E10",
-      "E11",
-      "E12",
-      "E13",
-      "E14"
-    ]
-  },
-  {
-    "name": "N7",
-    "center": [
-      80.536374,
-      16.496049
-    ],
-    "bbox": [
-      80.5333042,
-      16.4690114,
-      80.5394443,
-      16.5230868
-    ],
-    "length_km": 6.2,
-    "orientation": "N-S",
-    "surveyed": true,
-    "axis": 80.535728,
-    "category": "sub-arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Typical sub-arterial section",
-    "meets": [
-      "E7",
-      "E8",
-      "E10",
-      "E11"
-    ]
-  },
-  {
-    "name": "N8",
-    "center": [
-      80.523734,
-      16.498941
-    ],
-    "bbox": [
-      80.5232069,
-      16.4862719,
-      80.5242613,
-      16.5116099
-    ],
-    "length_km": 2.55,
-    "orientation": "N-S",
-    "surveyed": true,
-    "axis": 80.52346,
-    "category": "arterial",
-    "row_m": 50,
-    "lane_pattern": "2+2+2",
-    "brt_present": true,
-    "connects_nh16": false,
-    "confidence": "B",
-    "remarks": "Arterial; in trunk tender package",
-    "meets": [
+      "E5",
+      "E6",
       "E7",
       "E8",
       "E9"
     ]
   },
   {
-    "name": "N9",
+    "name": "N15",
     "center": [
-      80.519364,
-      16.499668
+      80.457837,
+      16.524286
     ],
     "bbox": [
-      80.5136274,
-      16.4578183,
-      80.5250998,
-      16.5415167
+      80.455791,
+      16.486257,
+      80.459882,
+      16.562315
     ],
-    "length_km": 11.03,
+    "length_km": 8.44,
     "orientation": "N-S",
-    "surveyed": true,
-    "axis": 80.514037,
-    "category": "sub-arterial",
     "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
     "lane_pattern": "2+2+2",
     "brt_present": true,
     "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Arterial, 50m ROW (WB EIA)",
+    "meets": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
+      "E7",
+      "E8",
+      "E9"
+    ]
+  },
+  {
+    "name": "N16",
+    "center": [
+      80.448377,
+      16.517847
+    ],
+    "bbox": [
+      80.443992,
+      16.480474,
+      80.452762,
+      16.55522
+    ],
+    "length_km": 8.3,
+    "orientation": "N-S",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": false,
+    "connects_nh16": false,
     "confidence": "A",
-    "remarks": "WB EIA: 4-lane + 2 BRT, ~12.5km; Nidamarru/Kuragallu/Mandadam/Malkapuram/Velagapudi",
+    "remarks": "WB EIA: 4-lane, ~7.36km; Borupalem/Pichakalapalem/Thullur/Ananthavaram/Nekkallu",
+    "meets": [
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
+      "E7",
+      "E8",
+      "E9"
+    ]
+  },
+  {
+    "name": "N17",
+    "center": [
+      80.43656,
+      16.51268
+    ],
+    "bbox": [
+      80.436036,
+      16.480757,
+      80.437084,
+      16.544602
+    ],
+    "length_km": 7.09,
+    "orientation": "N-S",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "B",
+    "remarks": "Arterial section",
     "meets": [
       "E3",
       "E4",
@@ -1047,8 +1157,35 @@
       "E6",
       "E7",
       "E8",
-      "E9",
-      "E11"
+      "E9"
+    ]
+  },
+  {
+    "name": "N18",
+    "center": [
+      80.425011,
+      16.496343
+    ],
+    "bbox": [
+      80.424691,
+      16.486553,
+      80.425331,
+      16.506134
+    ],
+    "length_km": 2.17,
+    "orientation": "N-S",
+    "row_m": 50,
+    "source": "APCRDA trunk road network",
+    "category": "sub-arterial",
+    "lane_pattern": "2+2+2",
+    "brt_present": true,
+    "connects_nh16": false,
+    "confidence": "A",
+    "remarks": "4-lane + 2 BRT confirmed",
+    "meets": [
+      "E7",
+      "E8",
+      "E9"
     ]
   }
 ]
