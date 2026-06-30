@@ -247,6 +247,39 @@ export function getColorForSymbology(symbology) {
   return SYMBOLOGY_COLOR_MAP[symbology] || '#BDBDBD'
 }
 
+/**
+ * Official zone names — APCRDA 2015 Zoning Regulations (docs/zoning plan).
+ * Keyed by the land-use code (lu_code) prefix of a plot's symbology. Used to show
+ * the authoritative zone name in the UI instead of the raw, inconsistent symbology.
+ */
+export const ZONE_NAMES = {
+  R1: 'R1 · Village Planning Zone', R2: 'R2 · Low Density Zone',
+  R3: 'R3 · Medium to High Density Zone', R4: 'R4 · High Density Zone',
+  R5: 'R5 · Affordable / EWS Housing Zone',
+  C1: 'C1 · Mixed Use Zone', C2: 'C2 · General Commercial Zone',
+  C3: 'C3 · Neighbourhood Centre Zone', C4: 'C4 · Town Centre Zone',
+  C5: 'C5 · Regional Centre Zone', C6: 'C6 · Central Business District Zone',
+  I1: 'I1 · Business Park Zone', I2: 'I2 · Logistics Zone', I3: 'I3 · Non-polluting Industry Zone',
+  P1: 'P1 · Passive (Parks) Zone', P2: 'P2 · Active Recreation Zone', P3: 'P3 · Protected Zone',
+  S1: 'S1 · Government Zone', S2: 'S2 · Education Zone', S3: 'S3 · Special Zone',
+  U1: 'U1 · Reserve Zone', U2: 'U2 · Road Reserve Zone',
+  RAA: 'Road Affected Area', BG: 'Burial Ground', PGN: 'Green / Walkway',
+}
+
+// Extract the land-use code from a symbology string ("R3-Medium…" → "R3",
+// "SC1a-Mixed Use" → special; "PGN-G" → "PGN") and return the official zone name.
+export function getZoneName(symbology) {
+  if (!symbology) return null
+  const s = symbology.trim()
+  if (/vacant/i.test(s)) return s.replace(/\s+/g, ' ')           // "Residential Vacant" etc.
+  if (/^Burial/i.test(s)) return ZONE_NAMES.BG
+  if (/^PGN/i.test(s)) return ZONE_NAMES.PGN
+  if (/^RAA/i.test(s)) return ZONE_NAMES.RAA
+  const m = s.match(/^S?([RCISPU])\s?(\d)([ab])?/i)              // R3, C2, SS2a, SR4, SU2…
+  const code = m ? (m[1] + m[2]).toUpperCase() : null
+  return (code && ZONE_NAMES[code]) || s.replace(/\s+/g, ' ')
+}
+
 export function getGroupForSymbology(symbology) {
   return SYMBOLOGY_GROUP_MAP[symbology] || 'unknown'
 }
@@ -312,61 +345,30 @@ export function buildRoadReserveFilter() {
   ]
 }
 
-// Allocated lands categories
+/**
+ * Allotted-land categories — the authoritative APCRDA category field
+ * (LandAllotmentsFeb2025, cleaned in pipeline/08_allotments.mjs). No more keyword
+ * guessing: an allotment is a NAMED institution sitting on a zoned plot.
+ */
 export const ALLOCATED_LAND_CATEGORIES = {
-  education: {
-    label: 'Education',
-    color: '#FF9800',
-    keywords: ['School', 'IGNOU', 'VIT', 'SRM', 'Amrita', 'BITS', 'BES', 'XAVIER', 'Podar', 'CSI', 'DAV', 'Basil Wood', 'Law University', 'Chinmaya Mission School', 'KV-2', 'NID'],
-  },
-  health: {
-    label: 'Health',
-    color: '#F44336',
-    keywords: ['Health Center', 'Primary Health', 'Basavatarakam', 'ESIC'],
-  },
-  civic: {
-    label: 'Civic & Social',
-    color: '#9C27B0',
-    keywords: ['Anganwadi', 'Multi Faith Funeral', 'Ramakrishna Mission'],
-  },
-  government: {
-    label: 'Government',
-    color: '#D32F2F',
-    keywords: ['IGC', 'APCRDA', 'CAG', 'CPWD', 'SDPO', 'DOP', 'Bureau of Immigration', 'Income Tax', 'CBI', 'VIDESH BHAVAN', 'BJP', 'AIS'],
-  },
-  financial: {
-    label: 'Financial',
-    color: '#1976D2',
-    keywords: ['SBI', 'BOI', 'BOB', 'CANARA', 'LIC', 'NIACL', 'Reserve Bank', 'NABARD', 'Coastal Bank', 'INB', 'UBI', 'AP Grameena', 'SIB', 'Central Bannk', 'HUDCO', 'APCOB'],
-  },
-  infrastructure: {
-    label: 'Infrastructure & PSU',
-    color: '#455A64',
-    keywords: ['400KV', 'BPCL', 'GAIL', 'HPCL', 'IRCTC', 'IRCS', 'L&T', 'QuantumValley', 'APTIDCO', 'CITD', 'APSDRFSD', 'APNART'],
-  },
-  sports: {
-    label: 'Sports',
-    color: '#4CAF50',
-    keywords: ['Gopichand', 'Cricket Academy', 'TTD', 'NSM'],
-  },
-  private: {
-    label: 'Private & Commercial',
-    color: '#607D8B',
-    keywords: ['SPLENDOR', 'MALAXMI', 'GRT', 'MANJEERA', 'SOUTHERN', 'VARUN', 'GPHRL', 'GLENDALE', 'SFSL', 'INDROYAL', 'JRGR', 'DASAPAllA', 'BISER', 'G.V. Estates', 'K. Srikanth', 'PV Sindhu', 'LVPEI'],
-  },
+  'Govt of India': '#D32F2F',
+  'Govt of India (PSU)': '#E57373',
+  'Govt of AP': '#F4511E',
+  'Govt of AP (PSU)': '#FF8A65',
+  'University': '#1976D2',
+  'School': '#42A5F5',
+  'Healthcare': '#00897B',
+  'Sports': '#43A047',
+  'Spiritual / Religious': '#8E24AA',
+  'Hotel': '#FB8C00',
+  'PPP / Private': '#607D8B',
+  'Housing': '#6D4C41',
+  'Other allotment': '#90A4AE',
+  'Other': '#90A4AE',
 }
 
-export function categorizeAllocatedLand(label) {
-  if (!label) return 'private'
-  const upper = label.toUpperCase()
-  for (const [catKey, cat] of Object.entries(ALLOCATED_LAND_CATEGORIES)) {
-    for (const keyword of cat.keywords) {
-      if (upper.includes(keyword.toUpperCase())) {
-        return catKey
-      }
-    }
-  }
-  return 'private'
+export function getAllocatedLandColor(category) {
+  return ALLOCATED_LAND_CATEGORIES[category] || '#FF6F00'
 }
 
 /**

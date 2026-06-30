@@ -1,6 +1,6 @@
 import React from 'react'
 import useMapStore from '../../stores/mapStore'
-import { getColorForSymbology, getGroupForSymbology, ZONING_GROUPS } from '../../utils/colors'
+import { getColorForSymbology, getGroupForSymbology, ZONING_GROUPS, getZoneName, getAllocatedLandColor } from '../../utils/colors'
 import { formatArea, formatDimensions, formatFarmerName, formatNeighbour } from '../../utils/formatters'
 import { getRoadType, getROW, getRoadData, getLanePattern } from '../../utils/roadAttributes'
 import { NAMED_ROAD_COLOR } from '../../utils/constants'
@@ -21,8 +21,8 @@ export default function PlotDetailPanel({ plot, onClose }) {
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-4 h-4 rounded" style={{ backgroundColor: '#FF6F00' }} />
-                <span className="text-xs font-medium text-[var(--text-2)]">Allocated Land</span>
+                <div className="w-4 h-4 rounded" style={{ backgroundColor: getAllocatedLandColor(plot.category) }} />
+                <span className="text-xs font-medium text-[var(--text-2)]">Allotted institution</span>
               </div>
               <h2 className="text-lg font-bold text-[var(--text-1)]">{plot.name}</h2>
             </div>
@@ -30,10 +30,13 @@ export default function PlotDetailPanel({ plot, onClose }) {
           </div>
         </div>
         <div className="flex-1 overflow-y-auto panel-scroll px-5 py-4 space-y-5">
-          <Section title="Details">
+          <Section title="Allotment">
             <InfoGrid items={[
               { label: 'Category', value: plot.category },
+              { label: 'FSI', value: plot.fsi },
+              { label: 'On zone', value: plot.zoning ? getZoneName(plot.zoning) : undefined },
             ]} />
+            <p className="text-[10px] text-[var(--text-3)] mt-1.5">A named entity allotted this land. The plot's zoning district is shown above; the institution is the allotment on it.</p>
           </Section>
           {googleMapsLink && (
             <Section title="External Links">
@@ -112,14 +115,14 @@ export default function PlotDetailPanel({ plot, onClose }) {
       {/* Content */}
       <div className="flex-1 overflow-y-auto panel-scroll px-5 py-4 space-y-5">
 
-        {/* Zoning */}
+        {/* Zoning — official APCRDA 2015 zone name */}
         <Section title="Zoning">
           <div className="flex items-center gap-2">
             <div
-              className="w-5 h-5 rounded border border-[var(--border)]"
+              className="w-5 h-5 rounded border border-[var(--border)] flex-shrink-0"
               style={{ backgroundColor: color }}
             />
-            <span className="text-sm text-[var(--text-1)]">{plot.symbology || 'N/A'}</span>
+            <span className="text-sm text-[var(--text-1)]">{getZoneName(plot.symbology) || 'N/A'}</span>
           </div>
         </Section>
 

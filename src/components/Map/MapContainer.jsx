@@ -4,7 +4,7 @@ import { Protocol } from 'pmtiles'
 import useMapStore, { LoadingStage } from '../../stores/mapStore'
 import { MAP_CENTER, MAP_ZOOM, MAP_MIN_ZOOM, MAP_MAX_ZOOM, MAP_STYLE, DATA_PATHS, LAYERS } from '../../utils/constants'
 import {
-  buildFilteredColorExpression, buildAreaHeatmapExpression, categorizeAllocatedLand,
+  buildFilteredColorExpression, buildAreaHeatmapExpression,
 } from '../../utils/colors'
 import {
   getPlotFillLayer, getPlotOutlineLayer, getPlotHighlightLayer, getRoadModeOverlayLayer,
@@ -183,10 +183,10 @@ export default function MapContainer() {
         const hit = map.queryRenderedFeatures(e.point, { layers: [LAYERS.ALLOCATED_LANDS] })
         const labelled = hit.find((h) => h.properties?.label)
         if (labelled) {
-          const label = labelled.properties.label
+          const props = labelled.properties
           store.selectPlot({
-            _type: 'landmark', name: label,
-            category: categorizeAllocatedLand(label),
+            _type: 'landmark', name: props.label,
+            category: props.category, zoning: props.zoning, fsi: props.fsi,
             lat: e.lngLat.lat, lon: e.lngLat.lng,
           })
           if (map.getLayer(LAYERS.PLOTS_HIGHLIGHT)) map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['get', 'pid'], -1])
