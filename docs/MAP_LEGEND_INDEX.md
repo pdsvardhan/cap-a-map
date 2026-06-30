@@ -82,11 +82,12 @@ NOT a separate land-use. Categories (count):
 ### E. ADMINISTRATIVE BOUNDARIES & REGIONS
 - Capital Planning Boundary (1) · AGC (Govt Complex) Boundary · Seed Capital Boundary
 - Authentic hierarchy: Townships (28) · **Sectors (145, official)** · Colony (571) · Blocks (3,767) · Villages (27)
-- **Custom grid Region (NEW):** each cell bounded by two adjacent N roads (W–E) and two
-  adjacent E roads (S–N), given a short derived code (format being finalised; e.g.
-  `Grid 7·3` = the cell between N7–N8 and E3–E4). This is a site-custom "region" used for
-  identification/search. Needs a subtle boundary + label treatment that doesn't fight the
-  zoning fills. (Distinct from the 145 official Sectors above.)
+- **Custom grid Region — "Node" (NEW):** each cell bounded by two adjacent N roads (W–E)
+  and two adjacent E roads (S–N), labelled **`Node {lowerN}·{lowerE}`** — e.g.
+  `Node 7·3` = the cell between N7–N8 and E3–E4 (`Node 12·10` at two-digit edges; the dot
+  disambiguates). Bounding roads shown on click. A site-custom region for orientation/
+  search — distinct from the 145 official APCRDA Sectors. Needs a subtle cell-boundary +
+  small code-label treatment that doesn't fight the zoning fills.
 
 ### F. SPECIAL AREAS (context overlays / scoring anchors)
 - Amaravati Government Complex (AGC) · Seed Capital Area · Industrial Area · Land for
