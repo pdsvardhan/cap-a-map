@@ -1,3 +1,5 @@
+import { CANVAS_BG } from './designTokens'
+
 // Amaravati Capital City center coordinates
 export const MAP_CENTER = [80.50, 16.505]
 export const MAP_ZOOM = 12
@@ -14,7 +16,7 @@ export const MAP_STYLE = {
   glyphs: 'https://tiles.basemaps.cartocdn.com/fonts/{fontstack}/{range}.pbf',
   sources: {},
   layers: [
-    { id: 'background', type: 'background', paint: { 'background-color': '#0a0d12' } },
+    { id: 'background', type: 'background', paint: { 'background-color': CANVAS_BG } },
   ],
 }
 

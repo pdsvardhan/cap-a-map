@@ -1,8 +1,9 @@
 /**
  * Zoning color scheme for Amaravati Capital City plots.
- * Colors match official ArcGIS APCRDA Land Pooling Scheme renderer.
- * Source: layers_metadata.json → Layer 7 (LPSVILLAGE) uniqueValueInfos
+ * Fill colours now come from the active design direction (designTokens.js); the
+ * ZONING_GROUPS structure below is retained for the legend grouping + labels.
  */
+import { colorForSymbology, IS_LIGHT } from './designTokens'
 
 export const ZONING_GROUPS = {
   'residential-high': {
@@ -284,29 +285,19 @@ export function getGroupForSymbology(symbology) {
   return SYMBOLOGY_GROUP_MAP[symbology] || 'unknown'
 }
 
-/**
- * Road-reserve fill tone. Road reserves ARE the entire street grid, so they
- * tile most of the developed core. A near-black fill made the whole map read
- * as black when zoomed out (owner feedback 2026-06-30). A recessive slate-grey
- * reads as "pavement", lets the coloured zoning dominate, and stays clearly
- * darker than every plot colour so it recedes.
- */
-export const ROAD_RESERVE_FILL = '#363B45'
+// Muted fill for zoning categories the user has filtered OUT (theme-aware).
+const MUTED_FILL = IS_LIGHT ? 'rgba(20,18,12,0.08)' : 'rgba(255,255,255,0.08)'
 
 /**
- * Build a MapLibre match expression for fill-color based on symbology.
- * Road-reserve (U2/SU2) gets a recessive slate fill (see ROAD_RESERVE_FILL).
+ * Build a MapLibre match expression for fill-color based on symbology, using the
+ * ACTIVE design direction's per-zone colours (src/utils/designTokens.js).
  */
 export function buildSymbologyColorExpression() {
   const expr = ['match', ['get', 'symbology']]
-  for (const [sym, color] of Object.entries(SYMBOLOGY_COLOR_MAP)) {
-    if (color === 'transparent') {
-      expr.push(sym, ROAD_RESERVE_FILL)
-    } else {
-      expr.push(sym, color)
-    }
+  for (const sym of Object.keys(SYMBOLOGY_COLOR_MAP)) {
+    expr.push(sym, colorForSymbology(sym))
   }
-  expr.push('#BDBDBD') // default fallback
+  expr.push(colorForSymbology(null)) // default fallback
   return expr
 }
 
@@ -480,13 +471,9 @@ export function buildFilteredColorExpression(activeGroups) {
   for (const [groupKey, group] of Object.entries(ZONING_GROUPS)) {
     const isActive = activeGroups.has(groupKey)
     for (const sym of group.symbologies) {
-      if (group.color === 'transparent') {
-        expr.push(sym, ROAD_RESERVE_FILL)
-      } else {
-        expr.push(sym, isActive ? group.color : 'rgba(255,255,255,0.08)')
-      }
+      expr.push(sym, isActive ? colorForSymbology(sym) : MUTED_FILL)
     }
   }
-  expr.push('rgba(255,255,255,0.08)')
+  expr.push(MUTED_FILL)
   return expr
 }

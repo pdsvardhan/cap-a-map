@@ -1,5 +1,11 @@
-import { LAYERS, NAMED_ROAD_COLOR, NAMED_ROAD_OUTLINE, PLOTS_SOURCE, PLOTS_SOURCE_LAYER } from '../../../utils/constants'
+import { LAYERS, PLOTS_SOURCE, PLOTS_SOURCE_LAYER } from '../../../utils/constants'
 import { buildSymbologyColorExpression, ROAD_RESERVE_SYMBOLOGIES, buildRoadReserveFilter } from '../../../utils/colors'
+import { ROAD, WATER_FILL, IS_LIGHT } from '../../../utils/designTokens'
+
+// Theme-aware tones for outlines / highlights / road edges.
+const PLOT_OUTLINE = IS_LIGHT ? 'rgba(40,33,20,0.22)' : '#20242C'
+const ROAD_EDGE = IS_LIGHT ? 'rgba(18,12,4,0.45)' : (ROAD.casing || '#23262E')
+const HIGHLIGHT = IS_LIGHT ? '#0f0d09' : '#FFFFFF'
 
 export function getPlotFillLayer() {
   return {
@@ -25,7 +31,7 @@ export function getPlotOutlineLayer() {
     paint: {
       // Softer-than-black so the border mesh never reads as a black wash; held
       // at width 0 below z13 so zoomed-out views show pure colour, no mesh.
-      'line-color': '#20242C',
+      'line-color': PLOT_OUTLINE,
       'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0, 13, 0, 14, 0.4, 16, 0.9, 19, 1.8],
       'line-opacity': [
         'case',
@@ -43,7 +49,7 @@ export function getPlotHighlightLayer() {
     type: 'line',
     source: PLOTS_SOURCE,
     'source-layer': PLOTS_SOURCE_LAYER,
-    paint: { 'line-color': '#FFFFFF', 'line-width': 3, 'line-opacity': 1 },
+    paint: { 'line-color': HIGHLIGHT, 'line-width': 3, 'line-opacity': 1 },
     filter: ['==', ['get', 'pid'], -1],
   }
 }
@@ -68,7 +74,7 @@ export function getNamedRoadsFillLayer() {
     type: 'fill',
     source: 'namedRoads',
     paint: {
-      'fill-color': NAMED_ROAD_COLOR,
+      'fill-color': ROAD.color,
       'fill-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0.7, 14, 0.78, 18, 0.85],
     },
   }
@@ -81,7 +87,7 @@ export function getNamedRoadsOutlineLayer() {
     type: 'line',
     source: 'namedRoads',
     paint: {
-      'line-color': NAMED_ROAD_OUTLINE,
+      'line-color': ROAD_EDGE,
       'line-width': ['interpolate', ['linear'], ['zoom'], 11, 0.4, 14, 0.8, 17, 1.4, 19, 2],
       'line-opacity': 0.85,
     },
@@ -96,7 +102,7 @@ export function getNamedRoadsHighlightLayer() {
     source: 'namedRoads',
     layout: { 'line-cap': 'round', 'line-join': 'round' },
     paint: {
-      'line-color': '#FFFFFF',
+      'line-color': HIGHLIGHT,
       'line-width': ['interpolate', ['linear'], ['zoom'], 11, 2, 14, 3.5, 17, 6, 19, 9],
       'line-opacity': 1,
     },
@@ -130,7 +136,7 @@ export function getWaterFillLayer() {
     id: LAYERS.WATER,
     type: 'fill',
     source: 'water',
-    paint: { 'fill-color': '#15405f', 'fill-opacity': 0.9 },
+    paint: { 'fill-color': WATER_FILL, 'fill-opacity': 0.9 },
   }
 }
 
