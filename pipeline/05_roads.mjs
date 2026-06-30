@@ -1,4 +1,10 @@
 /**
+ * ⚠️ DEPRECATED 2026-06-30 — superseded by pipeline/06_roads_grid.mjs (adr-001).
+ * The segId seed mapping this stage relies on drifted after the data re-clean
+ * (positional indices), and a few seeds land on city-wide aggregate polygons, so
+ * its output was geometrically wrong (owner feedback). Kept for reference only;
+ * not part of the build. Named roads now come from OSM-anchored grid-model fusion.
+ *
  * Pipeline stage 05 — NAMED ROADS (offline, denoised)
  *
  * The old in-browser builder over-propagated road names (loose corridor

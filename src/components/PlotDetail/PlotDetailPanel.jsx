@@ -3,7 +3,7 @@ import useMapStore from '../../stores/mapStore'
 import { getColorForSymbology, getGroupForSymbology, ZONING_GROUPS } from '../../utils/colors'
 import { formatArea, formatDimensions, formatFarmerName, formatNeighbour } from '../../utils/formatters'
 import { getRoadType, getROW, getRoadData, getLanePattern } from '../../utils/roadAttributes'
-import { NAMED_ROAD_CATEGORY_COLORS } from '../../utils/constants'
+import { NAMED_ROAD_COLOR } from '../../utils/constants'
 
 export default function PlotDetailPanel({ plot, onClose }) {
   const namedRoadsIndex = useMapStore((s) => s.namedRoadsIndex)
@@ -225,7 +225,7 @@ function InfoGrid({ items }) {
 }
 
 function RoadInfoPanel({ plot, onClose }) {
-  const color = NAMED_ROAD_CATEGORY_COLORS[plot.category] || NAMED_ROAD_CATEGORY_COLORS.other
+  const color = NAMED_ROAD_COLOR
   const meets = plot.meets || []
   return (
     <div className="glass absolute z-20 flex flex-col animate-slide-in inset-x-0 bottom-0 h-[72%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-[380px] sm:h-full sm:rounded-t-none sm:border-l">
@@ -261,12 +261,15 @@ function RoadInfoPanel({ plot, onClose }) {
             </div>
           </Section>
         )}
-        <Section title="Mapping coverage">
+        <Section title="Geometry">
           <InfoGrid items={[
-            { label: 'Mapped segments', value: plot.segCount },
-            { label: 'Verified seeds', value: plot.seedCount },
+            { label: 'Length', value: plot.length_km != null ? `${plot.length_km} km` : undefined },
+            { label: 'Source', value: plot.surveyed ? 'Surveyed (OSM)' : 'Planned (grid model)' },
             { label: 'Confidence', value: plot.confidence },
           ]} />
+          {!plot.surveyed && (
+            <p className="text-[10px] text-[var(--text-3)] mt-1.5">Centre-line modelled on the calibrated 1 km grid; not yet field-surveyed.</p>
+          )}
         </Section>
         {plot.remarks && (
           <Section title="Notes"><p className="text-sm text-[var(--text-2)]">{plot.remarks}</p></Section>

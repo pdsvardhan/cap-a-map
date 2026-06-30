@@ -1,6 +1,13 @@
 # Named-Roads Rebuild Plan — real-source centerlines
 
-**Status:** planned (decision = adr-001-roads-from-osm-centerlines)
+**Status:** ✅ IMPLEMENTED 2026-06-30 — `pipeline/06_roads_grid.mjs` (grid-model fusion).
+Phases A+B were delivered together as one calibrated grid model rather than sequentially.
+Result: 35 roads (N1–N18 incl N3A/N3B, E1–E16) — 8 surveyed from OSM geometry, 27 modelled
+on the calibrated 1 km grid (N 1.07 km/step, E 1.05 km/step; anchor residuals ≤160 m),
+each clipped to plot road-reserve extent + roadAttributes length, rendered as single-colour
+cased lines with a dashed centre marking. Panel shows length + surveyed/modelled + confidence.
+
+**Original status:** planned (decision = adr-001-roads-from-osm-centerlines)
 **Owner feedback that triggered it:** 2026-06-30 comment-tool #2/#3/#4 (roads "behave weird", N8 edge-to-edge, E4 not grid-aligned) + #6 (single colour).
 **Supersedes:** the derive-from-plot-polygons approach (`pipeline/05_roads.mjs` + `src/utils/roadSegmentMapping.js` seeds).
 

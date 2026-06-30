@@ -1,7 +1,8 @@
-import { LAYERS, NAMED_ROAD_COLOR_MATCH, NAMED_ROAD_FALLBACK, PLOTS_SOURCE, PLOTS_SOURCE_LAYER } from '../../../utils/constants'
-
-const roadCategoryColor = ['match', ['get', 'roadCategory'], ...NAMED_ROAD_COLOR_MATCH, NAMED_ROAD_FALLBACK]
+import { LAYERS, NAMED_ROAD_COLOR, NAMED_ROAD_CASING, NAMED_ROAD_MARKING, PLOTS_SOURCE, PLOTS_SOURCE_LAYER } from '../../../utils/constants'
 import { buildSymbologyColorExpression, ROAD_RESERVE_SYMBOLOGIES, buildRoadReserveFilter } from '../../../utils/colors'
+
+// Shared zoom→width ramp for the named-road carriageway line.
+const ROAD_LINE_WIDTH = ['interpolate', ['linear'], ['zoom'], 11, 1.2, 14, 2.6, 17, 6, 19, 11]
 
 export function getPlotFillLayer() {
   return {
@@ -62,24 +63,45 @@ export function getRoadModeOverlayLayer() {
   }
 }
 
-export function getNamedRoadsFillLayer() {
+// Dark bed under the carriageway — gives the line separation from plot fills.
+export function getNamedRoadsCasingLayer() {
   return {
-    id: LAYERS.NAMED_ROADS_FILL,
-    type: 'fill',
+    id: LAYERS.NAMED_ROADS_CASING,
+    type: 'line',
     source: 'namedRoads',
-    paint: { 'fill-color': roadCategoryColor, 'fill-opacity': 0.85 },
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': NAMED_ROAD_CASING,
+      'line-width': ['interpolate', ['linear'], ['zoom'], 11, 2.6, 14, 4.6, 17, 9, 19, 15],
+      'line-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0.5, 13, 0.9],
+    },
   }
 }
 
-export function getNamedRoadsOutlineLayer() {
+// The carriageway — ONE colour for every named road (owner feedback #6).
+export function getNamedRoadsLineLayer() {
   return {
-    id: LAYERS.NAMED_ROADS_OUTLINE,
+    id: LAYERS.NAMED_ROADS_LINE,
     type: 'line',
     source: 'namedRoads',
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: { 'line-color': NAMED_ROAD_COLOR, 'line-width': ROAD_LINE_WIDTH, 'line-opacity': 0.95 },
+  }
+}
+
+// Dashed centre marking — the "marking" that distinguishes roads instead of colour.
+export function getNamedRoadsMarkingLayer() {
+  return {
+    id: LAYERS.NAMED_ROADS_MARKING,
+    type: 'line',
+    source: 'namedRoads',
+    minzoom: 13,
+    layout: { 'line-cap': 'butt', 'line-join': 'round' },
     paint: {
-      'line-color': roadCategoryColor,
-      'line-width': ['interpolate', ['linear'], ['zoom'], 12, 1, 16, 2, 19, 3.5],
-      'line-opacity': 1,
+      'line-color': NAMED_ROAD_MARKING,
+      'line-width': ['interpolate', ['linear'], ['zoom'], 13, 0.6, 17, 1.4, 19, 2.2],
+      'line-dasharray': [2, 3],
+      'line-opacity': 0.9,
     },
   }
 }
@@ -89,7 +111,12 @@ export function getNamedRoadsHighlightLayer() {
     id: LAYERS.NAMED_ROADS_HIGHLIGHT,
     type: 'line',
     source: 'namedRoads',
-    paint: { 'line-color': '#FFFFFF', 'line-width': 3, 'line-opacity': 1 },
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': '#FFFFFF',
+      'line-width': ['interpolate', ['linear'], ['zoom'], 11, 3, 14, 5.5, 17, 11, 19, 18],
+      'line-opacity': 1,
+    },
     filter: ['==', ['get', 'roadName'], ''],
   }
 }

@@ -10,7 +10,8 @@ import {
   getPlotFillLayer, getPlotOutlineLayer, getPlotHighlightLayer, getRoadModeOverlayLayer,
   getWaterFillLayer,
   getAllocatedLandsFillLayer, getAllocatedLandsOutlineLayer, getAllocatedLandsLabelsLayer,
-  getNamedRoadsFillLayer, getNamedRoadsOutlineLayer, getNamedRoadsHighlightLayer, getNamedRoadsLabelsLayer,
+  getNamedRoadsCasingLayer, getNamedRoadsLineLayer, getNamedRoadsMarkingLayer,
+  getNamedRoadsHighlightLayer, getNamedRoadsLabelsLayer,
 } from './utils/layerDefinitions'
 
 // PMTiles protocol is global; register once across mounts.
@@ -162,9 +163,11 @@ export default function MapContainer() {
       }
       map.addSource('namedRoads', { type: 'geojson', data: roads })
       map.addSource('namedRoadLabels', { type: 'geojson', data: labels })
-      map.addLayer(getNamedRoadsFillLayer())
-      map.addLayer(getNamedRoadsOutlineLayer())
+      // z-order: white highlight halo (bottom) → casing → carriageway → dashed marking → labels
       map.addLayer(getNamedRoadsHighlightLayer())
+      map.addLayer(getNamedRoadsCasingLayer())
+      map.addLayer(getNamedRoadsLineLayer())
+      map.addLayer(getNamedRoadsMarkingLayer())
       map.addLayer(getNamedRoadsLabelsLayer())
     } catch (e) { /* non-fatal */ }
   }
@@ -192,9 +195,11 @@ export default function MapContainer() {
         }
       }
 
-      // named roads (overlay) take precedence over the plot beneath
-      if (map.getLayer(LAYERS.NAMED_ROADS_FILL)) {
-        const rd = map.queryRenderedFeatures(e.point, { layers: [LAYERS.NAMED_ROADS_FILL] })[0]
+      // named roads (overlay) take precedence over the plot beneath.
+      // Lines are thin — query a small box around the click so they're easy to hit.
+      if (map.getLayer(LAYERS.NAMED_ROADS_LINE)) {
+        const p = e.point, box = [[p.x - 6, p.y - 6], [p.x + 6, p.y + 6]]
+        const rd = map.queryRenderedFeatures(box, { layers: [LAYERS.NAMED_ROADS_LINE] })[0]
         if (rd) {
           const name = rd.properties.roadName
           const meta = useMapStore.getState().namedRoadsIndex.find((r) => r.name === name) || {}
@@ -214,11 +219,12 @@ export default function MapContainer() {
     })
 
     map.on('mousemove', (e) => {
-      const ids = [LAYERS.NAMED_ROADS_FILL, LAYERS.PLOTS_FILL]
+      const ids = [LAYERS.NAMED_ROADS_LINE, LAYERS.PLOTS_FILL]
       if (allocatedRef.current) ids.unshift(LAYERS.ALLOCATED_LANDS)
       const layers = existing(ids)
       if (!layers.length) { map.getCanvas().style.cursor = ''; return }
-      const feats = map.queryRenderedFeatures(e.point, { layers })
+      const p = e.point, box = [[p.x - 6, p.y - 6], [p.x + 6, p.y + 6]]
+      const feats = map.queryRenderedFeatures(box, { layers })
       map.getCanvas().style.cursor = feats.length ? 'pointer' : ''
     })
   }
