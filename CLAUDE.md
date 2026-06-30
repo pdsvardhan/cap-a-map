@@ -1,15 +1,22 @@
 # Capital of Amaravati (cap-a)
 
 ## Status
-- **Current Step:** 3 (Build)
-- **Current Sub-Step:** Code modernization in progress
+- **Current Step:** 3 (Build) — full rebuild on branch `rebuild`
+- **Current Sub-Step:** Foundation (L0) + roads (L1) + polish done; owner testing pass; next = scoring engine (L2–L4)
 - **Step Status:** in-progress
-- **Last Session:** 2026-03-20
-- **Next Action:** Complete MapContainer decomposition, PMTiles migration, mobile responsiveness
+- **Last Session:** 2026-06-30
+- **Next Action:** Owner testing via in-app comment tool (press `c`) → read `feedback/` and fix; then build the valuation/scoring engine
 - **Blockers:** None
 - **Your Action Needed:** No
 - **Action Description:** —
 - **Action Type:** —
+
+> **⚠️ This file's lower sections are pre-rebuild and partly stale.** The 2026-06 rebuild reframed the product as an **intelligent land-value explorer** (not just a map). Source of truth:
+> - `docs/UNDERSTANDING.md` — confirmed vision, data reality, scoring model (the canonical doc)
+> - `docs/BUILD_PLAN.md` — sequenced offline-pipeline → thin-client plan (P0–P9)
+> - `docs/AMARAVATI_CONTEXT.md` — real-world intelligence base (anchors, roads, exclusions) for the scoring engine
+> - Pipeline `pipeline/01_clean → 02_grid → 03_tiles → 04_indexes → 05_roads` (offline enrichment; app is a thin PMTiles client)
+> - Rebuild commits P0–P5 + polish on branch `rebuild` (14 commits). `wip/prev-agent` holds the prior broken refactor (incl. the 110 road seeds, recovered).
 
 ## Quick Context
 - Stack: Vite 7 + React 19 + MapLibre GL 5.18 + Tailwind CSS v4 + Zustand
