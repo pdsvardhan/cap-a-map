@@ -36,6 +36,11 @@ export const DATA_PATHS = {
 export const PLOTS_SOURCE = 'plots'
 export const PLOTS_SOURCE_LAYER = 'plots'
 
+// Owner/farmer names are personal data. Per the product research (legal/privacy),
+// don't surface them in the public/anonymous view — flip to true only behind
+// authenticated, justified access. Easy single-switch override.
+export const SHOW_OWNER_NAMES = false
+
 // Layer IDs
 export const LAYERS = {
   WATER: 'water-fill',

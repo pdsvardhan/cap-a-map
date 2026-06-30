@@ -3,7 +3,8 @@ import useMapStore from '../../stores/mapStore'
 import { getColorForSymbology, getGroupForSymbology, ZONING_GROUPS, getZoneName, getAllocatedLandColor } from '../../utils/colors'
 import { formatArea, formatDimensions, formatFarmerName, formatNeighbour } from '../../utils/formatters'
 import { getRoadType, getROW, getRoadData, getLanePattern } from '../../utils/roadAttributes'
-import { NAMED_ROAD_COLOR } from '../../utils/constants'
+import { NAMED_ROAD_COLOR, SHOW_OWNER_NAMES } from '../../utils/constants'
+import { computeNode } from '../../utils/regions'
 
 export default function PlotDetailPanel({ plot, onClose }) {
   const namedRoadsIndex = useMapStore((s) => s.namedRoadsIndex)
@@ -79,6 +80,9 @@ export default function PlotDetailPanel({ plot, onClose }) {
     ? `https://www.google.com/maps?q=${plot.lat},${plot.lon}`
     : null
 
+  // Custom site region (the road-grid "Node" cell this plot falls in)
+  const node = computeNode(plot.lon, plot.lat, namedRoadsIndex)
+
   return (
     <div className="glass absolute z-20 flex flex-col animate-slide-in inset-x-0 bottom-0 h-[72%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-[380px] sm:h-full sm:rounded-t-none sm:border-l">
       {/* Header */}
@@ -126,8 +130,8 @@ export default function PlotDetailPanel({ plot, onClose }) {
           </div>
         </Section>
 
-        {/* Owner */}
-        {plot.farmer_n && plot.farmer_n !== 'N/A' && (
+        {/* Owner — personal data, hidden in the public view (see SHOW_OWNER_NAMES). */}
+        {SHOW_OWNER_NAMES && plot.farmer_n && plot.farmer_n !== 'N/A' && (
           <Section title="Owner / Farmer">
             <p className="text-sm text-[var(--text-1)]">
               {formatFarmerName(plot.farmer_n)}
@@ -138,14 +142,16 @@ export default function PlotDetailPanel({ plot, onClose }) {
         {/* Location */}
         <Section title="Location">
           <InfoGrid items={[
+            { label: 'Region', value: node?.code },
             { label: 'Village', value: plot.village_na ? 'N/A' : plot.village },
-            // 'Region (1km)' (grid_id) hidden until the scoring engine gives the
-            // 1km analysis cell a user-facing meaning (owner feedback 2026-06-30).
             { label: 'Township', value: plot.township },
             { label: 'Sector', value: plot.sector },
             { label: 'Block', value: plot.block },
             { label: 'Plot No', value: plot.plot_no },
           ]} />
+          {node?.between && (
+            <p className="text-[10px] text-[var(--text-3)] mt-1.5">Between {node.between}</p>
+          )}
         </Section>
 
         {/* Area & Frontage */}

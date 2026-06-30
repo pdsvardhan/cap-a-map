@@ -57,14 +57,18 @@ for (const name of Object.keys(byName).sort((a, b) => a.localeCompare(b, undefin
   const rd = ROAD_DATA[name] || {}
   const orientation = rd.orientation || (name[0] === 'N' ? 'N-S' : 'E-W')
 
-  // bbox + center over all rings
+  // bbox + center + axis over all outer-ring vertices
   let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity
+  const perp = []  // axis coord: longitude for N-S roads, latitude for E-W
   for (const rings of polys) for (const c of rings[0]) {
     if (c[0] < minx) minx = c[0]; if (c[0] > maxx) maxx = c[0]
     if (c[1] < miny) miny = c[1]; if (c[1] > maxy) maxy = c[1]
+    perp.push(orientation === 'N-S' ? c[0] : c[1])
   }
   const bbox = [r6(minx), r6(miny), r6(maxx), r6(maxy)]
   const center = [r6((minx + maxx) / 2), r6((miny + maxy) / 2)]
+  perp.sort((a, b) => a - b)
+  const axis = r6(perp[Math.floor(perp.length / 2)])  // median — robust to road shape/length
   // road length ≈ extent along its orientation (authentic geometry span)
   const lengthKm = +(orientation === 'N-S' ? (maxy - miny) * KM_PER_LAT : (maxx - minx) * KM_PER_LON).toFixed(2)
 
@@ -77,7 +81,7 @@ for (const name of Object.keys(byName).sort((a, b) => a.localeCompare(b, undefin
     geometry: polys.length === 1 ? { type: 'Polygon', coordinates: polys[0] } : { type: 'MultiPolygon', coordinates: polys },
   })
   index.push({
-    name, center, bbox, length_km: lengthKm, orientation,
+    name, center, bbox, axis, length_km: lengthKm, orientation,
     row_m: rd_width || rd.row_m || null, source: 'APCRDA trunk road network',
     category: rd.category, lane_pattern: rd.lane_pattern, brt_present: rd.brt_present,
     connects_nh16: rd.connects_nh16, confidence: rd.confidence, remarks: rd.remarks, meets: [],
