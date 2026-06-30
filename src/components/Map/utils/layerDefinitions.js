@@ -11,7 +11,9 @@ export function getPlotFillLayer() {
     'source-layer': PLOTS_SOURCE_LAYER,
     paint: {
       'fill-color': buildSymbologyColorExpression(),
-      'fill-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0.6, 14, 0.75, 18, 0.85],
+      // Saturate colours at low zoom — at z10-12 plots are sub-pixel and a low
+      // floor let the dark canvas bleed through, reading as black (owner feedback).
+      'fill-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0.92, 13, 0.88, 16, 0.85, 18, 0.85],
     },
   }
 }
@@ -23,8 +25,10 @@ export function getPlotOutlineLayer() {
     source: PLOTS_SOURCE,
     'source-layer': PLOTS_SOURCE_LAYER,
     paint: {
-      'line-color': '#1A1A1A',
-      'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0, 13, 0.3, 15, 0.8, 17, 1.2, 19, 1.8],
+      // Softer-than-black so the border mesh never reads as a black wash; held
+      // at width 0 below z13 so zoomed-out views show pure colour, no mesh.
+      'line-color': '#20242C',
+      'line-width': ['interpolate', ['linear'], ['zoom'], 10, 0, 13, 0, 14, 0.4, 16, 0.9, 19, 1.8],
       'line-opacity': [
         'case',
         ['any', ...Array.from(ROAD_RESERVE_SYMBOLOGIES).map(sym => ['==', ['get', 'symbology'], sym])],

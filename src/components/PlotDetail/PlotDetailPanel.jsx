@@ -136,7 +136,8 @@ export default function PlotDetailPanel({ plot, onClose }) {
         <Section title="Location">
           <InfoGrid items={[
             { label: 'Village', value: plot.village_na ? 'N/A' : plot.village },
-            { label: 'Region (1km)', value: plot.grid_id },
+            // 'Region (1km)' (grid_id) hidden until the scoring engine gives the
+            // 1km analysis cell a user-facing meaning (owner feedback 2026-06-30).
             { label: 'Township', value: plot.township },
             { label: 'Sector', value: plot.sector },
             { label: 'Block', value: plot.block },

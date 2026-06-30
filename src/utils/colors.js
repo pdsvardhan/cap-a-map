@@ -252,17 +252,23 @@ export function getGroupForSymbology(symbology) {
 }
 
 /**
+ * Road-reserve fill tone. Road reserves ARE the entire street grid, so they
+ * tile most of the developed core. A near-black fill made the whole map read
+ * as black when zoomed out (owner feedback 2026-06-30). A recessive slate-grey
+ * reads as "pavement", lets the coloured zoning dominate, and stays clearly
+ * darker than every plot colour so it recedes.
+ */
+export const ROAD_RESERVE_FILL = '#363B45'
+
+/**
  * Build a MapLibre match expression for fill-color based on symbology.
- * Road-reserve (U2/SU2) gets near-transparent fill to match ArcGIS behavior.
+ * Road-reserve (U2/SU2) gets a recessive slate fill (see ROAD_RESERVE_FILL).
  */
 export function buildSymbologyColorExpression() {
   const expr = ['match', ['get', 'symbology']]
   for (const [sym, color] of Object.entries(SYMBOLOGY_COLOR_MAP)) {
-    // Road reserve zones: use dark grey fill instead of transparent
-    // This prevents the black basemap from showing through and causing
-    // the "color goes black on zoom" issue
     if (color === 'transparent') {
-      expr.push(sym, '#1E1E1E')
+      expr.push(sym, ROAD_RESERVE_FILL)
     } else {
       expr.push(sym, color)
     }
@@ -473,7 +479,7 @@ export function buildFilteredColorExpression(activeGroups) {
     const isActive = activeGroups.has(groupKey)
     for (const sym of group.symbologies) {
       if (group.color === 'transparent') {
-        expr.push(sym, isActive ? '#1E1E1E' : '#1E1E1E')
+        expr.push(sym, ROAD_RESERVE_FILL)
       } else {
         expr.push(sym, isActive ? group.color : 'rgba(255,255,255,0.08)')
       }
