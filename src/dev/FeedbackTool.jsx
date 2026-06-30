@@ -131,6 +131,7 @@ function Editor({ img, view, onSaved, onCancel }) {
     const lw = Math.max(3, cv.width / 600)
     const all = draft.current ? [...shapes, draft.current] : shapes
     for (const s of all) {
+      if (!s || !s.type) continue // defensive: never let one bad shape crash the editor
       ctx.strokeStyle = s.color; ctx.fillStyle = s.color; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.lineJoin = 'round'
       if (s.type === 'box') ctx.strokeRect(s.x, s.y, s.x2 - s.x, s.y2 - s.y)
       else if (s.type === 'arrow') drawArrow(ctx, s.x, s.y, s.x2, s.y2, lw)
@@ -165,7 +166,14 @@ function Editor({ img, view, onSaved, onCancel }) {
     else { draft.current.x2 = x; draft.current.y2 = y }
     redraw()
   }
-  const onUp = () => { if (draft.current) { setShapes((s) => [...s, draft.current]); draft.current = null } }
+  const onUp = () => {
+    // Capture the in-progress shape BEFORE nulling the ref: setShapes' updater
+    // runs lazily (at render), so reading draft.current inside it would see null
+    // and push null into shapes → redraw crashes on null.color. (was the pen/box
+    // /arrow "site crashes when marking up" bug, owner feedback 2026-06-30.)
+    const d = draft.current
+    if (d) { draft.current = null; setShapes((s) => [...s, d]) }
+  }
 
   const undo = () => setShapes((s) => {
     const last = s[s.length - 1]
