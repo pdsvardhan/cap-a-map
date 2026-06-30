@@ -8,7 +8,7 @@
  */
 import GEN from './designTokens.generated.json'
 
-const DEFAULT_DIR = 'B'
+const DEFAULT_DIR = 'C'   // Statutory Dark — owner pick (the "official" palette on dark)
 function pickDir() {
   if (typeof window !== 'undefined') {
     const q = new URLSearchParams(window.location.search).get('dir')
