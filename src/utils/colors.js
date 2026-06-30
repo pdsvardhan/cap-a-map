@@ -248,6 +248,12 @@ export function getColorForSymbology(symbology) {
   return SYMBOLOGY_COLOR_MAP[symbology] || '#BDBDBD'
 }
 
+// Representative ACTIVE-design colour for a legend group (so swatches match the map).
+export function getGroupColor(groupKey) {
+  const g = ZONING_GROUPS[groupKey]
+  return g && g.symbologies && g.symbologies[0] ? colorForSymbology(g.symbologies[0]) : '#9aa0ab'
+}
+
 /**
  * Official zone names — APCRDA 2015 Zoning Regulations (docs/zoning plan).
  * Keyed by the land-use code (lu_code) prefix of a plot's symbology. Used to show

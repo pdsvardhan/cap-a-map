@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import useMapStore from '../../stores/mapStore'
-import { ZONING_GROUPS, ZONING_HIERARCHY, AREA_HEATMAP_LEGEND } from '../../utils/colors'
-import { NAMED_ROAD_COLOR } from '../../utils/constants'
+import { ZONING_GROUPS, ZONING_HIERARCHY, AREA_HEATMAP_LEGEND, getGroupColor } from '../../utils/colors'
+import { ROAD } from '../../utils/designTokens'
 
 const ALL_GROUP_KEYS = Object.keys(ZONING_GROUPS)
 
@@ -226,7 +226,7 @@ export default function Legend() {
                           const group = ZONING_GROUPS[groupKey]
                           if (!group) return null
                           const active = isGroupActive(groupKey)
-                          const isTransparent = group.color === 'transparent'
+                          const swatch = getGroupColor(groupKey)
                           const count = plotCounts?.[groupKey] || 0
 
                           return (
@@ -248,14 +248,7 @@ export default function Legend() {
                               </button>
                               <div
                                 className="w-4 h-3 rounded-sm flex-shrink-0"
-                                style={isTransparent ? {
-                                  backgroundColor: '#f5f5f5',
-                                  border: '1px solid #999',
-                                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, #ccc 2px, #ccc 3px)',
-                                } : {
-                                  backgroundColor: group.color,
-                                  border: '1px solid ' + (group.outlineColor || '#ddd'),
-                                }}
+                                style={{ backgroundColor: swatch, border: '1px solid rgba(0,0,0,0.25)' }}
                               />
                               <span className="text-[11px] text-[var(--text-2)] flex-1">{group.label}</span>
                               <span className="text-[9px] text-[var(--text-3)] tabular-nums">{count.toLocaleString()}</span>
@@ -352,7 +345,7 @@ export default function Legend() {
           {!roadsCollapsed && (
             <div className="ml-5 space-y-1">
               <div className="flex items-center gap-2.5 py-1 px-1.5">
-                <div className="w-5 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: NAMED_ROAD_COLOR }} />
+                <div className="w-5 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: ROAD.color }} />
                 <span className="text-[11px] text-[var(--text-2)]">Named road (N/E grid)</span>
               </div>
               <p className="text-[9px] text-[var(--text-3)] px-1.5">E1–E16 (E-W), N1–N18 (N-S). Class &amp; ROW shown on click.</p>
