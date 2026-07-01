@@ -29,7 +29,10 @@ const base = (o) => Object.assign({ kChroma: 1, kBig2: 0.7, kL: 0, famMul: {}, r
 const THEMES = {
   A: base({ id: 'A', name: 'Cool Atlas', light: false, bg: '#0b0f16', ink: '#aeb7c4', kChroma: 0.9, kBig2: 0.5, famHue: { R: 258, C: 232, I: 300, S: 80, E: 205, P: 168, U: 250, X: 250, W: 232 }, rampHue: 218, road: { treat: 'cased', color: '#dbe3ee', casing: '#070b12' } }),
   B: base({ id: 'B', name: 'Warm Cadastre', light: true, bg: '#f3ece1', ink: '#4a4034', kChroma: 1.0, kBig2: 0.66, kL: 0.02, famHue: { R: 45, C: 92, I: 25, S: 228, E: 286, P: 138, U: 64, X: 48, W: 236 }, rampHue: 78, road: { treat: 'filled', color: '#b59a5e', casing: '#fffdf6', alpha: 0.92 } }),
-  C: base({ id: 'C', name: 'Statutory Dark', light: false, bg: '#0e1013', ink: '#bcc0c6', kChroma: 1.12, kBig2: 0.55, famHue: { R: 58, C: 28, I: 305, S: 255, E: 200, P: 145, U: 75, X: 312, W: 222 }, rampHue: 60, road: { treat: 'cased', color: '#dfe3ea', casing: '#070a0e' } }),
+  // C tuned to the LITERAL official/statutory look (owner): residential = clear
+  // yellow, commercial = red/pink — big-two brought UP (kBig2 near 1 + R/C famMul
+  // + a lightness lift) instead of recessed, so the dense core reads bright.
+  C: base({ id: 'C', name: 'Statutory Dark', light: false, bg: '#191c21', ink: '#bcc0c6', kChroma: 1.12, kBig2: 0.95, bigLift: 0.20, famLift: { R: 0.10, U: 0.20 }, famMul: { R: 2.0, C: 2.05 }, famHue: { R: 90, C: 25, I: 305, S: 255, E: 200, P: 145, U: 75, X: 312, W: 222 }, rampHue: 60, road: { treat: 'cased', color: '#dfe3ea', casing: '#070a0e' } }),
   D: base({ id: 'D', name: 'Statutory Light', light: true, bg: '#eef0e3', ink: '#41443a', kChroma: 1.05, kBig2: 0.5, famHue: { R: 58, C: 28, I: 305, S: 255, E: 200, P: 145, U: 75, X: 312, W: 232 }, rampHue: 60, road: { treat: 'cased', color: '#8a8576', casing: '#ffffff' } }),
 }
 
@@ -50,6 +53,8 @@ function zoneHex(code, theme, bold = BOLD) {
   const fm = theme.famMul[z.fam] != null ? theme.famMul[z.fam] : 1
   let C = z.C * theme.kChroma * fm * (z.big2 ? theme.kBig2 : 1) * (0.4 + bold * 0.95)
   let L = z.L + (theme.kL || 0)
+  if (theme.famLift && theme.famLift[z.fam]) L += theme.famLift[z.fam]   // brighten a whole family
+  if (z.big2 && theme.bigLift) L += theme.bigLift   // lift the dominant zones so they read bright, not dark
   if (theme.light) { L = 0.34 + z.L * 0.52; C = C * 1.18 }
   L = clamp(L, 0.12, 0.94); C = clamp(C, 0, 0.42)
   return toHex(oklch2rgb(L, C, H))

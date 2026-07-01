@@ -15,9 +15,9 @@ export function getPlotFillLayer() {
     'source-layer': PLOTS_SOURCE_LAYER,
     paint: {
       'fill-color': buildSymbologyColorExpression(),
-      // Saturate colours at low zoom — at z10-12 plots are sub-pixel and a low
-      // floor let the dark canvas bleed through, reading as black (owner feedback).
-      'fill-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0.92, 13, 0.88, 16, 0.85, 18, 0.85],
+      // Near-opaque at low zoom so the dark canvas doesn't bleed through the
+      // sub-pixel parcels as black seams (owner: "less black").
+      'fill-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0.98, 14, 0.94, 18, 0.9],
     },
   }
 }
