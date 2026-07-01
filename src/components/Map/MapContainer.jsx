@@ -220,7 +220,12 @@ export default function MapContainer() {
 
       if (!map.getLayer(LAYERS.PLOTS_FILL)) return
       const feats = map.queryRenderedFeatures(e.point, { layers: [LAYERS.PLOTS_FILL] })
-      if (!feats.length) return
+      if (!feats.length) {
+        // Empty-canvas click dismisses any open selection (plot / road / landmark).
+        if (map.getLayer(LAYERS.PLOTS_HIGHLIGHT)) map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['get', 'pid'], -1])
+        store.clearPlot()
+        return
+      }
       const f = feats[0]
       map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['get', 'pid'], f.properties.pid])
       store.selectPlot(f.properties)

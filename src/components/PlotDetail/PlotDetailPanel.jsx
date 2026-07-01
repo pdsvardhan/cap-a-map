@@ -147,12 +147,37 @@ export default function PlotDetailPanel({ plot, onClose }) {
             { label: 'Township', value: plot.township },
             { label: 'Sector', value: plot.sector },
             { label: 'Block', value: plot.block },
+            { label: 'Colony', value: plot.colony },
             { label: 'Plot No', value: plot.plot_no },
+            { label: 'Coordinates', value: (plot.lat && plot.lon) ? `${Number(plot.lat).toFixed(5)}, ${Number(plot.lon).toFixed(5)}` : undefined },
           ]} />
           {node?.between && (
             <p className="text-[10px] text-[var(--text-3)] mt-1.5">Between {node.between}</p>
           )}
         </Section>
+
+        {/* Adjacent plots — adj_plots is an array of "dir:regcode" strings (pipeline 01_clean),
+            and arrives JSON-stringified from the vector tiles. Parse both shapes defensively. */}
+        {(() => {
+          let adj = plot.adj_plots
+          if (typeof adj === 'string') { try { adj = JSON.parse(adj) } catch { adj = [] } }
+          if (!Array.isArray(adj) || adj.length === 0) return null
+          const DIRS = { n: 'North', s: 'South', e: 'East', w: 'West' }
+          const items = adj.map((a) => {
+            let dir, val
+            if (typeof a === 'string') {
+              const i = a.indexOf(':')
+              dir = i >= 0 ? a.slice(0, i) : ''
+              val = i >= 0 ? a.slice(i + 1).trim() : a
+            } else { dir = a?.dir; val = a?.regcode }
+            return { label: DIRS[dir] || dir || '—', value: formatNeighbour(val) }
+          })
+          return (
+            <Section title="Adjacent plots">
+              <InfoGrid items={items} />
+            </Section>
+          )
+        })()}
 
         {/* Area & Frontage */}
         <Section title="Area & Frontage">
