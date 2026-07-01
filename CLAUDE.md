@@ -1,15 +1,16 @@
 # Capital of Amaravati (cap-a)
 
 ## Status
-- **Current Step:** 3 (Build) — full rebuild on branch `rebuild`
-- **Current Sub-Step:** Foundation (L0) + roads (L1) + polish done; owner testing pass; next = scoring engine (L2–L4)
+- **Current Step:** 3 (Build) — full rebuild on branch `rebuild`; **Ottomate Stage 0→3 done for built scope** (2026-07-01)
+- **Current Sub-Step:** L0 + most of L1 = 7 features verified (independent verifier) + **deployed live** (project-cap-a :8502); next = scoring engine (L2–L4)
 - **Step Status:** in-progress
-- **Last Session:** 2026-06-30
-- **Next Action:** Owner testing via in-app comment tool (press `c`) → read `feedback/` and fix; then build the valuation/scoring engine
-- **Blockers:** None
+- **Last Session:** 2026-07-01
+- **Next Action:** Build the valuation/scoring engine L2–L4 (#127/#135/#136); wire Value data-mode ramp (#137); public-exposure decision (#147); dead-code cleanup (#146)
+- **Blockers:** None (risk #7 tippecanoe = host binary only; Docker tippecanoe path works)
 - **Your Action Needed:** No
 - **Action Description:** —
 - **Action Type:** —
+- **Ottomate SO1:** locked in tracker — 13 features (7 done / 1 building / 1 dropped / 4 planned), 8 flows, 2 pages; ADRs 003–006. cap-a.vault7a.xyz is SSO-gated (not yet public).
 
 > **⚠️ This file's lower sections are pre-rebuild and partly stale.** The 2026-06 rebuild reframed the product as an **intelligent land-value explorer** (not just a map). Source of truth:
 > - `docs/UNDERSTANDING.md` — confirmed vision, data reality, scoring model (the canonical doc)
