@@ -21,6 +21,7 @@ export const TOKENS = GEN[DIR]
 export const CANVAS_BG = TOKENS.bg
 export const INK = TOKENS.ink
 export const IS_LIGHT = TOKENS.light
+export const LAND_BASE = TOKENS.landBase || TOKENS.bg   // fill under plots so inter-parcel gaps read as land
 export const ROAD = TOKENS.road          // { treat:'filled'|'cased', color, casing, alpha? }
 export const ZONE_HEX = TOKENS.zones      // { R3:'#..', C2:'#..', ... }
 

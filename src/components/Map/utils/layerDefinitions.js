@@ -1,6 +1,16 @@
 import { LAYERS, PLOTS_SOURCE, PLOTS_SOURCE_LAYER } from '../../../utils/constants'
 import { buildSymbologyColorExpression, ROAD_RESERVE_SYMBOLOGIES, buildRoadReserveFilter } from '../../../utils/colors'
-import { ROAD, WATER_FILL, IS_LIGHT } from '../../../utils/designTokens'
+import { ROAD, WATER_FILL, IS_LIGHT, LAND_BASE } from '../../../utils/designTokens'
+
+// Solid base under the plots so inter-parcel gaps read as land, not black canvas.
+export function getLandBaseLayer() {
+  return {
+    id: LAYERS.LAND_BASE,
+    type: 'fill',
+    source: 'landBase',
+    paint: { 'fill-color': LAND_BASE, 'fill-opacity': 1 },
+  }
+}
 
 // Theme-aware tones for outlines / highlights / road edges.
 const PLOT_OUTLINE = IS_LIGHT ? 'rgba(40,33,20,0.22)' : '#20242C'

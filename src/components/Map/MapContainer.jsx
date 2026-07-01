@@ -7,7 +7,7 @@ import {
   buildFilteredColorExpression, buildAreaHeatmapExpression,
 } from '../../utils/colors'
 import {
-  getPlotFillLayer, getPlotOutlineLayer, getPlotHighlightLayer, getRoadModeOverlayLayer,
+  getLandBaseLayer, getPlotFillLayer, getPlotOutlineLayer, getPlotHighlightLayer, getRoadModeOverlayLayer,
   getWaterFillLayer,
   getAllocatedLandsFillLayer, getAllocatedLandsOutlineLayer, getAllocatedLandsLabelsLayer,
   getNamedRoadsFillLayer, getNamedRoadsOutlineLayer,
@@ -84,6 +84,7 @@ export default function MapContainer() {
         map.addLayer(getPlotHighlightLayer())
 
         store.setLoadingStage(LoadingStage.LOADING_OVERLAYS)
+        await loadLandBase(map)
         await loadWater(map)
         await loadAllocated(map)
         await loadNamedRoads(map)
@@ -124,6 +125,16 @@ export default function MapContainer() {
         try { map.setLayoutProperty(layer.id, 'visibility', 'none') } catch (e) { /* ignore */ }
       }
     }
+  }
+
+  async function loadLandBase(map) {
+    try {
+      const data = await fetch(DATA_PATHS.landBase).then((r) => (r.ok ? r.json() : null))
+      if (!data) return
+      map.addSource('landBase', { type: 'geojson', data })
+      const before = map.getLayer(LAYERS.PLOTS_FILL) ? LAYERS.PLOTS_FILL : undefined
+      map.addLayer(getLandBaseLayer(), before) // insert UNDER the plots fill
+    } catch (e) { /* non-fatal */ }
   }
 
   async function loadWater(map) {

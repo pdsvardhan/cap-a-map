@@ -4,6 +4,7 @@
     "light": false,
     "bg": "#0b0f16",
     "ink": "#aeb7c4",
+    "landBase": "#20242b",
     "road": {
       "treat": "cased",
       "color": "#dbe3ee",
@@ -47,6 +48,7 @@
     "light": true,
     "bg": "#f3ece1",
     "ink": "#4a4034",
+    "landBase": "#e7ddca",
     "road": {
       "treat": "filled",
       "color": "#b59a5e",
@@ -91,6 +93,7 @@
     "light": false,
     "bg": "#191c21",
     "ink": "#bcc0c6",
+    "landBase": "#2d2e27",
     "road": {
       "treat": "cased",
       "color": "#dfe3ea",
@@ -134,6 +137,7 @@
     "light": true,
     "bg": "#eef0e3",
     "ink": "#41443a",
+    "landBase": "#e2e3d6",
     "road": {
       "treat": "cased",
       "color": "#8a8576",
