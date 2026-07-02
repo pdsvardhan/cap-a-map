@@ -75,3 +75,34 @@ client), adr-006 (build plan).
 - Data-mode value ramp + wire area ramp to designTokens.rampHue (#137).
 - Public exposure: cap-a.vault7a.xyz is SSO-gated (#147). Dead-code cleanup (#146).
 - Known infra: Ottomate ND1-finalize has no API write path (#145).
+
+---
+
+## Session 2026-07-03 — Live map hotfix (ops)
+
+**Stage:** post-deploy operations (no Stage change; lifecycle still `building`).
+
+**Symptom:** live app (cap-a.vault7a.xyz) hung on the loading screen at 10% — the map never
+rendered. Owner reported "opening but broken."
+
+**Root cause:** nginx was gzipping `plots.pmtiles`. `nginx.conf` had `application/octet-stream`
+in `gzip_types` and `.pmtiles` maps to that type, so a browser's `Accept-Encoding: gzip` + Range
+request returned a chunked gzip `200` with no `206`/`Content-Range`/`Content-Length` → PMTiles
+byte-serving broke and MapLibre threw. Latent since the March Docker setup (e11ab8d); became
+fatal on the 2026-07-01 deploy when the map switched from GeoJSON to PMTiles. Server + every other
+data file served fine (200s) — only the tiles were killed, which is why it looked "broken but open."
+
+**Fix (cf7e04b, rebuild):** removed `application/octet-stream` from `gzip_types`; gave `.pmtiles`
+its own nginx location with `gzip off` + a comment. Applied in-container for instant relief, then
+SCP'd to build ctx + `docker compose up -d --build`. Verified: fresh container returns `206` (no
+gzip) for `gzip + Range`; browser renders the full map (95k plots, E/N grid labels, landmarks,
+roads, waterbodies) with no recurring console errors.
+
+**Decisions:** none (candidate ADR "never gzip .pmtiles" / cat:reliability offered, not yet taken).
+**Friction:** none blocking. Owner keeps NO local checkout by design (working tree = `.git` +
+`CLAUDE.md`); do not `git restore` it — edit specific files transiently, commit + push, re-clean.
+
+**Next session pick-up:**
+- Scoring engine L2–L4 (#127/#135/#136) — the product core, still the next real feature work.
+- Optional: record the gzip/pmtiles fix as an ADR (recruiter-readable, cat:reliability).
+- Value/Area data-mode ramps (#137); dead-code cleanup (#146); public exposure (#147).
