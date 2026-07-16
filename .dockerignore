@@ -11,3 +11,16 @@ pipeline
 # the image and served for no reason, and the authoritative plot mosaic carries
 # farmer names AND aadhar_no (national ID numbers). Never ship them.
 public/data/sources
+
+# Same trap, one level down: vite copies ALL of public/ into dist/, so every
+# pipeline intermediate left in public/data gets served too. None of these are in
+# DATA_PATHS and nothing in src/ reads them — plots.clean/enriched are the inputs
+# 03_tiles.sh turns into plots.pmtiles (what the client actually fetches), the
+# reports and village_index are pipeline bookkeeping. ~228MB of public download.
+public/data/plots.clean.geojson
+public/data/plots.enriched.geojson
+public/data/clean_report.json
+public/data/grid_report.json
+public/data/village_index.json
+# Rollback copies kept beside the live tiles (e.g. plots.pmtiles.bak-20260716).
+public/data/*.bak-*
