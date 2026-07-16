@@ -151,11 +151,31 @@ export default function MapContainer() {
     try {
       const data = await fetch(DATA_PATHS.allocatedLands).then((r) => (r.ok ? r.json() : null))
       if (!data) return
+      ensureIvoryHatch(map)
       map.addSource('allocated_lands', { type: 'geojson', data })
       map.addLayer(getAllocatedLandsFillLayer())
       map.addLayer(getAllocatedLandsOutlineLayer())
       map.addLayer(getAllocatedLandsLabelsLayer())
     } catch (e) { /* non-fatal */ }
+  }
+
+  // Diagonal ivory hatch tile for the allotment overlay (outline + hatch + name):
+  // a faint ivory wash with 45° ivory lines so allotments read as an overlay ON
+  // the coloured zoning beneath, not a competing solid fill. Registered before the
+  // fill layer that references it via fill-pattern.
+  function ensureIvoryHatch(map) {
+    if (map.hasImage('ivory-hatch')) return
+    const s = 16
+    const cv = document.createElement('canvas'); cv.width = s; cv.height = s
+    const ctx = cv.getContext('2d')
+    ctx.fillStyle = 'rgba(238,230,210,0.14)'      // faint ivory wash
+    ctx.fillRect(0, 0, s, s)
+    ctx.strokeStyle = 'rgba(238,230,210,0.60)'    // ivory hatch lines
+    ctx.lineWidth = 1.3
+    ctx.beginPath()
+    for (let o = -s; o < s * 2; o += 6) { ctx.moveTo(o, s); ctx.lineTo(o + s, 0) }
+    ctx.stroke()
+    try { map.addImage('ivory-hatch', ctx.getImageData(0, 0, s, s), { pixelRatio: 2 }) } catch (e) { /* ignore */ }
   }
 
   async function loadNamedRoads(map) {

@@ -269,16 +269,19 @@ export default function Legend() {
                 >
                   <button
                     className={`w-3.5 h-3.5 rounded-sm border flex-shrink-0 flex items-center justify-center transition-colors ${
-                      allocatedLandsVisible ? 'bg-orange-500 border-orange-500' : 'border-white/25'
+                      allocatedLandsVisible ? 'bg-[#c9be9e] border-[#c9be9e]' : 'border-white/25'
                     }`}
                   >
                     {allocatedLandsVisible && (
-                      <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-2.5 h-2.5 text-[#2a2418]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                       </svg>
                     )}
                   </button>
-                  <div className="w-4 h-3 rounded-sm flex-shrink-0 bg-[#FF6F00] border border-[#CC5800]" />
+                  <div
+                    className="w-4 h-3 rounded-sm flex-shrink-0 border border-[#c9be9e]"
+                    style={{ backgroundColor: 'rgba(238,230,210,0.18)', backgroundImage: 'repeating-linear-gradient(45deg, rgba(200,186,140,0.75) 0 1px, transparent 1px 4px)' }}
+                  />
                   <span className="text-[11px] text-[var(--text-2)]">Allocated Lands</span>
                 </div>
               </div>
