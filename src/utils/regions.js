@@ -21,12 +21,12 @@ function bracket(roads, v) {
 }
 
 /**
- * @param {number} lon @param {number} lat
- * @param {Array} roadsIndex  named_roads_index.json entries (name, orientation, center)
- * @returns {{ code:string, between:string }|null}
+ * The N (lon) and E (lat) road axis stacks that define the grid.
+ * Exported so the Value-mode colour expression (utils/valueScores.js) and the
+ * offline scoring pipeline derive regions from the SAME axes as computeNode.
+ * @param {Array} roadsIndex named_roads_index.json entries
  */
-export function computeNode(lon, lat, roadsIndex) {
-  if (lon == null || lat == null || !Array.isArray(roadsIndex) || !roadsIndex.length) return null
+export function buildAxes(roadsIndex) {
   // Exclude the diagonal Seed Road (E3, "seed access") — it isn't an axis-aligned
   // grid line and would scramble the latitude stack.
   const grid = roadsIndex.filter((r) => r.category !== 'seed access')
@@ -38,6 +38,17 @@ export function computeNode(lon, lat, roadsIndex) {
     .filter((r) => r.orientation === 'E-W' && (r.axis != null || r.center))
     .map((r) => ({ name: r.name, n: roadNum(r.name), axis: r.axis != null ? r.axis : r.center[1] }))
     .sort((a, b) => a.axis - b.axis)
+  return { N, E }
+}
+
+/**
+ * @param {number} lon @param {number} lat
+ * @param {Array} roadsIndex  named_roads_index.json entries (name, orientation, center)
+ * @returns {{ code:string, between:string }|null}
+ */
+export function computeNode(lon, lat, roadsIndex) {
+  if (lon == null || lat == null || !Array.isArray(roadsIndex) || !roadsIndex.length) return null
+  const { N, E } = buildAxes(roadsIndex)
 
   const nb = bracket(N, lon), eb = bracket(E, lat)
   if (!nb.length || !eb.length) return null

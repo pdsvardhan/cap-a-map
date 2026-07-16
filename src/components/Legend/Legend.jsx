@@ -22,13 +22,19 @@ export default function Legend() {
   const toggleAllocatedLands = useMapStore((s) => s.toggleAllocatedLands)
   const colorMode = useMapStore((s) => s.colorMode)
   const setColorMode = useMapStore((s) => s.setColorMode)
+  const valueLens = useMapStore((s) => s.valueLens)
+  const setValueLens = useMapStore((s) => s.setValueLens)
+  const regionScores = useMapStore((s) => s.regionScores)
   const toggleLegend = useMapStore((s) => s.toggleLegend)
 
   const [collapsedCategories, setCollapsedCategories] = useState(new Set())
   const [activeQuickFilter, setActiveQuickFilter] = useState(null)
   const [roadsCollapsed, setRoadsCollapsed] = useState(false)
 
-  const isZoning = colorMode !== 'area'
+  const isZoning = colorMode === 'zoning'
+  const isArea = colorMode === 'area'
+  const isValue = colorMode === 'value'
+  const hasScores = !!regionScores?.cells
   const isAllActive = !activeZoningGroups || activeZoningGroups.size === ALL_GROUP_KEYS.length
 
   const isGroupActive = useCallback((groupKey) => {
@@ -129,13 +135,25 @@ export default function Legend() {
           <button
             onClick={() => setColorMode('area')}
             className={`flex-1 px-2 py-1.5 text-[11px] font-medium rounded transition-colors ${
-              !isZoning
+              isArea
                 ? 'bg-emerald-600 text-white'
                 : 'bg-white/[0.06] text-[var(--text-2)] hover:bg-white/[0.12]'
             }`}
           >
             Plot Size
           </button>
+          {hasScores && (
+            <button
+              onClick={() => setColorMode('value')}
+              className={`flex-1 px-2 py-1.5 text-[11px] font-medium rounded transition-colors ${
+                isValue
+                  ? 'bg-amber-600 text-white'
+                  : 'bg-white/[0.06] text-[var(--text-2)] hover:bg-white/[0.12]'
+              }`}
+            >
+              Value
+            </button>
+          )}
         </div>
       </div>
 
@@ -289,8 +307,48 @@ export default function Legend() {
           </>
         )}
 
+        {/* === VALUE MODE CONTENT (adr-008 region desirability) === */}
+        {isValue && (
+          <div className="px-4 py-3">
+            <p className="text-[9px] font-semibold text-[var(--text-3)] uppercase tracking-wider mb-1.5">Lens</p>
+            <div className="flex gap-1 mb-3">
+              {[['commercial', 'Commercial'], ['residential', 'Residential']].map(([k, label]) => (
+                <button
+                  key={k}
+                  onClick={() => setValueLens(k)}
+                  className={`flex-1 px-2 py-1.5 text-[11px] font-medium rounded transition-colors ${
+                    valueLens === k ? 'bg-amber-600 text-white' : 'bg-white/[0.06] text-[var(--text-2)] hover:bg-white/[0.12]'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <p className="text-[9px] font-semibold text-[var(--text-3)] uppercase tracking-wider mb-1.5">
+              Relative desirability · 1km region
+            </p>
+            <div className="h-3 rounded-sm w-full" style={{ background: `linear-gradient(to right, ${RAMP.join(', ')})` }} />
+            <div className="flex justify-between mt-0.5">
+              <span className="text-[9px] text-[var(--text-3)]">Lower</span>
+              <span className="text-[9px] text-[var(--text-3)]">Higher</span>
+            </div>
+
+            <div className="mt-3 flex items-center gap-2">
+              <div className="w-5 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: 'rgba(120,120,120,0.25)', border: '1px solid #888' }} />
+              <span className="text-[11px] text-[var(--text-3)] italic">No score for this region</span>
+            </div>
+
+            <p className="text-[10px] text-[var(--text-3)] mt-3 leading-relaxed">
+              A relative index from status-weighted anchors (built &gt; under-construction &gt; planned),
+              road access and FSI — <strong>not</strong> a price. It can diverge from current asking
+              prices, which are broker-sourced. Click a plot for its drivers.
+            </p>
+          </div>
+        )}
+
         {/* === AREA HEATMAP MODE CONTENT === */}
-        {!isZoning && (
+        {isArea && (
           <div className="px-4 py-3">
             <p className="text-[9px] font-semibold text-[var(--text-3)] uppercase tracking-wider mb-2">Plot Size (Sq. Yards)</p>
             <div className="space-y-1">
@@ -362,7 +420,9 @@ export default function Legend() {
         <span className="text-[10px] text-[var(--text-3)]">
           {isZoning
             ? `${totalVisible.toLocaleString()} plots visible`
-            : 'Showing plot sizes (Sq. Yards)'
+            : isValue
+              ? `${valueLens === 'residential' ? 'Residential' : 'Commercial'} desirability · ${Object.keys(regionScores?.cells || {}).length} regions`
+              : 'Showing plot sizes (Sq. Yards)'
           }
         </span>
       </div>

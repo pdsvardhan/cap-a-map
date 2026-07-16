@@ -6,6 +6,7 @@ import { MAP_CENTER, MAP_ZOOM, MAP_MIN_ZOOM, MAP_MAX_ZOOM, MAP_STYLE, DATA_PATHS
 import {
   buildFilteredColorExpression, buildAreaHeatmapExpression,
 } from '../../utils/colors'
+import { buildValueColorExpression } from '../../utils/valueScores'
 import {
   getLandBaseLayer, getPlotFillLayer, getPlotOutlineLayer, getPlotHighlightLayer, getRoadModeOverlayLayer,
   getWaterFillLayer,
@@ -25,6 +26,9 @@ export default function MapContainer() {
   const activeZoningGroups = useMapStore((s) => s.activeZoningGroups)
   const allocatedLandsVisible = useMapStore((s) => s.allocatedLandsVisible)
   const colorMode = useMapStore((s) => s.colorMode)
+  const valueLens = useMapStore((s) => s.valueLens)
+  const regionScores = useMapStore((s) => s.regionScores)
+  const namedRoadsIndex = useMapStore((s) => s.namedRoadsIndex)
   const selectedPlot = useMapStore((s) => s.selectedPlot)
 
   // mutable mirrors for use inside map event handlers
@@ -88,6 +92,7 @@ export default function MapContainer() {
         await loadWater(map)
         await loadAllocated(map)
         await loadNamedRoads(map)
+        await loadRegionScores()
 
         setupInteractions(map)
         store.setLoadingStage(LoadingStage.RENDERING)
@@ -202,6 +207,15 @@ export default function MapContainer() {
     } catch (e) { /* non-fatal */ }
   }
 
+  // Region desirability scores (adr-008). Non-fatal: without them the Value mode
+  // simply has nothing to colour and the Legend hides the option.
+  async function loadRegionScores() {
+    try {
+      const data = await fetch(DATA_PATHS.regionScores).then((r) => (r.ok ? r.json() : null))
+      if (data?.cells) useMapStore.getState().setRegionScores(data)
+    } catch (e) { /* non-fatal */ }
+  }
+
   function setupInteractions(map) {
     // only query layers that currently exist (avoids errors during load races)
     const existing = (ids) => ids.filter((id) => map.getLayer(id))
@@ -263,15 +277,17 @@ export default function MapContainer() {
 
   // --- Reactive effects ---
 
-  // zoning filter / area heatmap
+  // zoning filter / area heatmap / value (region desirability)
   useEffect(() => {
     const map = mapRef.current
     if (!map?.isStyleLoaded?.() || !map.getLayer(LAYERS.PLOTS_FILL)) return
-    map.setPaintProperty(
-      LAYERS.PLOTS_FILL, 'fill-color',
-      colorMode === 'area' ? buildAreaHeatmapExpression() : buildFilteredColorExpression(activeZoningGroups),
-    )
-  }, [activeZoningGroups, colorMode])
+    const expr = colorMode === 'area'
+      ? buildAreaHeatmapExpression()
+      : colorMode === 'value'
+        ? buildValueColorExpression(namedRoadsIndex, regionScores?.cells, valueLens)
+        : buildFilteredColorExpression(activeZoningGroups)
+    map.setPaintProperty(LAYERS.PLOTS_FILL, 'fill-color', expr)
+  }, [activeZoningGroups, colorMode, valueLens, regionScores, namedRoadsIndex])
 
   // allocated lands visibility
   useEffect(() => {

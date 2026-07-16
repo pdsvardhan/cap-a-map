@@ -22,7 +22,8 @@ const useMapStore = create((set, get) => ({
   selectedPlot: null,
   showLegend: false,
   roadMode: false,
-  colorMode: 'zoning',
+  colorMode: 'zoning',            // 'zoning' | 'area' | 'value'
+  valueLens: 'commercial',        // 'commercial' | 'residential' (Value mode)
   showNamedOnly: false,
   allocatedLandsVisible: true,
   activeZoningGroups: null,
@@ -30,6 +31,7 @@ const useMapStore = create((set, get) => ({
   // Data state
   namedRoadsIndex: [],
   plotCounts: {},
+  regionScores: null,             // region_scores.json (adr-008)
 
   // Map internals (not reactive — stored as refs)
   _mapInstance: null,
@@ -49,9 +51,11 @@ const useMapStore = create((set, get) => ({
   toggleAllocatedLands: () => set((s) => ({ allocatedLandsVisible: !s.allocatedLandsVisible })),
 
   setColorMode: (mode) => set({ colorMode: mode }),
+  setValueLens: (lens) => set({ valueLens: lens }),
   setActiveZoningGroups: (groups) => set({ activeZoningGroups: groups }),
   setNamedRoadsIndex: (index) => set({ namedRoadsIndex: index }),
   setPlotCounts: (counts) => set({ plotCounts: counts }),
+  setRegionScores: (scores) => set({ regionScores: scores }),
 
   // Internal setters (map instance, data refs)
   setMapInstance: (map) => set({ _mapInstance: map }),

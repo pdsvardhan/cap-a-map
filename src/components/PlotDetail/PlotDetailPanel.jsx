@@ -5,9 +5,11 @@ import { formatArea, formatDimensions, formatFarmerName, formatNeighbour } from 
 import { getRoadVillages, getRoadLengthKm } from '../../utils/roadAttributes'
 import { NAMED_ROAD_COLOR, SHOW_OWNER_NAMES } from '../../utils/constants'
 import { computeNode } from '../../utils/regions'
+import { lookupRegionScore, rampColor } from '../../utils/valueScores'
 
 export default function PlotDetailPanel({ plot, onClose }) {
   const namedRoadsIndex = useMapStore((s) => s.namedRoadsIndex)
+  const regionScores = useMapStore((s) => s.regionScores)
 
   if (!plot) return null
 
@@ -82,6 +84,8 @@ export default function PlotDetailPanel({ plot, onClose }) {
 
   // Custom site region (the road-grid "Node" cell this plot falls in)
   const node = computeNode(plot.lon, plot.lat, namedRoadsIndex)
+  // Relative desirability for that region (adr-008)
+  const score = lookupRegionScore(regionScores?.cells, node?.code)
 
   return (
     <div className="glass absolute z-20 flex flex-col animate-slide-in inset-x-0 bottom-0 h-[72%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-[380px] sm:h-full sm:rounded-t-none sm:border-l">
@@ -155,6 +159,30 @@ export default function PlotDetailPanel({ plot, onClose }) {
             <p className="text-[10px] text-[var(--text-3)] mt-1.5">Between {node.between}</p>
           )}
         </Section>
+
+        {/* Relative desirability for this 1km region (adr-008) */}
+        {score && (
+          <Section title="Desirability (relative)">
+            <div className="grid grid-cols-2 gap-3">
+              <ScoreBar label="Commercial" value={score.c} />
+              <ScoreBar label="Residential" value={score.r} />
+            </div>
+            {Array.isArray(score.drivers) && score.drivers.length > 0 && (
+              <div className="mt-3">
+                <span className="text-[11px] uppercase tracking-wide text-[var(--text-3)]">Why</span>
+                <ul className="mt-1 space-y-0.5">
+                  {score.drivers.map((d) => (
+                    <li key={d} className="text-[11px] text-[var(--text-2)]">· {d}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <p className="text-[10px] text-[var(--text-3)] mt-2 leading-relaxed">
+              A relative index for this 1km region — not a price, and not per-plot. Built from
+              status-weighted anchors, road access and FSI; may diverge from broker asking prices.
+            </p>
+          </Section>
+        )}
 
         {/* Adjacent plots — adj_plots is an array of "dir:regcode" strings (pipeline 01_clean),
             and arrives JSON-stringified from the vector tiles. Parse both shapes defensively. */}
@@ -239,6 +267,21 @@ function Section({ title, children }) {
         {title}
       </h3>
       {children}
+    </div>
+  )
+}
+
+function ScoreBar({ label, value }) {
+  const v = Math.max(0, Math.min(100, Number(value) || 0))
+  return (
+    <div>
+      <div className="flex items-baseline justify-between">
+        <span className="text-[11px] uppercase tracking-wide text-[var(--text-3)]">{label}</span>
+        <span className="text-sm font-semibold text-[var(--text-1)] mono">{v}</span>
+      </div>
+      <div className="mt-1 h-1.5 rounded-full bg-white/[0.08] overflow-hidden">
+        <div className="h-full rounded-full" style={{ width: `${v}%`, backgroundColor: rampColor(v) }} />
+      </div>
     </div>
   )
 }
