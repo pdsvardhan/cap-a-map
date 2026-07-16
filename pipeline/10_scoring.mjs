@@ -115,15 +115,21 @@ const ANCHORS = [
   { name: 'ACA Cricket Stadium', village: 'Navuluru', status: 'operational', type: 'sports' },
   // The EXISTING metro across the Krishna — an operational driver the capital
   // anchor list otherwise misses entirely. §2: E3's NH-16 link crosses at the
-  // Kanakadurga Varadhi, which lands at Undavalli; §4 prices Penumaka/Undavalli
-  // at 35-45k on that access, not on (unbuilt) capital anchors. Anchored at
-  // Undavalli because that is where the crossing actually touches our data.
-  // The Krishna riverfront (§3, ⚪ planned, "low build certainty") is DROPPED rather
-  // than listed separately: it resolves to the same Undavalli centroid, so two
-  // entries double-counted one place and pushed Undavalli above its §4 band. What
-  // is credited here is the OPERATIONAL crossing/city access only — the riverfront's
-  // planned upside is deliberately not modelled, so nothing planned is scored as built.
-  { name: 'Vijayawada gateway (Kanakadurga Varadhi)', village: 'Undavalli', status: 'operational', type: 'gateway' },
+  // Kanakadurga Varadhi; §4 prices the southern corridor on that access, not on
+  // (unbuilt) capital anchors.
+  //
+  // Anchored at the E3 seed road's EASTERN TERMINUS — the crossing itself —
+  // derived from authoritative road geometry rather than an invented coordinate.
+  // It was previously anchored to the village of Undavalli, but the authoritative
+  // LPSMosaicDec2024 contains neither Undavalli nor Penumaka, so that anchor
+  // silently vanished on the move to the mosaic. Deriving it from E3 keeps the
+  // driver alive for the villages that DO remain (Venkatapalem, Krishnayapalem),
+  // whose §4 prices rest on exactly this access.
+  //
+  // The Krishna riverfront (§3, ⚪ planned, "low build certainty") is deliberately
+  // NOT modelled: only the operational crossing is credited, so nothing planned
+  // is ever scored as built.
+  { name: 'Vijayawada gateway (Kanakadurga Varadhi)', deriveFrom: 'e3-east', status: 'operational', type: 'gateway' },
 ]
 
 // §5 flood downside: Kondaveeti Vagu inundated the region twice in a year;
@@ -214,6 +220,10 @@ function villageKey(raw) {
     pitchikalapalem: 'pitchakalapalem', pitchikalaplem: 'pitchakalapalem',
     ptichikalapalem: 'pitchakalapalem',
     maplapuram: 'malkapuram',
+    // The authoritative mosaic carries BOTH spellings (Sekhamuru 3,318 /
+    // Sakhamuru 525). Without this, NID-AP + the Central Park anchor to a
+    // 525-plot fragment instead of the real village centroid.
+    sekhamuru: 'sakhamuru',
   }
   return ALIAS[s] || s
 }
@@ -288,13 +298,8 @@ for (const [k, v] of villageAgg) {
   villageCentroid.set(k, { lon: v.sumLon / v.n, lat: v.sumLat / v.n, label: v.label, n: v.n })
 }
 
-// ─── 4. Resolve anchors to coordinates (skip + report unresolvable) ──────────
-const resolved = [], skipped = []
-for (const a of ANCHORS) {
-  const c = villageCentroid.get(villageKey(a.village))
-  if (!c) { skipped.push(`${a.name} (${a.village})`); continue }
-  resolved.push({ ...a, lon: c.lon, lat: c.lat })
-}
+// (Anchors are resolved in step 5b, once road geometry is available — one anchor
+//  derives its coordinate from the E3 alignment rather than a village centroid.)
 
 // ─── 5. Road geometry → per-cell access (#135: E3 / NH-16 / arterial) ────────
 // Nearest-vertex distance: the trunk-road polygons are densely vertexed, so this
@@ -337,6 +342,37 @@ if (!E3_NAMES.length) {
 }
 if (!NH16_NAMES.length || !ART_NAMES.length) {
   console.warn('WARNING: no NH-16 link or major-arterial roads matched — those access factors contribute 0.')
+}
+
+// ─── 5b. Resolve anchors to coordinates (skip + report unresolvable) ─────────
+// Most anchors sit at their village's centroid. One (the Vijayawada gateway)
+// derives its position from the E3 alignment's eastern terminus — the crossing —
+// because the mosaic contains no village there to average.
+function deriveCoord(kind) {
+  if (kind === 'e3-east') {
+    let best = null
+    for (const nm of E3_NAMES) {
+      for (const [lon, lat] of (roadVerts.get(nm) || [])) {
+        if (!best || lon > best.lon) best = { lon, lat }
+      }
+    }
+    return best
+  }
+  return null
+}
+
+const resolved = [], skipped = []
+for (const a of ANCHORS) {
+  let c = null
+  if (a.deriveFrom) {
+    c = deriveCoord(a.deriveFrom)
+    if (!c) { skipped.push(`${a.name} (derive:${a.deriveFrom} failed)`); continue }
+    console.log(`Derived ${a.name} from ${a.deriveFrom}: ${c.lon.toFixed(5)}, ${c.lat.toFixed(5)}`)
+  } else {
+    c = villageCentroid.get(villageKey(a.village))
+    if (!c) { skipped.push(`${a.name} (${a.village})`); continue }
+  }
+  resolved.push({ ...a, lon: c.lon, lat: c.lat })
 }
 
 // ─── 6. FSI per cell (#135: AvailableLands + LandAllotments) ─────────────────

@@ -16,7 +16,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { categorizeAllocatedLand, ALLOCATED_LAND_CATEGORIES } from '../src/utils/colors.js'
+import { ALLOCATED_LAND_CATEGORIES } from '../src/utils/colors.js'
 import { KNOWN_ROAD_NAMES } from '../src/utils/roadAttributes.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -58,7 +58,10 @@ for (const f of feats) {
     r: p.regcode || undefined,
     c: p.plot_code || undefined,
     v: p.village || undefined,
-    f: p.farmer_n || undefined,
+    // NO owner/farmer name: search.json is served publicly and the app never
+    // displays owner names (constants.js SHOW_OWNER_NAMES=false). The authoritative
+    // mosaic also carries aadhar_no; both are dropped in 01_clean_mosaic.mjs. Do not
+    // re-add identity fields to this index.
     lat: p.lat, lon: p.lon,
   })
 }
@@ -73,7 +76,9 @@ for (const f of (alloc.features || [])) {
   if (!c) continue
   search.push({
     t: 'landmark', n: label,
-    cat: categorizeAllocatedLand(label),
+    // category now comes straight from the authoritative APCRDA allotments
+    // (pipeline/08_allotments, adr-002) instead of being guessed from the label.
+    cat: f.properties?.category || 'Other',
     lat: c[1], lon: c[0],
   })
   landmarkCount++
@@ -90,7 +95,8 @@ const meta = {
   village_counts: villageCounts,
   search_entries: { plots: feats.length, landmarks: landmarkCount, roads: KNOWN_ROAD_NAMES.length },
   allocated_land_categories: Object.fromEntries(
-    Object.entries(ALLOCATED_LAND_CATEGORIES).map(([k, v]) => [k, { label: v.label, color: v.color }])
+    // ALLOCATED_LAND_CATEGORIES is category -> colour string.
+    Object.entries(ALLOCATED_LAND_CATEGORIES).map(([k, v]) => [k, { label: k, color: v }])
   ),
 }
 

@@ -3,7 +3,10 @@
  * Fill colours now come from the active design direction (designTokens.js); the
  * ZONING_GROUPS structure below is retained for the legend grouping + labels.
  */
-import { colorForSymbology, IS_LIGHT, RAMP } from './designTokens'
+// Explicit .js extension: the offline pipeline (pipeline/01_clean_mosaic.mjs,
+// 04_indexes.mjs) imports this module under plain Node ESM, which — unlike Vite —
+// does not resolve extensionless specifiers.
+import { colorForSymbology, IS_LIGHT, RAMP } from './designTokens.js'
 
 export const ZONING_GROUPS = {
   'residential-high': {

@@ -5,3 +5,9 @@ dist
 docs
 scripts
 .env*
+pipeline
+# Raw APCRDA scrapes are PIPELINE INPUT ONLY — nothing in the client fetches
+# /data/sources (see utils/constants.js DATA_PATHS). They were being copied into
+# the image and served for no reason, and the authoritative plot mosaic carries
+# farmer names AND aadhar_no (national ID numbers). Never ship them.
+public/data/sources

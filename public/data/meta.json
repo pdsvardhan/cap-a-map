@@ -1,137 +1,132 @@
 {
-  "generated_at": "2026-06-28T20:55:25.619Z",
-  "total_plots": 95291,
+  "generated_at": "2026-07-16T11:37:16.325Z",
+  "total_plots": 86918,
   "bbox": [
-    80.408998,
-    16.41561,
-    80.602025,
-    16.587438
+    80.40899344918246,
+    16.41590593091679,
+    80.60178000729344,
+    16.58278517652658
   ],
   "zoning_group_counts": {
-    "residential-high": 45821,
-    "road-reserve": 3753,
-    "green-belt": 1117,
-    "commercial-vacant": 2882,
-    "roads-infra": 593,
-    "commercial": 31549,
-    "education": 422,
-    "village-green": 661,
-    "residential-vacant": 5634,
-    "parks-passive": 809,
-    "parks-active": 1202,
-    "special": 233,
-    "residential-low": 274,
-    "water": 205,
-    "industrial": 38,
-    "recreation": 43,
-    "burial-ground": 7,
-    "unknown": 5,
+    "commercial": 28990,
+    "residential-high": 41983,
+    "green-belt": 1085,
+    "road-reserve": 2984,
+    "commercial-vacant": 2537,
+    "village-green": 641,
+    "residential-vacant": 5096,
+    "parks-active": 1161,
     "health": 2,
+    "water": 197,
+    "residential-low": 198,
+    "education": 413,
     "government": 14,
     "cultural": 18,
+    "parks-passive": 765,
+    "roads-infra": 575,
+    "special": 170,
+    "unknown": 10,
+    "industrial": 20,
+    "recreation": 42,
+    "burial-ground": 8,
     "special-zone": 9
   },
   "village_counts": {
-    "Thullur": 7753,
-    "Venkatapalem": 3505,
-    "Nowlur": 5820,
-    "Lingayapalem": 2130,
-    "Malkapuram": 1156,
-    "Nidamarru": 5595,
-    "Kuragallu": 8325,
-    "(N/A)": 4910,
-    "Rayapudi": 5413,
-    "Ananthavaram": 4765,
-    "Yerrabalem": 3508,
-    "Sakhamuru": 3841,
-    "Kondamarajupalem": 1807,
-    "Mandadam": 6992,
-    "Inavolu": 3409,
-    "Nekkallu": 3264,
-    "Abbarajupalem": 1782,
-    "Pitchakalapalem": 1764,
-    "Borupalem": 1164,
-    "Krishnayapalem": 3146,
-    "Velagapudi": 4182,
-    "Nelapadu": 2726,
-    "Mandadam-2": 21,
-    "Gannavaram": 341,
+    "Inavolu": 3260,
+    "Nidamarru": 5253,
+    "Nowluru": 5541,
+    "Rayapudi": 5096,
+    "Yerrabalem": 3747,
+    "Kuragallu": 8256,
+    "Lingayapalem": 2163,
     "Dondapadu": 821,
-    "Uddandarayunipalem": 1103,
-    "Nidamarru-1": 101,
-    "Rayapudi-1": 139,
-    "Thullur-1": 112,
-    "DONDAPADU": 24,
-    "Mandadam-1": 197,
-    "RAYAPUDI": 18,
-    "KONDAMARAJUPALEM": 4,
-    "INAVOLU": 4,
-    "VELAGAPUDI": 1,
-    "VENKATAPALEM": 1,
-    "Nowluru": 217,
-    "Kuragallu,Nidamarru": 5,
-    "Maplapuram": 1,
-    "Pitchikalapalem": 35,
-    "Penumaka": 3970,
-    "Pitchikalaplem": 18,
-    "velagapudi": 8,
-    "Rayapudi, Lingayapalem": 8,
-    "Rayapudi, Kondamarajupalem": 13,
-    "Nelapadu, Sakhamuru": 8,
-    "Sakhamuru,Velgapudi,Inavolu": 1,
-    "Nowluru,Kuragallu": 1,
-    "UDPalem": 5,
-    "Lingayapalem,UDPalem": 1,
-    "Uddandarayunipalem,Velagapudi": 2,
-    "Ananthavaram,Thulluru": 1,
-    "Velgapudi": 1,
-    "Lingayapalem,Uddandarayunipalem": 1,
-    "Ptichikalapalem": 3,
-    "Abbarajupalem: Rayapudi": 1,
-    "KRISHNAYAPALEM": 17,
-    "MANDADAM": 1,
-    "Mandadam,Venkatapalem": 1,
-    "Inavolu ; Mandadam": 3,
-    "Uddandaryunipalem ; Velagapudi": 1,
-    "Undavalli": 1124
+    "Pitchakalapalem": 1805,
+    "Thullur": 7785,
+    "Borupalem": 1160,
+    "Abbarajupalem": 1781,
+    "Velagapudi": 4092,
+    "(N/A)": 4176,
+    "Ananthavaram": 4712,
+    "Sekhamuru": 3318,
+    "Nekkallu": 3185,
+    "Sakhamuru": 525,
+    "Nelapadu": 2624,
+    "Venkatapalem": 3429,
+    "Krishnayapalem": 3095,
+    "Kondamarajupalem": 1789,
+    "Mandadam": 6627,
+    "Uddandarayunipalem": 945,
+    "Malkapuram": 1083,
+    "Rayapudi-1": 119,
+    "DONDAPADU": 20,
+    "Gannavaram": 291,
+    "Mandadam-1": 187,
+    "RAYAPUDI": 10,
+    "Mandadam-2": 19,
+    "KONDAMARAJUPALEM": 3,
+    "VENKATAPALEM": 1
   },
   "search_entries": {
-    "plots": 95291,
-    "landmarks": 162,
+    "plots": 86918,
+    "landmarks": 116,
     "roads": 35
   },
   "allocated_land_categories": {
-    "education": {
-      "label": "Education",
-      "color": "#FF9800"
-    },
-    "health": {
-      "label": "Health",
-      "color": "#F44336"
-    },
-    "civic": {
-      "label": "Civic & Social",
-      "color": "#9C27B0"
-    },
-    "government": {
-      "label": "Government",
+    "Govt of India": {
+      "label": "Govt of India",
       "color": "#D32F2F"
     },
-    "financial": {
-      "label": "Financial",
+    "Govt of India (PSU)": {
+      "label": "Govt of India (PSU)",
+      "color": "#E57373"
+    },
+    "Govt of AP": {
+      "label": "Govt of AP",
+      "color": "#F4511E"
+    },
+    "Govt of AP (PSU)": {
+      "label": "Govt of AP (PSU)",
+      "color": "#FF8A65"
+    },
+    "University": {
+      "label": "University",
       "color": "#1976D2"
     },
-    "infrastructure": {
-      "label": "Infrastructure & PSU",
-      "color": "#455A64"
+    "School": {
+      "label": "School",
+      "color": "#42A5F5"
     },
-    "sports": {
+    "Healthcare": {
+      "label": "Healthcare",
+      "color": "#00897B"
+    },
+    "Sports": {
       "label": "Sports",
-      "color": "#4CAF50"
+      "color": "#43A047"
     },
-    "private": {
-      "label": "Private & Commercial",
+    "Spiritual / Religious": {
+      "label": "Spiritual / Religious",
+      "color": "#8E24AA"
+    },
+    "Hotel": {
+      "label": "Hotel",
+      "color": "#FB8C00"
+    },
+    "PPP / Private": {
+      "label": "PPP / Private",
       "color": "#607D8B"
+    },
+    "Housing": {
+      "label": "Housing",
+      "color": "#6D4C41"
+    },
+    "Other allotment": {
+      "label": "Other allotment",
+      "color": "#90A4AE"
+    },
+    "Other": {
+      "label": "Other",
+      "color": "#90A4AE"
     }
   }
 }

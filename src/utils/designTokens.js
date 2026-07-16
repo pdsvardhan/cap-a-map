@@ -6,7 +6,9 @@
  * direction (default 'B' Warm Cadastre; override with ?dir=A|B|C|D) and maps each
  * raw plot `symbology` to a zone code → hex, so MapLibre gets static colours.
  */
-import GEN from './designTokens.generated.json'
+// Import attribute required so the offline pipeline can load this chain under
+// plain Node ESM (Vite accepts it too).
+import GEN from './designTokens.generated.json' with { type: 'json' }
 
 const DEFAULT_DIR = 'C'   // Statutory Dark — owner pick (the "official" palette on dark)
 function pickDir() {
