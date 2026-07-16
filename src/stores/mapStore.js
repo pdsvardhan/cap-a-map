@@ -31,6 +31,7 @@ const useMapStore = create((set, get) => ({
   // Data state
   namedRoadsIndex: [],
   plotCounts: {},
+  totalPlots: null,               // meta.json total_plots — null until meta loads
   regionScores: null,             // region_scores.json (adr-008)
 
   // Map internals (not reactive — stored as refs)
@@ -55,6 +56,7 @@ const useMapStore = create((set, get) => ({
   setActiveZoningGroups: (groups) => set({ activeZoningGroups: groups }),
   setNamedRoadsIndex: (index) => set({ namedRoadsIndex: index }),
   setPlotCounts: (counts) => set({ plotCounts: counts }),
+  setTotalPlots: (n) => set({ totalPlots: n }),
   setRegionScores: (scores) => set({ regionScores: scores }),
 
   // Internal setters (map instance, data refs)

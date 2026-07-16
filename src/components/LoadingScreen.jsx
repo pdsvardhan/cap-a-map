@@ -4,6 +4,7 @@ import useMapStore from '../stores/mapStore'
 export default function LoadingScreen() {
   const stage = useMapStore((s) => s.loadingStage)
   const error = useMapStore((s) => s.loadingError)
+  const totalPlots = useMapStore((s) => s.totalPlots)
   const [displayedProgress, setDisplayedProgress] = useState(0)
   const [prevWord, setPrevWord] = useState(null)
   const [currentWord, setCurrentWord] = useState(stage.label)
@@ -57,7 +58,11 @@ export default function LoadingScreen() {
         </div>
 
         <h1 className="text-[26px] font-bold tracking-tight text-[var(--text-1)] mb-1">Amaravati</h1>
-        <p className="text-[var(--text-3)] text-[13px] tracking-wide mb-10 mono uppercase">Land Explorer · 95,291 plots</p>
+        {/* Count comes from meta.json (total_plots), which lands at LOADING_INDEX — so the
+            subtitle reads "Land Explorer" for the first moment, then gains the count. */}
+        <p className="text-[var(--text-3)] text-[13px] tracking-wide mb-10 mono uppercase">
+          Land Explorer{totalPlots ? ` · ${totalPlots.toLocaleString()} plots` : ''}
+        </p>
 
         {error ? (
           <div className="mb-8">

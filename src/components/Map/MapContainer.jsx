@@ -73,6 +73,7 @@ export default function MapContainer() {
         try {
           const meta = await fetch(DATA_PATHS.meta).then((r) => r.json())
           if (meta?.zoning_group_counts) store.setPlotCounts(meta.zoning_group_counts)
+          if (meta?.total_plots) store.setTotalPlots(meta.total_plots)
         } catch (e) { /* non-fatal */ }
 
         // Plots vector source (PMTiles)
