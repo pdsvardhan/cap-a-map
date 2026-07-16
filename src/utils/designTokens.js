@@ -55,3 +55,6 @@ export function colorForSymbology(sym) {
 export const WATER_FILL = ZONE_HEX.WAT
 // Road-reserve plot fill = the U2 zone colour for this direction.
 export const ROAD_RESERVE_FILL = ZONE_HEX.U2
+// Sequential data-mode ramp (plot-area now, land-value later) — 6 stops pale→deep
+// at the active direction's rampHue. Baked by gen_design_tokens.mjs.
+export const RAMP = TOKENS.ramp || ['#1a9850', '#91cf60', '#fee08b', '#fc8d59', '#d73027', '#7b2d8e']

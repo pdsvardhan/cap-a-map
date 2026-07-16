@@ -2,7 +2,7 @@ import React from 'react'
 import useMapStore from '../../stores/mapStore'
 import { getColorForSymbology, getGroupForSymbology, ZONING_GROUPS, getZoneName, getAllocatedLandColor } from '../../utils/colors'
 import { formatArea, formatDimensions, formatFarmerName, formatNeighbour } from '../../utils/formatters'
-import { getRoadType, getROW, getRoadData, getLanePattern } from '../../utils/roadAttributes'
+import { getRoadVillages, getRoadLengthKm } from '../../utils/roadAttributes'
 import { NAMED_ROAD_COLOR, SHOW_OWNER_NAMES } from '../../utils/constants'
 import { computeNode } from '../../utils/regions'
 
@@ -261,6 +261,10 @@ function InfoGrid({ items }) {
 function RoadInfoPanel({ plot, onClose }) {
   const color = NAMED_ROAD_COLOR
   const meets = plot.meets || []
+  // Enrichment from the canonical road table (WB EIA): villages traversed +
+  // length fallback when the roads index didn't carry a computed length_km.
+  const villages = getRoadVillages(plot.name)
+  const lengthKm = plot.length_km != null ? plot.length_km : getRoadLengthKm(plot.name)
   return (
     <div className="glass absolute z-20 flex flex-col animate-slide-in inset-x-0 bottom-0 h-[72%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-[380px] sm:h-full sm:rounded-t-none sm:border-l">
       <div className="px-5 py-4 border-b border-[var(--border)] flex-shrink-0">
@@ -297,9 +301,18 @@ function RoadInfoPanel({ plot, onClose }) {
         )}
         <Section title="Geometry">
           <InfoGrid items={[
-            { label: 'Length', value: plot.length_km != null ? `${plot.length_km} km` : undefined },
+            { label: 'Length', value: lengthKm != null ? `${lengthKm} km` : undefined },
           ]} />
         </Section>
+        {villages.length > 0 && (
+          <Section title="Villages traversed">
+            <div className="flex flex-wrap gap-1.5">
+              {villages.map((v) => (
+                <span key={v} className="text-xs px-2 py-0.5 bg-white/[0.07] text-[var(--text-2)] rounded font-medium">{v}</span>
+              ))}
+            </div>
+          </Section>
+        )}
         {plot.remarks && (
           <Section title="Notes"><p className="text-sm text-[var(--text-2)]">{plot.remarks}</p></Section>
         )}
@@ -311,285 +324,3 @@ function RoadInfoPanel({ plot, onClose }) {
   )
 }
 
-function NeighbourCell({ label, value }) {
-  const displayValue = formatNeighbour(value)
-  const isRoad = displayValue.includes('mtr Road') || displayValue.includes('Walkway')
-  const isVacant = displayValue.includes('Vacant')
-
-  return (
-    <div
-      className={`rounded p-1.5 text-[10px] leading-tight ${
-        isRoad ? 'bg-white/[0.07] text-[var(--text-2)]' :
-        isVacant ? 'bg-yellow-50 text-yellow-700' :
-        'bg-slate-50 text-slate-600'
-      }`}
-      title={displayValue}
-    >
-      <div className="font-semibold text-[9px] text-[var(--text-3)] mb-0.5">{label}</div>
-      <div className="truncate">{displayValue === 'N/A' ? '\u2014' : displayValue}</div>
-    </div>
-  )
-}
-
-function RoadDetailPanel({ plot, onClose, namedRoadsIndex = [] }) {
-  const [roadName, setRoadName] = React.useState(plot._roadName || plot._inferredRoadName || '')
-  const [saved, setSaved] = React.useState(!!plot._roadName)
-  const [isUnnamed, setIsUnnamed] = React.useState(!!plot._isUnnamed)
-  const displayName = (plot._roadName || roadName) || ''
-  const roadMeta = namedRoadsIndex.find(r => (r.name || '').toUpperCase() === displayName.toUpperCase())
-  const meets = (roadMeta && roadMeta.meets) || []
-
-  const googleMapsLink = plot.lat && plot.lon
-    ? `https://www.google.com/maps?q=${plot.lat},${plot.lon}`
-    : null
-
-  function refreshNamedRoads() {
-    useMapStore.getState()._refreshNamedRoads?.()
-  }
-
-  function handleSave() {
-    if (!plot._locKey || !roadName.trim()) return
-    try {
-      const roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}')
-      roadNames[plot._locKey] = roadName.trim()
-      localStorage.setItem('roadNames', JSON.stringify(roadNames))
-      // Remove from unnamed set if it was there
-      removeFromUnnamed(plot._locKey)
-      setSaved(true)
-      setIsUnnamed(false)
-      refreshNamedRoads()
-    } catch (e) { /* ignore */ }
-  }
-
-  function handleClear() {
-    if (!plot._locKey) return
-    try {
-      const roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}')
-      delete roadNames[plot._locKey]
-      localStorage.setItem('roadNames', JSON.stringify(roadNames))
-      setRoadName('')
-      setSaved(false)
-      refreshNamedRoads()
-    } catch (e) { /* ignore */ }
-  }
-
-  function handleMarkUnnamed() {
-    if (!plot._locKey) return
-    try {
-      const raw = JSON.parse(localStorage.getItem('roadUnnamed') || '[]')
-      const set = new Set(raw)
-      set.add(plot._locKey)
-      localStorage.setItem('roadUnnamed', JSON.stringify([...set]))
-      // Also clear any saved name
-      const roadNames = JSON.parse(localStorage.getItem('roadNames') || '{}')
-      delete roadNames[plot._locKey]
-      localStorage.setItem('roadNames', JSON.stringify(roadNames))
-      setIsUnnamed(true)
-      setRoadName('')
-      setSaved(false)
-      refreshNamedRoads()
-    } catch (e) { /* ignore */ }
-  }
-
-  function handleMarkNamed() {
-    if (!plot._locKey) return
-    removeFromUnnamed(plot._locKey)
-    setIsUnnamed(false)
-    refreshNamedRoads()
-  }
-
-  function removeFromUnnamed(key) {
-    try {
-      const raw = JSON.parse(localStorage.getItem('roadUnnamed') || '[]')
-      const set = new Set(raw)
-      set.delete(key)
-      localStorage.setItem('roadUnnamed', JSON.stringify([...set]))
-    } catch (e) { /* ignore */ }
-  }
-
-  return (
-    <div className="glass absolute z-20 flex flex-col animate-slide-in inset-x-0 bottom-0 h-[72%] rounded-t-2xl sm:inset-auto sm:top-0 sm:right-0 sm:w-[380px] sm:h-full sm:rounded-t-none sm:border-l">
-      {/* Header */}
-      <div className="px-5 py-4 border-b border-[var(--border)] flex-shrink-0">
-        <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-4 h-4 rounded bg-gray-800 border border-gray-600" />
-              <span className="text-xs font-medium text-[var(--text-2)]">Road Reserve</span>
-              {plot._segmentId != null && (
-                <span className="text-3xl font-mono font-bold text-orange-500 ml-auto">
-                  #{String(plot._segmentId).padStart(4, '0')}
-                </span>
-              )}
-            </div>
-            <h2 className="text-lg font-bold text-[var(--text-1)]">
-              {isUnnamed ? 'Marked as Unnamed' : (plot._roadName || 'Unnamed Road')}
-            </h2>
-            <p className="text-sm text-[var(--text-3)]">{plot.symbology}</p>
-          </div>
-          <CloseButton onClick={onClose} />
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto panel-scroll px-5 py-4 space-y-5">
-
-        {/* Named / Unnamed Toggle */}
-        <Section title="Road Status">
-          <div className="flex gap-4">
-            <label className={`flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border transition-colors ${
-              !isUnnamed ? 'border-blue-500 bg-blue-50' : 'border-[var(--border)] hover:bg-gray-50'
-            }`}>
-              <input
-                type="radio"
-                name="roadStatus"
-                checked={!isUnnamed}
-                onChange={handleMarkNamed}
-                className="accent-blue-600"
-              />
-              <span className="text-sm font-medium text-[var(--text-2)]">Named</span>
-            </label>
-            <label className={`flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border transition-colors ${
-              isUnnamed ? 'border-red-500 bg-red-50' : 'border-[var(--border)] hover:bg-gray-50'
-            }`}>
-              <input
-                type="radio"
-                name="roadStatus"
-                checked={isUnnamed}
-                onChange={handleMarkUnnamed}
-                className="accent-red-600"
-              />
-              <span className="text-sm font-medium text-[var(--text-2)]">Unnamed</span>
-            </label>
-          </div>
-          {isUnnamed && (
-            <p className="mt-2 text-xs text-red-600">This segment is excluded from named road rendering.</p>
-          )}
-        </Section>
-
-        {/* Road Name Editor (only when not marked unnamed) */}
-        {!isUnnamed && (
-        <Section title="Road Name">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={roadName}
-              onChange={(e) => { setRoadName(e.target.value); setSaved(false) }}
-              placeholder="e.g. E8, N3..."
-              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <button
-              onClick={handleSave}
-              disabled={!roadName.trim() || saved}
-              className={`px-3 py-2 text-sm rounded-lg font-medium transition-colors ${
-                saved
-                  ? 'bg-green-100 text-green-700 cursor-default'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
-            >
-              {saved ? 'Saved' : 'Save'}
-            </button>
-          </div>
-          {saved && roadName && (
-            <button
-              onClick={handleClear}
-              className="mt-2 text-xs text-red-500 hover:text-red-700 underline"
-            >
-              Remove name
-            </button>
-          )}
-        </Section>
-        )}
-
-        {/* Road attributes (from Amaravati road data) */}
-        {getRoadData(displayName) && (() => {
-          const rd = getRoadData(displayName)
-          const star = rd.confidence === 'B' ? ' *' : rd.confidence === 'C' ? ' **' : ''
-          const laneDesc = rd.brt_lanes > 0
-            ? `${rd.carriageway_lanes} + ${rd.brt_lanes} BRT + ${rd.carriageway_lanes}`
-            : `${rd.carriageway_lanes} + ${rd.carriageway_lanes}`
-          return (
-            <Section title="Road attributes">
-              <InfoGrid items={[
-                { label: 'Type', value: (rd.category || '\u2014') + star },
-                { label: 'ROW', value: rd.row_m ? `${rd.row_m} m${star}` : '\u2014' },
-                { label: 'Lane Pattern', value: rd.lane_pattern ? `${rd.lane_pattern} (${laneDesc})${star}` : '\u2014' },
-                { label: 'Orientation', value: rd.orientation || '\u2014' },
-              ]} />
-              <div className="flex gap-3 mt-2">
-                {rd.brt_present && (
-                  <span className="text-[10px] px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">BRT</span>
-                )}
-                {rd.connects_nh16 && (
-                  <span className="text-[10px] px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">NH-16</span>
-                )}
-              </div>
-              {star && (
-                <p className="text-[9px] text-[var(--text-3)] mt-1">* high confidence | ** indicative</p>
-              )}
-            </Section>
-          )
-        })()}
-
-        {/* Junctions: which roads this one meets (for directions) */}
-        {meets.length > 0 && (
-          <Section title="Connects to">
-            <p className="text-sm text-[var(--text-2)]">
-              {meets.sort((a, b) => a.localeCompare(b)).join(', ')}
-            </p>
-          </Section>
-        )}
-
-        {/* Area */}
-        <Section title="Area">
-          <InfoGrid items={[
-            { label: 'Reserve Area', value: formatArea(plot.alloted_ex, plot.nbr || 'Sq.Yards') },
-          ]} />
-        </Section>
-
-        {/* Location (when available) */}
-        {plot.village && plot.village !== 'N/A' && (
-          <Section title="Location">
-            <InfoGrid items={[
-              { label: 'Village', value: plot.village },
-              { label: 'Township', value: plot.township && plot.township !== '0' && plot.township !== 0 ? plot.township : undefined },
-            ]} />
-          </Section>
-        )}
-
-        {/* Coordinates */}
-        {plot.lat && plot.lon && (
-          <Section title="Position">
-            <InfoGrid items={[
-              { label: 'Latitude', value: typeof plot.lat === 'number' ? plot.lat.toFixed(6) : plot.lat },
-              { label: 'Longitude', value: typeof plot.lon === 'number' ? plot.lon.toFixed(6) : plot.lon },
-            ]} />
-          </Section>
-        )}
-
-        {/* Google Maps Link */}
-        {googleMapsLink && (
-          <Section title="External Links">
-            <a
-              href={googleMapsLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-[var(--accent)] hover:brightness-125 hover:underline"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Open in Google Maps
-            </a>
-          </Section>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="px-5 py-3 border-t border-[var(--border)] flex-shrink-0">
-        <p className="text-[10px] text-[var(--text-3)]">Click road segments to name them. Names saved in browser.</p>
-      </div>
-    </div>
-  )
-}

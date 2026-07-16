@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import useMapStore from '../../stores/mapStore'
 import { ZONING_GROUPS, ZONING_HIERARCHY, AREA_HEATMAP_LEGEND, getGroupColor } from '../../utils/colors'
-import { ROAD } from '../../utils/designTokens'
+import { ROAD, RAMP } from '../../utils/designTokens'
 
 const ALL_GROUP_KEYS = Object.keys(ZONING_GROUPS)
 
@@ -314,7 +314,7 @@ export default function Legend() {
               <div
                 className="h-3 rounded-sm w-full"
                 style={{
-                  background: 'linear-gradient(to right, #1a9850, #91cf60, #fee08b, #fc8d59, #d73027, #7b2d8e)',
+                  background: `linear-gradient(to right, ${RAMP.join(', ')})`,
                 }}
               />
               <div className="flex justify-between mt-0.5">

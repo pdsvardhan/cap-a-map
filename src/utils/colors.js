@@ -3,7 +3,7 @@
  * Fill colours now come from the active design direction (designTokens.js); the
  * ZONING_GROUPS structure below is retained for the legend grouping + labels.
  */
-import { colorForSymbology, IS_LIGHT } from './designTokens'
+import { colorForSymbology, IS_LIGHT, RAMP } from './designTokens'
 
 export const ZONING_GROUPS = {
   'residential-high': {
@@ -412,17 +412,13 @@ export const ZONING_HIERARCHY = [
 
 /**
  * Plot area heatmap: color expression based on alloted_ex (Sq.Yards).
- * Small plots = warm (yellow), medium = orange, large = deep red/purple.
- * Road reserves (transparent/U2) stay muted.
+ * Small plots = pale, large = deep — a single-hue sequential ramp derived from
+ * the active design direction's rampHue (RAMP, from designTokens). Road reserves
+ * (transparent/U2) stay muted.
  */
 export function buildAreaHeatmapExpression() {
-  // Gradient breakpoints in Sq. Yards:
-  //   0-200:     small plots (bright yellow-green)
-  //   200-500:   medium-small (yellow)
-  //   500-1000:  medium (orange)
-  //   1000-2000: medium-large (red-orange)
-  //   2000-5000: large (red)
-  //   5000+:     very large (deep purple)
+  // Gradient breakpoints in Sq. Yards mapped onto the 6-stop design ramp:
+  //   0 · 200 · 500 · 1000 · 2000 · 5000+  (pale → deep)
   return [
     'case',
     // Road reserves stay nearly invisible
@@ -438,29 +434,29 @@ export function buildAreaHeatmapExpression() {
     'rgba(120,120,120,0.3)',
     ['==', ['get', 'alloted_ex'], 0],
     'rgba(120,120,120,0.3)',
-    // Area-based gradient
+    // Area-based gradient (design-token ramp)
     [
       'interpolate', ['linear'], ['get', 'alloted_ex'],
-      0,    '#1a9850',   // green - tiny
-      200,  '#91cf60',   // light green
-      500,  '#fee08b',   // yellow
-      1000, '#fc8d59',   // orange
-      2000, '#d73027',   // red
-      5000, '#7b2d8e',   // purple - very large
+      0,    RAMP[0],
+      200,  RAMP[1],
+      500,  RAMP[2],
+      1000, RAMP[3],
+      2000, RAMP[4],
+      5000, RAMP[5],
     ],
   ]
 }
 
 /**
- * Area heatmap legend breakpoints for display.
+ * Area heatmap legend breakpoints for display (design-token ramp).
  */
 export const AREA_HEATMAP_LEGEND = [
-  { label: '< 200 Sq.Yd', color: '#91cf60' },
-  { label: '200–500', color: '#fee08b' },
-  { label: '500–1,000', color: '#fc8d59' },
-  { label: '1,000–2,000', color: '#d73027' },
-  { label: '2,000–5,000', color: '#7b2d8e' },
-  { label: '> 5,000', color: '#4a0072' },
+  { label: '< 200 Sq.Yd', color: RAMP[0] },
+  { label: '200–500', color: RAMP[1] },
+  { label: '500–1,000', color: RAMP[2] },
+  { label: '1,000–2,000', color: RAMP[3] },
+  { label: '2,000–5,000', color: RAMP[4] },
+  { label: '> 5,000', color: RAMP[5] },
 ]
 
 /**

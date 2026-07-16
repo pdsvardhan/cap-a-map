@@ -60,13 +60,23 @@ function zoneHex(code, theme, bold = BOLD) {
   return toHex(oklch2rgb(L, C, H))
 }
 
+// Sequential 6-stop data ramp at a single hue (pale/low → deep/saturated),
+// used for the Plot-area (and future Land-value) data modes. Hue per theme.
+function rampFrom(hue) {
+  const stops = [
+    [0.90, 0.05], [0.83, 0.09], [0.74, 0.13], [0.63, 0.16], [0.52, 0.17], [0.41, 0.15],
+  ]
+  return stops.map(([L, C]) => toHex(oklch2rgb(L, C, hue)))
+}
+
 const out = {}
 for (const [id, theme] of Object.entries(THEMES)) {
   const zones = {}
   for (const z of ZMETA) zones[z.code] = zoneHex(z.code, theme)
   out[id] = {
     name: theme.name, light: theme.light, bg: theme.bg, ink: theme.ink,
-    landBase: theme.landBase, road: theme.road, rampHue: theme.rampHue, zones,
+    landBase: theme.landBase, road: theme.road, rampHue: theme.rampHue,
+    ramp: rampFrom(theme.rampHue), zones,
   }
 }
 const file = path.join(__dirname, '..', 'src', 'utils', 'designTokens.generated.json')
