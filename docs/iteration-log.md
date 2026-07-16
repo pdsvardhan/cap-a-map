@@ -1,5 +1,91 @@
 # Iteration Log — cap-a (Capital of Amaravati)
 
+## Session 2026-07-16 — backlog clear: scoring engine (L4), authoritative mosaic, privacy
+
+**Stage:** 3 (Build) → Stage 4 iterations 81 + 82, on branch `rebuild`.
+**Arc:** clear the open backlog → build the L2–L4 scoring engine → discover #136 was never
+actually blocked → reprocess onto the authoritative mosaic → find and close two real PII leaks.
+
+**8 of 11 open to-dos done** (#146, #8, #129, #138, #137, #127, #135, #136); 3 remain and are
+not mine to close (#139 owner eyeball · #145 infra repo · #147 owner chose gated).
+
+**Iteration 81 — polish/cleanup** (5 items, verifier APPROVE ×5, deployed):
+- #146 dead code: `roadSegmentMapping`/`junctionMatrix`/`SegmentIdFlash` + `NeighbourCell`/
+  `RoadDetailPanel` + orphaned store plumbing. −351 LOC, zero surviving refs.
+- #8 `.gitea/workflows/ci.yml` — quality gates + `RUN_TESTS` toggle (rebuild had only security-scan).
+- #129 road panel: "Villages traversed" parsed from the WB-EIA remarks + length fallback.
+- #138 ivory allotment overlay (canvas hatch pattern + theme-aware outline + name).
+- #137 area ramp wired from `designTokens.rampHue` (was hardcoded green→purple).
+
+**Iteration 82 — L2–L4 scoring engine, adr-008** (3 items, verifier APPROVE ×3, deployed):
+- `pipeline/10_scoring.mjs` → `region_scores.json`: plots → 1km Node cells, 32-anchor catalog
+  from AMARAVATI_CONTEXT §3 (27 resolved / 5 skipped, **no coordinates invented**),
+  dominant-anchor `0.6·max + 0.4·noisy-OR(top-5)`, status weights 1.0/0.7/0.4/0.2, two lenses,
+  top-3 drivers per cell, flood penalty.
+- Value data-mode: colours plots by their Node cell via a MapLibre `step→concat→match` over
+  per-feature lat/lon — **no tile regen needed**. Verified 0 mismatches vs `computeNode` across
+  all plots, 100% coverage.
+
+**The sanity gate earned its keep.** It caught noisy-OR saturation (27 anchors' distant tails
+pushed every cell to ~0.75, flattening the field), a completely missing driver (the existing
+city across the Krishna — §4 prices the whole southern corridor on Vijayawada access, not on
+capital anchors), and a village-aggregation artifact (a core-adjacent mixed cell inflating
+whichever village was its plurality label). Then it exposed a problem in its own reference:
+**§4 (price table) and §7 (prose gradient) contradict each other** on Undavalli/Penumaka.
+Owner adjudicated for §4; the gate was downgraded from hard-fail to a reported warning because
+its biggest disagreements are where the model is defensibly right and the band is lagging
+(Quantum Valley; the High Court at Nelapadu). ρ is printed **both ways** every run
+(0.455 excl. Nelapadu / 0.129 incl.) so the headline can't be read as unbiased.
+
+**#136 — my error, corrected.** I reported the mosaic as "source data absent → blocked" and the
+owner deferred on that basis. adr-002 already said the raw layers were *gitignored yet
+regenerable*: `gis.apcrda.org` was reachable and `klokantech/tippecanoe` was present. It was
+never blocked. Reprocessed onto **LPSMosaicDec2024 (86,918 plots)**: `lu_desc` 86,918 /
+`lu_code` 86,600 (only 10 unmapped), **per-plot `fsi`** (78,781, mean 2.095), precise
+`extn_sqyrd` area, 8-direction neighbours.
+
+**🔒 PRIVACY — two real exposures found and closed:**
+1. The mosaic carries **`aadhar_no` (Aadhaar national ID numbers)** beside owner names.
+   `.dockerignore` did not exclude `public/data/sources`, and `/data/sources/*` **is** served
+   (HTTP 200) — the next image build would have published 195MB of Aadhaar numbers. Nothing in
+   the client fetches it (pipeline input only); now excluded. Verified: absent from image, 404.
+2. **Pre-existing:** the served `search.json` carried an owner name on **every plot** (`"f"`),
+   despite `SHOW_OWNER_NAMES=false` meaning the UI never showed them. Dropped at source.
+   Verified: 87,069 records, 0 with an `f` field; tile schema has no PII. **This was a hard
+   blocker for #147 and is now cleared.**
+
+**Decisions:** adr-008 (scoring engine) — written, then **amended to match the shipped code**
+after the verifier caught the ADR claiming ~40 anchors (actual 32) and a plain Σ blend (actual
+noisy-OR top-5).
+
+**Friction:**
+- *tooling* — `colors.js` imported `./designTokens` extensionless and `designTokens.js`
+  imported JSON without an attribute, so **no pipeline stage importing colors.js could run
+  under plain Node**: `01_clean` and `04_indexes` were both dead. Fixed (explicit `.js` +
+  `with { type: 'json' }`); vite stays green.
+- *tooling* — `04_indexes` imported `categorizeAllocatedLand`, which `colors.js` no longer
+  exports, and mis-typed `ALLOCATED_LAND_CATEGORIES`. Fixed.
+- *data-mismatch* — the mosaic uses **both** `Sekhamuru` and `Sakhamuru`; NID-AP was anchoring
+  to a 525-plot fragment. Normalized.
+- *data-mismatch* — the mosaic contains **neither Undavalli nor Penumaka**, so the Vijayawada
+  gateway anchor silently vanished on the switch. Re-anchored to E3's eastern terminus
+  (derived from authoritative road geometry, not invented).
+- *env-limitation* — `mirror:write` targets `/mnt/storage/websites/cap-a` (master branch) while
+  all real work lives in `/mnt/storage/websites/cap-a-rebuild` (branch `rebuild`). The YAML
+  mirrors land in the wrong worktree. Worth reconciling.
+- *env-limitation* — the deployed dir was not under git at session start; it is now a proper
+  worktree on `rebuild`.
+
+**Next session context:**
+- **Owner input needed:** #139 land_base tone (eyeball); #147 public exposure (privacy blocker
+  now cleared); review the mosaic's coverage change (86,918 vs 95,291 — Undavalli/Penumaka
+  omitted, plausibly non-LPS villages) and the deliberate score-vs-asking-price divergence.
+- **Scoring follow-ups:** the mosaic now carries **per-plot FSI** (78,781 plots) — the engine
+  still reads FSI from the 114 allotment/available polygons; switching to per-plot FSI is a
+  clear upgrade. Supplying real coordinates for the 5 skipped anchors (SRM/Neerukonda, AIIMS,
+  Pi DC, NRI, ACA — 45% of the operational tier) would sharpen the south/edge scores.
+- Zoning-mix per region is still deferred; per-plot `lu_code` now exists to build it.
+
 ## Session 2026-07-01 — build: roads, authentic data, labels, regions, design system
 
 **Stage:** 3 (Build) on branch `rebuild`.

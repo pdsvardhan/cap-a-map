@@ -1,16 +1,26 @@
 # Capital of Amaravati (cap-a)
 
 ## Status
-- **Current Step:** 3 (Build) — full rebuild on branch `rebuild`; **Ottomate Stage 0→3 done for built scope** (2026-07-01)
-- **Current Sub-Step:** L0 + most of L1 = 7 features verified (independent verifier) + **deployed live** (project-cap-a :8502); next = scoring engine (L2–L4)
+- **Current Step:** 3 (Build) — branch `rebuild`; **L2–L4 scoring engine shipped** (2026-07-16)
+- **Current Sub-Step:** L0–L4 live behind the SSO gate. Backlog cleared: 8 of 11 open to-dos done in one session (#146, #8, #129, #138, #137, #127, #135, #136). Data is now the authoritative APCRDA mosaic.
 - **Step Status:** in-progress
-- **Last Session:** 2026-07-01
-- **Next Action:** Build the valuation/scoring engine L2–L4 (#127/#135/#136); wire Value data-mode ramp (#137); public-exposure decision (#147); dead-code cleanup (#146)
-- **Blockers:** None (risk #7 tippecanoe = host binary only; Docker tippecanoe path works)
-- **Your Action Needed:** No
-- **Action Description:** —
-- **Action Type:** —
-- **Ottomate SO1:** locked in tracker — 13 features (7 done / 1 building / 1 dropped / 4 planned), 8 flows, 2 pages; ADRs 003–006. cap-a.vault7a.xyz is SSO-gated (not yet public).
+- **Last Session:** 2026-07-16
+- **Next Action:** #139 land_base tone (owner must eyeball); #147 public exposure (its privacy blocker is now CLEARED — see below); #145 Ottomate ND1-finalize write path (infra repo, not this one).
+- **Blockers:** None.
+- **Your Action Needed:** Yes
+- **Action Description:** (1) Eyeball the land_base tone at zoomed-out C (#139) — one-line adjustable in `scripts/gen_design_tokens.mjs`. (2) Decide #147 public exposure. (3) Review two judgement calls: the mosaic omits Undavalli/Penumaka (86,918 vs the old 95,291 plots) — plausibly because they sit outside the land-pooling scheme, but that is an interpretation; and the scoring index diverges from broker asking prices by design (ρ 0.455 excl. Nelapadu / 0.129 incl.).
+- **Action Type:** review
+- **Ottomate SO1:** 13 features, 8 flows, 2 pages; ADRs 003–008. cap-a.vault7a.xyz is SSO-gated (not yet public).
+
+### ⚠️ Privacy — read before touching the data pipeline
+The authoritative APCRDA mosaic carries `farmer_n` (owner names) **and `aadhar_no`
+(Aadhaar national ID numbers)**. Everything the pipeline emits is published (nginx serves
+`plots.pmtiles` + `search.json`). Two exposures were found and closed on 2026-07-16:
+`.dockerignore` now excludes `public/data/sources` (it was about to ship 195MB of Aadhaar
+numbers into the image), and `01_clean_mosaic.mjs` drops every identity field at source —
+the served `search.json` used to carry an owner name on **every plot**. Do not re-add
+identity fields to tiles, indexes, or the bundle. `SHOW_OWNER_NAMES=false` hides them in
+the UI; it does **not** keep them out of the files.
 
 > **⚠️ This file's lower sections are pre-rebuild and partly stale.** The 2026-06 rebuild reframed the product as an **intelligent land-value explorer** (not just a map). Source of truth:
 > - `docs/UNDERSTANDING.md` — confirmed vision, data reality, scoring model (the canonical doc)
