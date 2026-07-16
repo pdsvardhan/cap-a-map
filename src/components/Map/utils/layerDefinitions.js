@@ -16,6 +16,8 @@ export function getLandBaseLayer() {
 const PLOT_OUTLINE = IS_LIGHT ? 'rgba(40,33,20,0.22)' : '#20242C'
 const ROAD_EDGE = IS_LIGHT ? 'rgba(18,12,4,0.45)' : (ROAD.casing || '#23262E')
 const HIGHLIGHT = IS_LIGHT ? '#0f0d09' : '#FFFFFF'
+// Allotment overlay: ivory outline (deeper tan on light themes so it stays legible).
+const ALLOT_OUTLINE = IS_LIGHT ? '#9c8a5e' : '#e7dfc8'
 
 export function getPlotFillLayer() {
   return {
@@ -150,12 +152,15 @@ export function getWaterFillLayer() {
   }
 }
 
+// Ivory hatch overlay (owner design: outline + hatch + name) — reads as an
+// overlay on the zoning beneath instead of the old solid-orange block. The
+// 'ivory-hatch' pattern image is registered in MapContainer before this layer.
 export function getAllocatedLandsFillLayer() {
   return {
     id: LAYERS.ALLOCATED_LANDS,
     type: 'fill',
     source: 'allocated_lands',
-    paint: { 'fill-color': '#FF6F00', 'fill-opacity': 0.5 },
+    paint: { 'fill-pattern': 'ivory-hatch', 'fill-opacity': 0.92 },
   }
 }
 
@@ -164,7 +169,11 @@ export function getAllocatedLandsOutlineLayer() {
     id: LAYERS.ALLOCATED_LANDS_OUTLINE,
     type: 'line',
     source: 'allocated_lands',
-    paint: { 'line-color': '#E65100', 'line-width': 2 },
+    paint: {
+      'line-color': ALLOT_OUTLINE,
+      'line-width': ['interpolate', ['linear'], ['zoom'], 11, 0.8, 14, 1.4, 17, 2.2],
+      'line-opacity': 0.9,
+    },
   }
 }
 
@@ -181,9 +190,9 @@ export function getAllocatedLandsLabelsLayer() {
       'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
     },
     paint: {
-      'text-color': '#FFFFFF',
-      'text-halo-color': '#333333',
-      'text-halo-width': 1.5,
+      'text-color': '#f5efe1',
+      'text-halo-color': 'rgba(15,12,6,0.9)',
+      'text-halo-width': 1.6,
     },
   }
 }

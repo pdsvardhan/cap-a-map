@@ -22,7 +22,6 @@ const useMapStore = create((set, get) => ({
   selectedPlot: null,
   showLegend: false,
   roadMode: false,
-  flashSegmentId: null,
   colorMode: 'zoning',
   showNamedOnly: false,
   allocatedLandsVisible: true,
@@ -35,29 +34,19 @@ const useMapStore = create((set, get) => ({
   // Map internals (not reactive — stored as refs)
   _mapInstance: null,
   _plotsData: null,
-  _roadSegmentIndex: { segments: [], keyToId: new Map() },
-  _refreshNamedRoads: null,
 
   // Actions
   setLoadingStage: (stage) => set({ loadingStage: stage }),
   setLoadingError: (error) => set({ loadingError: error, loadingStage: LoadingStage.ERROR }),
   setReady: () => set({ isLoading: false, loadingStage: LoadingStage.READY }),
 
-  selectPlot: (plot) => {
-    set({ selectedPlot: plot })
-    if (plot?._segmentId != null) {
-      set({ flashSegmentId: plot._segmentId })
-    }
-  },
+  selectPlot: (plot) => set({ selectedPlot: plot }),
   clearPlot: () => set({ selectedPlot: null }),
 
   toggleLegend: () => set((s) => ({ showLegend: !s.showLegend })),
   toggleRoadMode: () => set((s) => ({ roadMode: !s.roadMode })),
   toggleNamedOnly: () => set((s) => ({ showNamedOnly: !s.showNamedOnly })),
   toggleAllocatedLands: () => set((s) => ({ allocatedLandsVisible: !s.allocatedLandsVisible })),
-
-  setFlashSegmentId: (id) => set({ flashSegmentId: id }),
-  clearFlash: () => set({ flashSegmentId: null }),
 
   setColorMode: (mode) => set({ colorMode: mode }),
   setActiveZoningGroups: (groups) => set({ activeZoningGroups: groups }),
@@ -67,8 +56,6 @@ const useMapStore = create((set, get) => ({
   // Internal setters (map instance, data refs)
   setMapInstance: (map) => set({ _mapInstance: map }),
   setPlotsData: (data) => set({ _plotsData: data }),
-  setRoadSegmentIndex: (index) => set({ _roadSegmentIndex: index }),
-  setRefreshNamedRoads: (fn) => set({ _refreshNamedRoads: fn }),
 }))
 
 export { LoadingStage }

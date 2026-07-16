@@ -83,3 +83,36 @@ export function getLanePattern(roadName) {
 
 /** All known road names (for display/validation). */
 export const KNOWN_ROAD_NAMES = Object.keys(ROAD_DATA)
+
+// A place-name token: capitalised, ≥4 letters, no digits/spaces/punctuation.
+const VILLAGE_TOKEN = /^[A-Z][a-z]{3,}$/
+
+/**
+ * Villages a named road traverses, parsed from the WB-EIA `remarks` string.
+ * Remarks encode the alignment's villages as a "; "-delimited chunk that is
+ * slash- or en-dash-separated (e.g. "…~12.5km; Nidamarru/Kuragallu/Mandadam").
+ * Only chunks that are mostly place-name tokens are accepted, so prose remarks
+ * (e.g. "NH-16 via … cable bridge", "8–9 lane") are not mis-read as villages.
+ * Returns [] when a road has no village list in its remarks.
+ */
+export function getRoadVillages(roadName) {
+  const rd = getRoadData(roadName)
+  if (!rd || !rd.remarks) return []
+  const out = []
+  for (const seg of rd.remarks.split(';')) {
+    const tokens = seg.replace(/–/g, '/').split('/').map((t) => t.trim()).filter(Boolean)
+    if (tokens.length < 2) continue
+    const villageLike = tokens.filter((t) => VILLAGE_TOKEN.test(t))
+    if (villageLike.length >= 2 && villageLike.length / tokens.length >= 0.6) {
+      for (const v of villageLike) if (!out.includes(v)) out.push(v)
+    }
+  }
+  return out
+}
+
+/** Road length in km, parsed from the "~N km" hint in the remarks (null if absent). */
+export function getRoadLengthKm(roadName) {
+  const rd = getRoadData(roadName)
+  const m = rd?.remarks?.match(/~\s*([\d.]+)\s*km/i)
+  return m ? Number(m[1]) : null
+}
