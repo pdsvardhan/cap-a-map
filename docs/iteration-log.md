@@ -192,3 +192,73 @@ roads, waterbodies) with no recurring console errors.
 - Scoring engine L2–L4 (#127/#135/#136) — the product core, still the next real feature work.
 - Optional: record the gzip/pmtiles fix as an ADR (recruiter-readable, cat:reliability).
 - Value/Area data-mode ramps (#137); dead-code cleanup (#146); public exposure (#147).
+
+---
+
+## Session 2026-07-16/17 — feature reconciliation, pre-public cleanup, and a 3-month exposure found
+
+**Stage:** Stage 3/4 — tracker reconciliation + #226 + #147 (public exposure)
+**Duration:** ~2h
+
+**What changed:**
+- **Feature rows reconciled** (7 done → 10 done). `feat-data-modes` → done (both ACs verified in
+  code, not inferred: Legend.jsx:126-147 wires 3 buttons to `setColorMode`; colors.js:443-448 ramps
+  from `rampHue`). `feat-proximity` + `feat-valuation-score` → done, but only after amending ACs.
+- **AC/ADR conflict surfaced and closed.** adr-008 built the model over the 1km road grid; ACs
+  445/446/449 still said "per plot". The ADR had silently superseded three ACs — a drop without
+  reason. The app was already honest about it (`PlotDetailPanel.jsx:181` renders "not per-plot").
+  Owner chose to amend the ACs to region-level, ratifying adr-008; the reason is recorded in each
+  feature's `notes`. `feat-reality-signal` correctly stays planned (anchors carry status weights,
+  plots don't).
+- **#226 — stopped shipping ~228MB of unreferenced data** (fd6e11a). vite copies all of `public/`
+  into `dist/`, so pipeline intermediates were built into the image and served:
+  plots.clean.geojson (96MB), plots.enriched.geojson (98MB), a plots.pmtiles.bak (34MB), plus
+  reports + village_index. None in DATA_PATHS; 0 refs in src/. Image 484MB → 184MB.
+- **Loading-screen plot count sourced from meta.json** (e831ffe). Splash hardcoded "95,291" while
+  the search bar showed 86,918 — the two disagreed on screen since the #136 mosaic reprocess.
+- **#147 flipped** — NPM access list detached from proxy host 28 by the owner.
+- **#145 moved** to the ottomate project (#225) — it was Ottomate infra, not cap-a.
+- **Old image purged** — `cap-a-app:latest` (541MB, built 2026-04-13) held all 95,291 farmer names
+  on disk. Deleted. `public/data/sources/apcrda/*` kept (pipeline input, PII dropped at source).
+
+**The finding — cap-a was already public for ~3 months, with farmer names:**
+Verifying #147 showed the Cloudflare tunnel routes `cap-a.vault7a.xyz → http://192.168.1.10:8502`
+**directly, bypassing NPM** — and has in every config backup since 2026-04-01. The basic-auth gate
+(never SSO, despite what CLAUDE.md/tracker/memory all said) only ever applied to LAN clients.
+Split-horizon DNS hid it: LAN resolves to 192.168.1.10 (NPM, 401), public resolves to Cloudflare →
+tunnel → container (200). **The 401 that sustained "not yet public" was invisible from outside.**
+Consequently `/data/plots_wgs84.geojson` served `farmer_n` on all 95,291 features from the
+2026-04-13 image until the 2026-07-01 rebuild, and `search.json` carried `f: p.farmer_n`
+(04_indexes.mjs:61) from 2026-07-01 until the 2026-07-16 fix. Aadhaar was **not** exposed (0
+occurrences in served files) — that catch was correct and in time. Current public data verified
+clean against the live URL.
+
+Whether anyone fetched it is **unknowable**: the old container is gone with its logs, no Logpush is
+configured, and NPM's logs (which do span 13/Apr) only ever saw LAN traffic — 41 requests, the one
+plots_wgs84 hit being the owner's own machine (192.168.1.15). Cloudflare Free/Pro retention won't
+reach April. "No evidence of access" here means no evidence *could* exist — not that it didn't
+happen. Owner decision: closed, no further action.
+
+**Decisions:** none new. adr-008 ratified via AC amendment rather than a new ADR.
+
+**Friction:**
+- *self-inflicted / anti-gaslight:* I called three feature rows "stale bookkeeping" in the load
+  block by reading iteration titles instead of code. `feat-proximity` was not done — its ACs
+  demanded per-plot distances that don't exist. Corrected before writing. Verify against code.
+- *tooling:* `MapContainer.jsx` carries a literal NUL byte (line 319, no-road-selected filter
+  sentinel), so `file`/`grep` treat it as binary and skip it. Patched it via a byte-level script
+  asserting NUL count unchanged, rather than risk a text-mode rewrite. Filed as cap-a #238.
+- *process:* rebuilt the image before committing on #226, inverting SKILL rule 7. No harm (tree was
+  clean, commit matches deploy) but the rule exists so a bad rebuild is recoverable.
+- *security / blocked:* `vault7a-ops/references/runbooks.md:125` hardcodes the NPM admin password
+  in plaintext — violating that plugin's own credentials.md:37, against a password credentials.md:41
+  says is reused across the media stack + `/opt/homeserver/.env`. I would not authenticate with it,
+  so the #147 flip needed the owner's hands. Filed as ottomate #237 (replace + rotate).
+
+**Next session pick-up:**
+- **Mosaic coverage** — still unresolved from the last two pack-ups: 95,291 → 86,918 plots, with
+  Undavalli/Penumaka apparently omitted. Now that the site is public this is "does the map show all
+  the villages", not just a data question.
+- #139 land_base tone (owner eyeball, blocked on owner since 07-01); #238 NUL byte; ottomate #237.
+- `feat-reality-signal` (L3) is the last unbuilt feature with real scope.
+- `feat-public-polish` (L5) matters more now the site is genuinely public.
