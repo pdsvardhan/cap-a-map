@@ -316,7 +316,7 @@ export default function MapContainer() {
       map.setFilter(LAYERS.PLOTS_HIGHLIGHT, ['==', ['get', 'pid'], pid])
     }
     if (map.getLayer(LAYERS.NAMED_ROADS_HIGHLIGHT)) {
-      const roadName = selectedPlot?._type === 'road' ? selectedPlot.name : ' '
+      const roadName = selectedPlot?._type === 'road' ? selectedPlot.name : ''
       map.setFilter(LAYERS.NAMED_ROADS_HIGHLIGHT, ['==', ['get', 'roadName'], roadName])
     }
   }, [selectedPlot])
