@@ -52,3 +52,7 @@ nul
 # Logs
 *.log
 npm-debug.log*
+
+# playwright
+test-results/
+playwright-report/
