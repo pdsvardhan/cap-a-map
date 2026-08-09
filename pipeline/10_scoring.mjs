@@ -3,16 +3,26 @@
  *
  * Computes an explainable, RELATIVE desirability index for every 1km-grid "Node"
  * cell, under two lenses (commercial / residential), from status-weighted anchor
- * proximity + road access + FSI − flood risk. No transaction prices (standing
- * non-goal); the output is an ordering, not a valuation.
+ * proximity + road access + FSI. No transaction prices (standing non-goal); the
+ * output is an ordering, not a valuation.
  *
  * Model (locked in adr-008):
  *   influence_i = base_weight(type, lens) × status_multiplier × exp(-d/DECAY_KM)
  *   anchorPart  = α·max(influence) + (1−α)·aggregate,  α = 0.6
  *                 aggregate = 1 − Π(1 − influence_i)   (noisy-OR: saturates at 1,
  *                 so accumulation never drowns out the dominant-anchor term)
- *   raw         = anchorPart + w_road·roadAccess + w_fsi·fsiNorm − floodPenalty
+ *   raw         = anchorPart + w_road·roadAccess + w_fsi·fsiNorm
  *   score       = min–max normalise(raw) → 0..100
+ *
+ * RETIRED 2026-08-09 — flood downside. §5 flags Kondaveeti Vagu inundation, and
+ * the factor targeted the only two villages the docs name as exposed (Undavalli,
+ * Penumaka). The move to the authoritative LPSMosaicDec2024 (#136) removed both
+ * villages from the dataset entirely — APCRDA's LPS mosaic does not contain them
+ * — so the penalty matched 0 of 161 cells and silently contributed nothing while
+ * still appearing in the model description. Removed rather than left as dead code;
+ * re-introducing flood exposure needs real geography (Kondaveeti Vagu alignment +
+ * elevation), not a village allowlist. Removal is numerically inert: verified
+ * identical scores for all 161 cells before/after.
  *
  * Inputs  : public/data/search.json, public/data/named_roads_index.json,
  *           public/data/named_roads.geojson,
@@ -43,8 +53,6 @@ const DECAY_BY_TYPE = { gateway: 4.0 }
 const AGG_TOP_K = 5
 const W_ROAD_C = 0.35, W_ROAD_R = 0.20
 const W_FSI_C = 0.25, W_FSI_R = 0.05
-// Flood is a real but SECONDARY downside (§5) — it discounts, it does not erase.
-const FLOOD_C = 0.12, FLOOD_R = 0.18
 
 // Golden rule: weight by status. Many 2014–19 MoUs never got built.
 const STATUS_MUL = {
@@ -132,10 +140,6 @@ const ANCHORS = [
   { name: 'Vijayawada gateway (Kanakadurga Varadhi)', deriveFrom: 'e3-east', status: 'operational', type: 'gateway' },
 ]
 
-// §5 flood downside: Kondaveeti Vagu inundated the region twice in a year;
-// low-lying plots near Undavalli / Penumaka carry real flood risk.
-const FLOOD_VILLAGES = new Set(['undavalli', 'penumaka'])
-
 // E3 = Seed Capital Road (frontage roughly doubles floor price, §4).
 // NH-16 links + major arterials per §2.
 const NH16_ROADS = new Set(['E5', 'E7', 'E9', 'E11', 'E13', 'E15'])
@@ -144,11 +148,13 @@ const MAJOR_ARTERIALS = new Set(['N6', 'N13', 'E5', 'E13'])
 // Sanity-gate reference: §4's sourced price bands (₹/sq.yd midpoints).
 //
 // Owner adjudicated 2026-07-16: where §4 (the sourced band table) and §7 (a prose
-// gradient summary) conflict, §4 wins. They genuinely contradict on Undavalli/
-// Penumaka — §4 puts them at 35–45k (High, level with Thullur), §7 ranks them below
-// Krishnayapalem/Nidamarru. Gating on §7 would have required cranking the flood
-// discount until the model contradicted §4's own prices, i.e. fitting the model to a
-// contradiction. Ananthavaram/Abbarajupalem are quoted as ₹2–4 cr/acre ≈ ₹4–8k/sq.yd.
+// gradient summary) conflict, §4 wins. Their genuine contradiction was over Undavalli/
+// Penumaka — §4 put them at 35–45k (High, level with Thullur), §7 ranked them below
+// Krishnayapalem/Nidamarru. That dispute is now MOOT: both villages are absent from the
+// authoritative LPSMosaicDec2024, so neither has plots to score. Their rows are removed
+// here rather than left to be skipped silently, which had quietly shrunk the reference
+// from n=12 to n=10 without saying so.
+// Ananthavaram/Abbarajupalem are quoted as ₹2–4 cr/acre ≈ ₹4–8k/sq.yd.
 //
 // Nelapadu is deliberately EXCLUDED: owner accepted that its operational + permanent
 // High Court anchors legitimately diverge from its stale 20–35k broker band. The score
@@ -160,7 +166,7 @@ const MAJOR_ARTERIALS = new Set(['N6', 'N13', 'E5', 'E13'])
 const PRICE_REF = {
   velagapudi: 52.5, rayapudi: 52.5,
   mandadam: 45, venkatapalem: 43,
-  thullur: 40, penumaka: 40, undavalli: 40,
+  thullur: 40,
   nidamarru: 35, krishnayapalem: 35, uddandarayunipalem: 35,
   dondapadu: 28, nowluru: 27.5,
 }
@@ -438,15 +444,13 @@ for (const [code, c] of cells) {
   const fsiVal = fa ? fa.sum / fa.n : FSI_MEAN
   const fsiNorm = Math.min(fsiVal / FSI_MAX, 1)
 
-  const flood = modalVillage && FLOOD_VILLAGES.has(modalVillage)
-  const rawC = part('c') + W_ROAD_C * roadAccess + W_FSI_C * fsiNorm - (flood ? FLOOD_C : 0)
-  const rawR = part('r') + W_ROAD_R * roadAccess + W_FSI_R * fsiNorm - (flood ? FLOOD_R : 0)
+  const rawC = part('c') + W_ROAD_C * roadAccess + W_FSI_C * fsiNorm
+  const rawR = part('r') + W_ROAD_R * roadAccess + W_FSI_R * fsiNorm
 
   // top-3 drivers (explainability)
   const drivers = [...infl].sort((a, b) => Math.max(b.c, b.r) - Math.max(a.c, a.r)).slice(0, 3)
     .map((i) => `${i.a.name} · ${i.d < 1 ? Math.round(i.d * 1000) + 'm' : i.d.toFixed(1) + 'km'} (${i.a.status})`)
   if (e3 > 0.5) drivers.push('E3 seed-road access')
-  if (flood) drivers.push('flood-prone (−)')
 
   rows.push({
     code, rawC, rawR, n: c.n,
@@ -480,9 +484,13 @@ for (const r of rows) {
   }
 }
 const pairs = [], gateRows = []
+const priceRefMissing = []
 for (const [vk, price] of Object.entries(PRICE_REF)) {
   const b = byVillage.get(vk)
-  if (!b) continue
+  // A reference village with no plots silently shrinks n. That is exactly how the
+  // reference went from 12 to 10 unnoticed when the mosaic dropped Undavalli/Penumaka,
+  // so collect and report rather than skipping quietly.
+  if (!b) { priceRefMissing.push(vk); continue }
   const score = b.sum / b.n
   pairs.push([score, price])
   gateRows.push({ vk, score, price })
@@ -500,7 +508,10 @@ console.log('\nPrice-reference check — model commercial score vs §4 price ban
 for (const g of [...gateRows].sort((a, b) => b.price - a.price)) {
   console.log(`  ${g.vk.padEnd(20)} price ${String(g.price).padStart(5)}   model ${g.score.toFixed(1).padStart(5)}`)
 }
-console.log(`  Spearman rho = ${rho.toFixed(3)}  (reported, not enforced; reference rho >= ${MIN_RHO}, n=${pairs.length})`)
+console.log(`  Spearman rho = ${rho.toFixed(3)}  (reported, not enforced; reference rho >= ${MIN_RHO}, n=${pairs.length}/${Object.keys(PRICE_REF).length})`)
+if (priceRefMissing.length) {
+  console.warn(`  NOTE: ${priceRefMissing.length} reference village(s) have no plots and were excluded from rho: ${priceRefMissing.join(', ')}`)
+}
 if (rhoWithNel != null) {
   console.log(`  rho incl. Nelapadu (owner-excluded, anchors trusted over its band) = ${rhoWithNel.toFixed(3)} (n=${withNel.length})`)
 }

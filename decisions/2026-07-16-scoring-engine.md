@@ -124,3 +124,42 @@ Datacenters, NRI Academy (Chinakakani), ACA Stadium (Navuluru) — their village
 the plot data (§6 flags that cluster as real but off the core land-pool). No coordinates were
 fabricated; the pipeline reports the skips on every run. Supplying real coordinates for these
 would sharpen the southern/edge scores.
+
+---
+
+## Amendment — 2026-08-09: flood downside retired
+
+**The flood factor was removed from the model.** It is gone, not disabled.
+
+§5 of `AMARAVATI_CONTEXT.md` flags a real downside: Kondaveeti Vagu inundated the capital
+region twice in a year, and low-lying land near **Undavalli / Penumaka** carries genuine flood
+risk. The model encoded that as a village allowlist — `FLOOD_VILLAGES = {undavalli, penumaka}`
+— discounting matched cells by `FLOOD_C = 0.12` (commercial) / `FLOOD_R = 0.18` (residential).
+
+The move to the authoritative **LPSMosaicDec2024** (#136) removed both villages from the
+dataset entirely: APCRDA's LPS mosaic contains **no plots** in Undavalli or Penumaka. Measured
+2026-08-09 — Penumaka 3,970 plots and Undavalli 1,124 in the previous scrape, **0 and 0** in
+the mosaic. The penalty therefore matched **0 of 161 cells**, and no cell has ever carried the
+`flood-prone (−)` driver since the reprocess, while the model docstring still advertised
+`− floodPenalty` as part of the formula. A factor that cannot fire is worse than no factor: it
+reads as covered risk that is not covered.
+
+**Removal is numerically inert.** Verified by regenerating `region_scores.json` and diffing all
+161 cells before/after: 0 cells changed on `c`, `r`, or `drivers`; ρ unchanged at 0.455.
+
+**Why not re-target it instead.** Flood exposure is geography, not village membership — it
+belongs to low-lying ground along the Kondaveeti Vagu alignment, which crosses villages that
+*are* in the dataset. Re-deriving it needs the vagu geometry plus elevation, which we do not
+currently hold. Rebuilding it on a fresh village allowlist would repeat the original mistake at
+a different address. Filed as a to-do rather than guessed at.
+
+**Price reference corrected alongside.** `PRICE_REF` still carried `penumaka: 40` and
+`undavalli: 40`. Both were silently skipped at gate time, which had quietly shrunk the
+reference from **n=12 to n=10** without ever saying so — the run log claimed only "n=10". The
+dead rows are removed, the log now prints `n=<used>/<total>`, and any future reference village
+with no plots is reported by name instead of vanishing. The §4-vs-§7 contradiction over
+Undavalli/Penumaka that this ADR previously adjudicated is now **moot**: neither village has
+plots to score.
+
+**Stale figure corrected.** This ADR previously recorded ρ = 0.398; the current value is
+**0.455** (n=10/10, reported not enforced).
