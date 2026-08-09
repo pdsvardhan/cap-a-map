@@ -1,5 +1,16 @@
 # Product Brief: Capital of Amaravati (cap-a)
 
+> ⚠️ **SUPERSEDED — pre-rebuild (before 2026-06).** This document describes the
+> original architecture (raw `plots_wgs84.geojson`, positional road-segment
+> mapping, the internal road-naming tool) and quotes the old **95,291 plots /
+> 48 villages** figures. The shipped dataset is the authoritative APCRDA
+> LPSMosaicDec2024: **86,918 plots across 24 villages** (Undavalli and Penumaka
+> are absent from that mosaic). The road tool was dropped per adr-002.
+>
+> Current sources of truth: `docs/UNDERSTANDING.md` (product + data reality),
+> `docs/AMARAVATI_CONTEXT.md` (scoring intelligence base), `decisions/` (ADRs).
+> Full doc backfill is tracked as to-do #394.
+
 ## Problem Statement
 
 No publicly accessible, interactive map of Amaravati Capital City's 95,000+ plots exists today. APCRDA data is locked away in ArcGIS servers and scattered across PDFs. Citizens, investors, and urban planning enthusiasts have no easy way to explore what is planned where.
