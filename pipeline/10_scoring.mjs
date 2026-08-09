@@ -93,7 +93,12 @@ const ANCHORS = [
   { name: 'Lok Bhavan / Raj Bhavan', village: 'Rayapudi', status: 'committed', type: 'govt' },
   { name: 'Happy Nest towers', village: 'Nelapadu', status: 'under-construction', type: 'residential' },
   // Education (Knowledge City)
-  { name: 'SRM University-AP', village: 'Neerukonda', status: 'operational', type: 'education' },
+  // Neerukonda is absent from the plot data (and was absent from the pre-mosaic
+  // scrape too), so the village centroid can never resolve. It is a 🟢 operational
+  // Knowledge-City anchor, not an off-pool edge one, so dropping it silently
+  // understated the whole southern education cluster. Placed from its own APCRDA
+  // allotment polygons instead (#449).
+  { name: 'SRM University-AP', deriveFrom: 'allotment:SRM University', status: 'operational', type: 'education' },
   { name: 'VIT-AP', village: 'Inavolu', status: 'operational', type: 'education' },
   { name: 'Amrita Vishwa Vidyapeetham', village: 'Kuragallu', status: 'operational', type: 'education' },
   { name: 'NID-AP', village: 'Sakhamuru', status: 'operational', type: 'education' },
@@ -351,9 +356,43 @@ if (!NH16_NAMES.length || !ART_NAMES.length) {
 }
 
 // ─── 5b. Resolve anchors to coordinates (skip + report unresolvable) ─────────
-// Most anchors sit at their village's centroid. One (the Vijayawada gateway)
-// derives its position from the E3 alignment's eastern terminus — the crossing —
-// because the mosaic contains no village there to average.
+// Most anchors sit at their village's centroid. Two derive differently:
+//   · the Vijayawada gateway, from the E3 alignment's eastern terminus (the
+//     crossing), because the mosaic contains no village there to average;
+//   · SRM University-AP, from its own APCRDA land-allotment polygons, because
+//     its village (Neerukonda) has never been in the plot data at all.
+const ringCentroid = (g) => {
+  const ring = g.type === 'Polygon' ? g.coordinates[0]
+    : g.type === 'MultiPolygon' ? g.coordinates[0][0] : null
+  if (!ring || !ring.length) return null
+  let sx = 0, sy = 0
+  for (const pt of ring) { sx += pt[0]; sy += pt[1] }
+  return { lon: sx / ring.length, lat: sy / ring.length }
+}
+
+// Named institutions carry authoritative geometry in LandAllotments. An anchor
+// whose village is missing can still be placed from its OWN allotted parcels —
+// real APCRDA geometry, not an invented coordinate. Multi-parcel institutions
+// are area-weighted so a 7-acre annexe cannot drag the anchor off the campus.
+const allotmentsFC = readJSON(D(path.join('sources', 'apcrda', 'land_allotments.geojson')))
+function allotmentCentroid(name) {
+  const re = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+  const hits = allotmentsFC.features.filter((f) => {
+    const p = f.properties || {}
+    return [p.name, p.text].some((v) => typeof v === 'string' && re.test(v))
+  })
+  if (!hits.length) return null
+  let wsum = 0, lon = 0, lat = 0
+  for (const h of hits) {
+    const c = ringCentroid(h.geometry)
+    if (!c) continue
+    const w = Number(h.properties?.area_ac) > 0 ? Number(h.properties.area_ac) : 1
+    wsum += w; lon += c.lon * w; lat += c.lat * w
+  }
+  if (!wsum) return null
+  return { lon: lon / wsum, lat: lat / wsum, parcels: hits.length, acres: wsum }
+}
+
 function deriveCoord(kind) {
   if (kind === 'e3-east') {
     let best = null
@@ -364,6 +403,7 @@ function deriveCoord(kind) {
     }
     return best
   }
+  if (kind.startsWith('allotment:')) return allotmentCentroid(kind.slice('allotment:'.length))
   return null
 }
 
@@ -373,7 +413,8 @@ for (const a of ANCHORS) {
   if (a.deriveFrom) {
     c = deriveCoord(a.deriveFrom)
     if (!c) { skipped.push(`${a.name} (derive:${a.deriveFrom} failed)`); continue }
-    console.log(`Derived ${a.name} from ${a.deriveFrom}: ${c.lon.toFixed(5)}, ${c.lat.toFixed(5)}`)
+    const prov = c.parcels ? ` (${c.parcels} parcel(s), ${c.acres.toFixed(1)} ac)` : ''
+    console.log(`Derived ${a.name} from ${a.deriveFrom}: ${c.lon.toFixed(5)}, ${c.lat.toFixed(5)}${prov}`)
   } else {
     c = villageCentroid.get(villageKey(a.village))
     if (!c) { skipped.push(`${a.name} (${a.village})`); continue }
@@ -382,14 +423,7 @@ for (const a of ANCHORS) {
 }
 
 // ─── 6. FSI per cell (#135: AvailableLands + LandAllotments) ─────────────────
-const ringCentroid = (g) => {
-  const ring = g.type === 'Polygon' ? g.coordinates[0]
-    : g.type === 'MultiPolygon' ? g.coordinates[0][0] : null
-  if (!ring || !ring.length) return null
-  let sx = 0, sy = 0
-  for (const pt of ring) { sx += pt[0]; sy += pt[1] }
-  return { lon: sx / ring.length, lat: sy / ring.length }
-}
+// (ringCentroid is defined in 5b, where the allotment anchor resolver needs it.)
 const fsiAgg = new Map() // code -> {sum, n}
 let fsiAll = 0, fsiAllN = 0
 for (const file of ['available_lands.geojson', 'land_allotments.geojson']) {

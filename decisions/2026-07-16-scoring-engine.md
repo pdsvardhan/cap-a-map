@@ -163,3 +163,44 @@ plots to score.
 
 **Stale figure corrected.** This ADR previously recorded ρ = 0.398; the current value is
 **0.455** (n=10/10, reported not enforced).
+
+---
+
+## Amendment — 2026-08-09: SRM University-AP placed from its own allotment (#449)
+
+**An anchor can now be resolved from APCRDA land-allotment geometry, not only from a village
+centroid.** Anchors resolve at their village's plot centroid; SRM University-AP's village,
+**Neerukonda**, is absent from the plot data — and was absent from the pre-mosaic scrape too, so
+this was never a regression from #136, just a gap nobody had closed. It was therefore dropped on
+every run since the engine was written.
+
+That matters because the earlier amendment lumped SRM in with four genuinely off-pool edge
+anchors (AIIMS, Pi Datacenters, NRI Academy, ACA Stadium), which §6 correctly excludes as real
+but outside the land pool. **SRM is not one of those.** It is a 🟢 operational Knowledge-City
+anchor sitting inside the capital, and dropping it silently understated the entire southern
+education cluster.
+
+**Resolution, without inventing coordinates.** `LandAllotments` carries SRM University as two
+allotted parcels (93 ac + 7 ac) with real polygon geometry. A new `deriveFrom:
+'allotment:<name>'` mode area-weights an institution's parcels into a single anchor point, so a
+small annexe cannot drag the anchor off the main campus. This keeps the standing rule intact —
+the pipeline still fabricates nothing and still reports every skip.
+
+**Measured effect** (161 cells, before/after):
+
+- anchors used **27 → 28**; skipped **5 → 4** (the four remaining are the genuine edge anchors).
+- **33 cells changed** — 31 on the residential lens, 18 on commercial. Education weights
+  residential far above commercial (`r 0.90` vs `c 0.50`), so the residential lens moves most,
+  which is the expected shape rather than a surprise.
+- Largest moves are the Kuragallu cells nearest the campus: `Node 10·11` **r +45 / c +21`,
+  `Node 10·12` r +33, `Node 9·11` r +29.
+- **23 cells now name SRM among their top-3 drivers**, so the change is visible in the panel's
+  explainability, not just in the number.
+- **ρ is unchanged at 0.455.** No `PRICE_REF` village lies near the campus, so the price gate
+  cannot see this correction either way. Recorded explicitly so the flat ρ is not misread as
+  "the fix did nothing".
+
+**Still skipped, deliberately (4).** AIIMS Mangalagiri, NRI Academy (Chinakakani), Pi
+Datacenters (Mangalagiri), ACA Stadium (Navuluru) — all off the core land-pool per §6. Note that
+`LandAllotments` does contain an "International Cricket Academy (MSK Prasad)" parcel; that is a
+different facility from the ACA stadium and was **not** used to resolve it.
