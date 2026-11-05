@@ -222,10 +222,10 @@ roads, waterbodies) with no recurring console errors.
   on disk. Deleted. `public/data/sources/apcrda/*` kept (pipeline input, PII dropped at source).
 
 **The finding — cap-a was already public for ~3 months, with farmer names:**
-Verifying #147 showed the Cloudflare tunnel routes `cap-a.vault7a.xyz → http://192.168.1.10:8502`
+Verifying #147 showed the Cloudflare tunnel routes `cap-a.vault7a.xyz → http://192.0.2.10:8502`
 **directly, bypassing NPM** — and has in every config backup since 2026-04-01. The basic-auth gate
 (never SSO, despite what CLAUDE.md/tracker/memory all said) only ever applied to LAN clients.
-Split-horizon DNS hid it: LAN resolves to 192.168.1.10 (NPM, 401), public resolves to Cloudflare →
+Split-horizon DNS hid it: LAN resolves to 192.0.2.10 (NPM, 401), public resolves to Cloudflare →
 tunnel → container (200). **The 401 that sustained "not yet public" was invisible from outside.**
 Consequently `/data/plots_wgs84.geojson` served `farmer_n` on all 95,291 features from the
 2026-04-13 image until the 2026-07-01 rebuild, and `search.json` carried `f: p.farmer_n`
@@ -235,7 +235,7 @@ clean against the live URL.
 
 Whether anyone fetched it is **unknowable**: the old container is gone with its logs, no Logpush is
 configured, and NPM's logs (which do span 13/Apr) only ever saw LAN traffic — 41 requests, the one
-plots_wgs84 hit being the owner's own machine (192.168.1.15). Cloudflare Free/Pro retention won't
+plots_wgs84 hit being the owner's own machine (192.0.2.15). Cloudflare Free/Pro retention won't
 reach April. "No evidence of access" here means no evidence *could* exist — not that it didn't
 happen. Owner decision: closed, no further action.
 

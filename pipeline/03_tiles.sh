@@ -15,7 +15,7 @@
 # Usage (from repo root):  bash pipeline/03_tiles.sh
 set -euo pipefail
 
-SERVER="pdsv@192.168.1.10"
+SERVER="pdsv@192.0.2.10"
 WORK="/tmp/capa-tiling"
 LOCAL_IN="public/data/plots.enriched.geojson"
 LOCAL_OUT="public/data/plots.pmtiles"
